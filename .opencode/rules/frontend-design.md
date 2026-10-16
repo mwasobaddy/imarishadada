@@ -41,6 +41,71 @@ npx shadcn@latest add @aceternity/spotlight @magicui/marquee
 
 Installed components are vendored into `components/ui/`. They are yours to edit. Fix `'use client'` boundaries, hydration errors, and accessibility on arrival — the registry does not check those.
 
+## Brand palette — derived by measurement, not assumed (2026-10-15)
+
+**#E30B5D is the brand colour and holds the dominant surface role** — announcement bar,
+stats band, closing CTA band. **#004B49 is the accent.** The deep green #14342a that
+previously held those surfaces is retired.
+
+Every ratio below is **computed** with WCAG relative luminance. Recompute before changing
+any token; do not eyeball.
+
+### Against the page background `#F4F8F1` (`--color-surface-warm`)
+
+| Colour | Ratio | Verdict |
+|---|---|---|
+| `--color-ink` `#1C1917` | 16.28:1 | AAA, all sizes |
+| `--color-accent` `#004B49` | 9.29:1 | AAA, all sizes |
+| `--color-brand-600` `#C00950` | 5.75:1 | AA, all sizes |
+| `--color-ink-muted` `#57534E` | 7.10:1 | AAA |
+| **`--color-brand` `#E30B5D`** | **4.37:1** | **LARGE TEXT / UI ONLY** |
+
+### On the brand surface `#E30B5D`
+
+| Foreground | Ratio | Verdict |
+|---|---|---|
+| pure white `#FFFFFF` | 4.70:1 | AA, all sizes |
+| `#F4F8F1` (page bg) | 4.37:1 | large only — **do not use** |
+| `--color-accent` `#004B49` | 2.13:1 | **FAIL — never** |
+
+### The two rules that matter
+
+**1. `#E30B5D` fails as small text on a light background. Use `--color-brand-600`
+`#C00950` (5.75:1) instead** — same hue, dark enough for labels, links and eyebrows at
+any size. This is why there are two brand tokens.
+
+**2. On the brand surface, text must be 100% white — opacity variants fail.**
+
+| White at | Ratio | Verdict |
+|---|---|---|
+| 100% | 4.70:1 | AA |
+| 85% | 3.64:1 | large/UI only |
+| 70% | 2.80:1 | **FAIL** |
+| 60% | 2.33:1 | **FAIL** |
+
+Never write `text-ink-inverse/70` on a brand band. If text needs to feel softer, use a
+**larger size** rather than lower opacity. `--color-ink-inverse` is deliberately pure
+white, not the page background, for this reason.
+
+### Other measured facts
+
+- White on `--color-brand-600` = 6.18:1 — so `#C00950` also works as a band surface if
+  `4.70:1` on white ever feels tight. One token change.
+- `--color-accent` is **2.13:1** on the brand surface — it must never appear there.
+- `--color-pattern` `#7C8A86` = 3.35:1 on the page background: the neutral used for
+  background hexagon fields so they never compete with copy.
+- `#E30B5D` as a *button* background with a white label is **4.70:1 — legal**. The same
+  hex as *text* on a light background is not. Same colour, opposite verdict.
+
+### 60/30/10
+
+- **60%** — ground: `--color-surface-warm` `#F4F8F1`, white cards
+- **30%** — brand `#E30B5D`: announcement bar, stats band, closing CTA band
+- **10%** — accent `#004B49` for Donate buttons and secondary actions; `--color-brand-600`
+  for headings and links; `--color-pattern` for background fields
+
+If a page reads as all-magenta, the 30% share has crept. Check the band sizes.
+
 ## Break the AI monoculture
 
 Do not emit the default Tailwind hero — centred `<h1>`, `bg-gradient-to-b from-slate-50`, three identical cards, `rounded-xl shadow-lg`. Every section must be justified by the content.
