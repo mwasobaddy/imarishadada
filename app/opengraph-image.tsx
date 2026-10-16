@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Imarisha Dada — Empowering girls and young women in Kibera, Nairobi";
+export const alt = "Imarisha Dada — Empowering Girls and Young Women in Kibera, Nairobi, Nairobi";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

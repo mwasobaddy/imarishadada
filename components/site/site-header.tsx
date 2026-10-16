@@ -95,12 +95,12 @@ export function SiteHeader() {
     >
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-50 focus:rounded-md focus:bg-brand-800 focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-ink-inverse"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-50 focus:rounded-md focus:bg-brand-600 focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-ink-inverse"
       >
         Skip to content
       </a>
 
-      <div className="border-b border-brand-900/10 bg-surface-warm/90 backdrop-blur-md">
+      <div className="border-b border-brand/20 bg-surface-warm/90 backdrop-blur-md">
         <nav
           aria-label="Main"
           className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3 sm:px-8"
@@ -109,7 +109,7 @@ export function SiteHeader() {
             href="/"
             className="flex items-baseline gap-2 rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-700"
           >
-            <span className="text-lg font-semibold tracking-tight text-brand-900">
+            <span className="text-lg font-semibold tracking-tight text-brand-600">
               Imarisha Dada
             </span>
             <span className="hidden text-xs text-ink-muted sm:inline">Empower a Sister</span>
@@ -178,7 +178,7 @@ export function SiteHeader() {
             aria-label="Dismiss menu"
             tabIndex={-1}
             onClick={() => setOpen(false)}
-            className="fixed inset-0 z-40 cursor-default bg-brand-900/20 lg:hidden"
+            className="fixed inset-0 z-40 cursor-default bg-brand/20 lg:hidden"
           />
           <div
             ref={sheetRef}
@@ -186,7 +186,7 @@ export function SiteHeader() {
             role="dialog"
             aria-modal="true"
             aria-label="Menu"
-            className="fixed inset-x-0 top-[57px] z-50 max-h-[calc(100dvh-57px)] overflow-y-auto border-b border-brand-900/10 bg-surface-warm px-5 py-6 shadow-lg sm:px-8 lg:hidden"
+            className="fixed inset-x-0 top-[57px] z-50 max-h-[calc(100dvh-57px)] overflow-y-auto border-b border-brand/20 bg-surface-warm px-5 py-6 shadow-lg sm:px-8 lg:hidden"
           >
             <ul className="flex flex-col gap-1">
               {NAV_ITEMS.map((item) => (
@@ -200,7 +200,7 @@ export function SiteHeader() {
                 </li>
               ))}
             </ul>
-            <div className="mt-6 border-t border-brand-900/10 pt-5">
+            <div className="mt-6 border-t border-brand/20 pt-5">
               <LocaleSwitcher open={localeOpen} setOpen={setLocaleOpen} />
             </div>
           </div>
@@ -252,7 +252,7 @@ function LocaleSwitcher({
         <ul
           role="listbox"
           aria-label="Language"
-          className="absolute right-0 z-50 mt-1 min-w-40 rounded-lg border border-brand-900/10 bg-surface-warm py-1 shadow-lg"
+          className="absolute right-0 z-50 mt-1 min-w-40 rounded-lg border border-brand/20 bg-surface-warm py-1 shadow-lg"
         >
           {live.map((locale) => (
             <li key={locale.code} role="option" aria-selected={locale.code === live[0]?.code}>

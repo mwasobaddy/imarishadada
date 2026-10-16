@@ -50,18 +50,18 @@ export const BentoGridItem = ({
     <>
       {header}
       <div className="flex h-full flex-col justify-between gap-4">
-        <div className="text-accent transition-colors group-hover/bento:text-accent-bright">
+        <div className="text-secondary transition-colors group-hover/bento:text-secondary-bright">
           {icon}
         </div>
 
         <div>
           {stat ? (
-            <p className="tabular mb-2 text-2xl font-semibold tracking-tight text-brand-900">
+            <p className="tabular mb-2 text-2xl font-semibold tracking-tight text-brand-600">
               {stat}
             </p>
           ) : null}
 
-          <h3 className="font-sans text-lg font-semibold tracking-tight text-brand-900">
+          <h3 className="font-sans text-lg font-semibold tracking-tight text-brand-600">
             {title}
           </h3>
 
@@ -74,7 +74,7 @@ export const BentoGridItem = ({
   );
 
   const shell = cn(
-    "group/bento rounded-card border border-brand-900/10 bg-white p-6 transition-colors duration-200 hover:border-accent/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700",
+    "group/bento rounded-card border border-brand/20 bg-white p-6 transition-colors duration-200 hover:border-accent/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700",
     className,
   );
 

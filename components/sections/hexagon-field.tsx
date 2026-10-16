@@ -69,7 +69,7 @@ export function HexagonField() {
       const y = next.y - box.top;
       if (x < 0 || y < 0 || x > box.width || y > box.height) return;
 
-      const radiusPx = next.strong ? 190 : 120;
+      const radiusPx = next.strong ? 118 : 88;
 
       setHighlight({
         cells: hexCellsAround(x, y, {
@@ -163,7 +163,7 @@ export function HexagonField() {
         radius={R}
         direction={DIRECTION}
         strokeDasharray="4 3"
-        className="h-full w-full fill-brand-800/[0.02] stroke-accent/12 stroke-[0.5]"
+        className="h-full w-full fill-pattern/[0.04] stroke-pattern/[0.30] stroke-[0.5]"
       />
 
       {/* Hover / focus highlight, layered on top of the same grid. High
@@ -176,8 +176,8 @@ export function HexagonField() {
           className={
             "h-full w-full transition-opacity duration-300 " +
             (highlight?.strong
-              ? "fill-accent/25 stroke-accent/55 stroke-[0.9]"
-              : "fill-accent/15 stroke-accent/40 stroke-[0.8]")
+              ? "fill-brand/10 stroke-brand/30 stroke-[0.8]"
+              : "fill-brand/[0.06] stroke-brand/20 stroke-[0.7]")
           }
         />
       ) : null}

@@ -30,7 +30,7 @@ export function GivingWays({ tiers }: { tiers: GivingTier[] }) {
           </p>
           <h2
             id="giving-heading"
-            className="mt-3 text-3xl font-semibold tracking-tight text-brand-900 sm:text-4xl"
+            className="mt-3 text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
           >
             What your gift actually does
           </h2>
@@ -49,9 +49,9 @@ export function GivingWays({ tiers }: { tiers: GivingTier[] }) {
               <Link
                 href="/donate"
                 data-hex-focus
-                className="group flex h-full flex-col rounded-card border border-brand-900/10 bg-white p-6 transition-colors hover:border-accent/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
+                className="group flex h-full flex-col rounded-card border border-brand/20 bg-white p-6 transition-colors hover:border-secondary/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
               >
-                <span className="tabular text-2xl font-semibold tracking-tight text-brand-900">
+                <span className="tabular text-2xl font-semibold tracking-tight text-brand-600">
                   {formatKsh(tier.amount)}
                 </span>
                 <span className="mt-2 flex-1 text-sm leading-relaxed text-ink-muted">
@@ -76,7 +76,7 @@ export function GivingWays({ tiers }: { tiers: GivingTier[] }) {
           </Link>
           <Link
             href="/ways-to-give"
-            className="inline-flex min-h-12 items-center rounded-lg px-2 text-base font-medium text-brand-800 underline decoration-brand-800/30 underline-offset-4 hover:decoration-brand-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-700"
+            className="inline-flex min-h-12 items-center rounded-lg px-2 text-base font-medium text-brand-600 underline decoration-brand-600/30 underline-offset-4 hover:decoration-brand-600 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-700"
           >
             All ways to give
           </Link>

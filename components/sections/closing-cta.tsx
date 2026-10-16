@@ -1,6 +1,6 @@
 export function ClosingCta() {
   return (
-    <section aria-labelledby="closing-heading" className="bg-brand-900 py-section text-ink-inverse">
+    <section aria-labelledby="closing-heading" className="bg-brand py-section text-ink-inverse">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:gap-16">
           <div>
@@ -10,7 +10,7 @@ export function ClosingCta() {
             >
               Every girl here was someone nobody was watching.
             </h2>
-            <p className="measure mt-5 text-lg text-ink-inverse/75">
+            <p className="measure mt-5 text-lg text-ink-inverse">
               They came to us, and they changed their own trajectory. Your gift keeps
               the door open for the next one.
             </p>
@@ -29,7 +29,7 @@ export function ClosingCta() {
             >
               Partner with us
             </a>
-            <p className="text-sm text-ink-inverse/60">
+            <p className="text-sm text-ink-inverse">
               M-Pesa and card. Receipts for every gift.
             </p>
           </div>

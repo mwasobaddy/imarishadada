@@ -19,7 +19,7 @@ import { HERO_PORTRAIT } from "@/lib/data/hero-portrait";
 import { buildLanguageAlternates, jsonLdScript, webSiteJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Imarisha Dada — Empowering Girls and Young Women in Kibera",
+  title: "Imarisha Dada — Empowering Girls and Young Women in Kibera, Nairobi",
   description:
     "Girl-led organisation in Kibera, Nairobi supporting school re-entry, safe spaces and economic empowerment for girls and young mothers.",
   alternates: {
@@ -30,13 +30,13 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_KE",
     url: "/",
-    title: "Imarisha Dada — Empowering Girls and Young Women in Kibera",
+    title: "Imarisha Dada — Empowering Girls and Young Women in Kibera, Nairobi",
     description:
       "Girl-led organisation in Kibera, Nairobi supporting school re-entry, safe spaces and economic empowerment for girls and young mothers.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Imarisha Dada — Empowering Girls and Young Women in Kibera",
+    title: "Imarisha Dada — Empowering Girls and Young Women in Kibera, Nairobi",
     description:
       "Girl-led organisation in Kibera, Nairobi supporting school re-entry, safe spaces and economic empowerment for girls and young mothers.",
   },

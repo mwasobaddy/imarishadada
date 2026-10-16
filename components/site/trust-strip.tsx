@@ -24,12 +24,12 @@ export function TrustStrip({
   if (items.length === 0) return null;
 
   return (
-    <section aria-label="Registration and accountability" className="border-y border-brand-900/10 bg-brand-50">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-8 gap-y-3 px-5 py-5 text-sm text-brand-900 sm:px-8">
+    <section aria-label="Registration and accountability" className="border-y border-brand/20 bg-brand-50">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-8 gap-y-3 px-5 py-5 text-sm text-brand-600 sm:px-8">
         {items.map((item, i) => (
           <p key={item} className="flex items-center gap-2">
             {i > 0 ? (
-              <span aria-hidden="true" className="text-brand-800/40">
+              <span aria-hidden="true" className="text-brand-600/40">
                 ·
               </span>
             ) : null}

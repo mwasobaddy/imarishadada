@@ -153,28 +153,62 @@
    ========================================================================== */
 
 @theme {
-  /* Brand — deep Kenyan green */
-  --color-brand-900: #14342a;
-  --color-brand-800: #1b4332;
-  --color-brand-700: #2d6a4f;
-  --color-brand-600: #3f8163;
-  --color-brand-100: #d8e8de;
-  --color-brand-50: #eef5f0;
+  /* ---- Brand palette --------------------------------------------------
+     #E30B5D is the brand colour. It occupies the DOMINANT surface role that
+     the deep green #14342a used to hold — announcement bar, stats band and
+     closing CTA band. #004B49 is the accent.
 
-  /* Accent — terracotta clay. `--color-accent` is text-safe (5.35:1 on warm). */
-  --color-accent: #a34e2b;
-  --color-accent-bright: #c4643c;
-  --color-accent-50: #fbf0e9;
+     Ratios are measured against --color-surface-warm (#F4F8F1) and against
+     the brand surface. Recompute before changing either token.
 
-  /* Surfaces */
-  --color-surface-warm: #fdf8f3;
-  --color-surface-sand: #f4e9dc;
-  --color-surface-deep: #14342a;
+       brand       #E30B5D  white on it 4.70:1 (AA) | as text on bg 4.37 (LARGE ONLY)
+       brand-600   #C00950  white on it 6.18:1 (AA) | as text on bg 5.75:1 (AA)
+       accent      #004B49  white on it 9.99:1 (AAA) | as text on bg 9.29:1 (AAA)
+  */
+
+  /* Brand — the dominant colour. Dark/saturated surfaces only. */
+  --color-brand: #e30b5d;
+  --color-brand-bright: #f2599c;
+  /* Text-safe brand. Use for any brand-coloured TEXT or link on a light
+     background, at any size. #E30B5D itself only reaches 4.37:1 there. */
+  --color-brand-600: #c00950;
+  /* Focus rings, borders, decorative rules. Same shade as brand-600:
+     5.75:1 on the page background clears the 3:1 non-text threshold. */
+  --color-brand-700: #c00950;
+  --color-brand-100: #fbd5e2;
+  --color-brand-50: #fdeef4;
+
+  /* Same colour, second name. Kept so shadcn's `secondary` button variant
+     resolves. There is only one brand hue — do not treat these as two
+     separate brand colours. */
+  --color-secondary: #e30b5d;
+  --color-secondary-bright: #f2599c;
+  --color-secondary-600: #c00950;
+  --color-secondary-50: #fdeef4;
+
+  /* Accent — dark teal. Safe for text at any size on light backgrounds.
+     2.13:1 on the brand surface, so never place it there. */
+  --color-accent: #004b49;
+  --color-accent-bright: #1a6b68;
+  --color-accent-600: #003836;
+  --color-accent-50: #e6f0ef;
+
+  /* Surfaces. --color-surface-warm is the page background every brand ratio
+     is measured against. Changing it invalidates the whole table. */
+  --color-surface-warm: #f4f8f1;
+  --color-surface-sand: #e6efe4;
+  --color-surface-deep: #e30b5d;
 
   /* Ink */
   --color-ink: #1c1917;
   --color-ink-muted: #57534e;
-  --color-ink-inverse: #fdf8f3;
+  /* Pure white, NOT the page background. On the brand surface #F4F8F1 text
+     drops to 4.37:1 (large only); pure white holds 4.70:1 (AA). */
+  --color-ink-inverse: #ffffff;
+
+  /* Neutral for background patterns. 3.35:1 on the page background, which
+     clears the 3:1 non-text threshold without competing with the copy. */
+  --color-pattern: #7c8a86;
 
   /* Type scale — deliberate contrast between display and body */
   --text-display: 3.75rem;

@@ -28,7 +28,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Imarisha Dada — Empowering Girls and Young Women in Kibera",
+    default: "Imarisha Dada — Empowering Girls and Young Women in Kibera, Nairobi",
     template: "%s | Imarisha Dada",
   },
   description:
@@ -47,13 +47,13 @@ export const metadata: Metadata = {
     siteName: "Imarisha Dada",
     locale: "en_KE",
     url: "/",
-    title: "Imarisha Dada — Empowering Girls and Young Women in Kibera",
+    title: "Imarisha Dada — Empowering Girls and Young Women in Kibera, Nairobi",
     description:
       "Girl-led organisation in Kibera, Nairobi supporting school re-entry, safe spaces and economic empowerment for girls and young mothers.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Imarisha Dada — Empowering Girls and Young Women in Kibera",
+    title: "Imarisha Dada — Empowering Girls and Young Women in Kibera, Nairobi",
     description:
       "Girl-led organisation in Kibera, Nairobi supporting school re-entry, safe spaces and economic empowerment for girls and young mothers.",
   },

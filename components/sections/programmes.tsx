@@ -25,19 +25,19 @@ export function Programmes({ programmes }: { programmes: Programme[] }) {
           <div>
             <h2
               id="programmes-heading"
-              className="max-w-2xl text-3xl font-semibold tracking-tight text-brand-900 sm:text-4xl"
+              className="max-w-2xl text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
             >
               Three programmes, one aim: a girl in Kibera decides her own future
             </h2>
             <p className="measure mt-4 text-lg text-ink-muted">
-              School re-entry, economic empowerment, and safe spaces — designed with
+              School re-entry, economic empowerment, and safe spaces designed with
               girls and community leaders, not delivered to them.
             </p>
           </div>
 
           <Link
             href="/programmes"
-            className="inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2 text-sm font-medium text-brand-800 underline decoration-brand-800/30 underline-offset-4 hover:decoration-brand-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-700"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2 text-sm font-medium text-brand-600 underline decoration-brand-600/30 underline-offset-4 hover:decoration-brand-600 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-700"
           >
             All programmes
             <svg
@@ -76,7 +76,7 @@ export function Programmes({ programmes }: { programmes: Programme[] }) {
                 </svg>
               }
               data-hex-focus
-              className="group rounded-card border border-brand-900/10 bg-white transition-colors hover:border-accent/40"
+              className="group rounded-card border border-brand/20 bg-white transition-colors hover:border-secondary/50"
               href={`/programmes/${programme.slug}`}
               stat={programme.stat ?? undefined}
             />

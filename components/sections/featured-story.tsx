@@ -26,7 +26,7 @@ export function FeaturedStory({ story }: { story: FeaturedStory | null }) {
             </p>
             <h2
               id="story-heading"
-              className="mt-3 text-3xl font-semibold tracking-tight text-brand-900 sm:text-4xl"
+              className="mt-3 text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
             >
               {anonymised ? "A story we can only tell partly" : story.slug.replace(/-/g, " ")}
             </h2>
@@ -36,7 +36,7 @@ export function FeaturedStory({ story }: { story: FeaturedStory | null }) {
 
             <Link
               href={`/stories/${story.slug}`}
-              className="mt-8 inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2 text-sm font-medium text-brand-800 underline decoration-brand-800/30 underline-offset-4 hover:decoration-brand-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-700"
+              className="mt-8 inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2 text-sm font-medium text-brand-600 underline decoration-brand-600/30 underline-offset-4 hover:decoration-brand-600 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-700"
             >
               Read her story
               <svg
@@ -54,12 +54,12 @@ export function FeaturedStory({ story }: { story: FeaturedStory | null }) {
             </Link>
           </div>
 
-          <figure className="rounded-card border border-brand-900/10 bg-white p-8 sm:p-10">
-            <blockquote className="measure text-xl leading-relaxed text-brand-900 sm:text-2xl">
+          <figure className="rounded-card border border-brand/20 bg-white p-8 sm:p-10">
+            <blockquote className="measure text-xl leading-relaxed text-brand-600 sm:text-2xl">
               <p>“{story.quote}”</p>
             </blockquote>
 
-            <figcaption className="mt-6 border-t border-brand-900/10 pt-5 text-sm">
+            <figcaption className="mt-6 border-t border-brand/20 pt-5 text-sm">
               {anonymised ? (
                 <span className="text-ink-muted">
                   Shared with consent. Name withheld to protect privacy.
