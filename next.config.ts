@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
     qualities: [60, 75, 85],
     // Widens the small-variant ladder so a 390–430px phone gets a ~400px image
     // instead of being rounded up to the 640px device size.
-    imageSizes: [400, 480, 640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [64, 96, 128, 160, 200, 400, 480, 640, 750, 828, 1080, 1200, 1920],
     // Every field is specified explicitly. Omitting protocol/port/pathname/search
     // implies a `**` wildcard, which is not recommended — it lets the optimiser
     // fetch URLs you did not intend.
