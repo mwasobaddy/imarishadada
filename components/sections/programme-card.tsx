@@ -24,7 +24,7 @@ export function ProgrammeCard({ programme }: { programme: Programme }) {
     <Link
       href={`/programmes/${programme.slug}`}
       data-hex-focus
-      className="group relative flex min-h-80 flex-col justify-end overflow-hidden rounded-card border border-brand/20 bg-brand-900 p-6 transition-colors hover:border-secondary/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
+      className="group relative flex min-h-80 flex-col justify-end overflow-hidden rounded-card border border-brand/20 bg-brand p-6 transition-colors hover:border-secondary/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
     >
       {programme.imagePath ? (
         <Image
@@ -37,7 +37,7 @@ export function ProgrammeCard({ programme }: { programme: Programme }) {
       ) : (
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-[linear-gradient(150deg,var(--color-brand-50)_0%,var(--color-brand-100)_55%,var(--color-brand-200,#f6bcd0)_100%)]"
+          className="absolute inset-0 bg-[linear-gradient(150deg,var(--surface-lilac)_0%,var(--surface-pink)_55%,var(--brand-tint)_100%)]"
         />
       )}
 
@@ -45,12 +45,12 @@ export function ProgrammeCard({ programme }: { programme: Programme }) {
           contrast, so full darkening would flatten the imagery. */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 bg-[linear-gradient(to_top,rgba(20,52,42,0.92)_0%,rgba(20,52,42,0.62)_42%,rgba(20,52,42,0.12)_72%,transparent_100%)]"
+        className="absolute inset-0 bg-[linear-gradient(to_top,rgba(42,20,69,0.92)_0%,rgba(42,20,69,0.62)_42%,rgba(42,20,69,0.12)_72%,transparent_100%)]"
       />
 
       <div className="relative">
         {programme.statLabel ? (
-          <p className="tabular mb-2 text-sm font-semibold tracking-wide text-secondary uppercase">
+          <p className="tabular mb-2 text-sm font-semibold tracking-wide text-brand-100 uppercase">
             {programme.statLabel}
           </p>
         ) : null}
