@@ -21,16 +21,14 @@ import {
 /**
  * Eyebrow label.
  *
- * The text stays on `--color-accent` (#004B49, 9.29:1) because this is
- * 14px small text and `--color-secondary` (#E30B5D) only reaches 4.37:1 on the
- * page background — it would fail WCAG AA here. The rule beside it is purely
- * decorative, so secondary is legal and carries the brand colour at the top of
- * the page.
+ * `--color-accent` (pink) measures 5.27:1 on the light page background, so it
+ * is safe for 14px text in both modes. The rule beside it is decorative and
+ * carries the brand fill at 40% so it reads as a quiet divider, not a label.
  */
 function Eyebrow() {
   return (
     <p className="hero-enter mb-5 flex items-center gap-2 text-sm font-medium tracking-wide text-accent uppercase">
-      <span aria-hidden="true" className="h-px w-8 bg-secondary" />
+      <span aria-hidden="true" className="h-px w-8 bg-brand/40" />
       :: Kibera, Nairobi ::
     </p>
   );
@@ -55,7 +53,7 @@ export function Hero({
     <section
       data-hex-root
       aria-labelledby="hero-title"
-      className="relative overflow-hidden bg-surface-warm pt-16 pb-16 sm:pt-20 lg:pt-24 lg:pb-24"
+      className="relative overflow-hidden bg-surface pt-16 pb-16 sm:pt-20 lg:pt-24 lg:pb-24"
     >
       {/* Text scrim. Protects headline contrast over the hexagon field: an opaque
           warm wash that fades out to the right.
@@ -65,7 +63,7 @@ export function Hero({
           hover (the CTAs on the left), silently killing the interaction. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(105deg,var(--color-surface-warm)_0%,var(--color-surface-warm)_42%,color-mix(in_oklab,var(--color-surface-warm)_55%,transparent)_72%,transparent_100%)] lg:bg-[linear-gradient(100deg,var(--color-surface-warm)_0%,var(--color-surface-warm)_46%,color-mix(in_oklab,var(--color-surface-warm)_50%,transparent)_80%,transparent_100%)]"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(105deg,var(--surface)_0%,var(--surface)_42%,color-mix(in_oklab,var(--surface)_55%,transparent)_72%,transparent_100%)] lg:bg-[linear-gradient(100deg,var(--surface)_0%,var(--surface)_46%,color-mix(in_oklab,var(--surface)_50%,transparent)_80%,transparent_100%)]"
       />
 
       <HexagonField />
@@ -73,7 +71,7 @@ export function Hero({
       {/* Warm wash — CSS only, no shader, no canvas. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-32 -top-24 size-[34rem] rounded-full bg-surface-sand opacity-70 blur-3xl"
+        className="pointer-events-none absolute -right-32 -top-24 size-[34rem] rounded-full bg-surface-lilac opacity-70 blur-3xl"
       />
 
       <div className="relative mx-auto grid max-w-6xl gap-12 px-5 sm:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16">
@@ -93,7 +91,7 @@ export function Hero({
           >
             <a
               href={primaryCta.href}
-              className="inline-flex min-h-12 items-center rounded-lg bg-accent px-7 text-base font-semibold text-white transition-colors hover:bg-accent/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
+              className="inline-flex min-h-12 items-center rounded-lg bg-gold px-7 text-base font-semibold text-gold-ink transition-colors hover:bg-gold/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
             >
               {primaryCta.label}
             </a>
