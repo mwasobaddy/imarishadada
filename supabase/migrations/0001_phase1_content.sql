@@ -188,3 +188,113 @@ create trigger giving_tiers_set_updated_at  before update on public.giving_tiers
 drop trigger if exists stories_set_updated_at       on public.stories;
 create trigger stories_set_updated_at       before update on public.stories
   for each row execute function public.set_updated_at();
+-- ---------------------------------------------------------------------------
+-- site_sections — editorial copy for page sections
+-- ---------------------------------------------------------------------------
+-- Why this exists: section headings and intro copy were hardcoded in
+-- components, which meant an editor could not change a word without a deploy
+-- and the page could drift from the admin. This makes section copy
+-- first-class configuration alongside the content it introduces.
+create table if not exists public.site_sections (
+  id            uuid primary key default gen_random_uuid(),
+  section_key   text not null unique,
+  eyebrow       text,
+  heading       text not null,
+  body          text,
+  cta_label     text,
+  cta_href      text,
+  sort_order    int  not null default 0,
+  active        boolean not null default true,
+  created_at    timestamptz not null default now(),
+  updated_at    timestamptz not null default now(),
+
+  constraint site_sections_key_format check (section_key ~ '^[a-z0-9-]+$')
+);
+
+comment on table public.site_sections is
+  'Editorial copy for page sections. Editor-managed; changing a heading must not require a redeploy.';
+
+create index if not exists site_sections_active_idx
+  on public.site_sections (active, sort_order);
+
+alter table public.site_sections enable row level security;
+
+create policy "site_sections_public_read"
+  on public.site_sections for select
+  to anon, authenticated
+  using (active = true);
+-- No INSERT/UPDATE/DELETE policy: default-deny. Admin writes only.
+
+drop trigger if exists site_sections_set_updated_at on public.site_sections;
+create trigger site_sections_set_updated_at before update on public.site_sections
+  for each row execute function public.set_updated_at();
+
+-- Allow editorial copy on programmes alongside the existing columns.
+alter table public.programmes add column if not exists image_alt text;
+alter table public.programmes add column if not exists stat_label text;
+
+-- ---------------------------------------------------------------------------
+-- core_values — the organisation's stated values
+-- ---------------------------------------------------------------------------
+create table if not exists public.core_values (
+  id            uuid primary key default gen_random_uuid(),
+  slug          text not null unique,
+  name          text not null,
+  description   text not null,
+  sort_order    int  not null default 0,
+  active        boolean not null default true,
+  created_at    timestamptz not null default now(),
+  updated_at    timestamptz not null default now(),
+
+  constraint core_values_slug_format check (slug ~ '^[a-z0-9-]+$')
+);
+
+create index if not exists core_values_active_idx
+  on public.core_values (active, sort_order);
+
+alter table public.core_values enable row level security;
+
+create policy "core_values_public_read"
+  on public.core_values for select
+  to anon, authenticated
+  using (active = true);
+
+drop trigger if exists core_values_set_updated_at on public.core_values;
+create trigger core_values_set_updated_at before update on public.core_values
+  for each row execute function public.set_updated_at();
+
+-- ---------------------------------------------------------------------------
+-- team_members — public team and governance
+-- ---------------------------------------------------------------------------
+-- `consent_recorded` is a publishing gate, not a content field. A member
+-- without recorded consent must never render on the public site.
+create table if not exists public.team_members (
+  id                 uuid primary key default gen_random_uuid(),
+  slug               text not null unique,
+  name               text not null,
+  role               text not null,
+  bio                text,
+  photo_path         text,
+  safeguarding_officer boolean not null default false,
+  consent_recorded   boolean not null default false,
+  sort_order         int  not null default 0,
+  active             boolean not null default true,
+  created_at         timestamptz not null default now(),
+  updated_at         timestamptz not null default now(),
+
+  constraint team_members_slug_format check (slug ~ '^[a-z0-9-]+$')
+);
+
+create index if not exists team_members_active_idx
+  on public.team_members (active, sort_order);
+
+alter table public.team_members enable row level security;
+
+create policy "team_members_public_read"
+  on public.team_members for select
+  to anon, authenticated
+  using (active = true and consent_recorded = true);
+
+drop trigger if exists team_members_set_updated_at on public.team_members;
+create trigger team_members_set_updated_at before update on public.team_members
+  for each row execute function public.set_updated_at();
