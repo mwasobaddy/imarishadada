@@ -17,7 +17,7 @@ export function FeaturedStory({ story }: { story: FeaturedStory | null }) {
   const noFace = story.consentTier === "named_no_face";
 
   return (
-    <section aria-labelledby="story-heading" className="bg-surface-sand py-section">
+    <section aria-labelledby="story-heading" className="bg-surface-lilac py-section">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-16">
           <div>
@@ -54,7 +54,7 @@ export function FeaturedStory({ story }: { story: FeaturedStory | null }) {
             </Link>
           </div>
 
-          <figure className="rounded-card border border-brand/20 bg-white p-8 sm:p-10">
+          <figure className="rounded-card border border-brand/20 bg-card p-8 sm:p-10">
             <blockquote className="measure text-xl leading-relaxed text-brand-600 sm:text-2xl">
               <p>“{story.quote}”</p>
             </blockquote>
