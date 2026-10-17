@@ -21,7 +21,7 @@ export function AboutTeam({
   if (members.length === 0) return null;
 
   return (
-    <section aria-labelledby="about-team-heading" className="py-section bg-surface-warm">
+    <section aria-labelledby="about-team-heading" className="py-section bg-surface">
       <Container>
         <h2
           id="about-team-heading"
@@ -50,7 +50,7 @@ export function AboutTeam({
                 {member.safeguardingOfficer ? (
                   <>
                     {" · "}
-                    <span className="text-secondary">Safeguarding Officer</span>
+                    <span className="text-brand-600">Safeguarding Officer</span>
                   </>
                 ) : null}
               </p>
