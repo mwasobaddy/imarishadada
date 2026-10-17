@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import {
   AboutApproach,
+  AboutField,
   AboutStory,
   AboutValues,
   AboutVisionMission,
@@ -76,6 +77,7 @@ export default async function AboutPage() {
         <AboutValues section={sections["about-values"]!} values={values} />
         <AboutWork section={sections["about-work"]!} programmes={programmes} />
         <AboutTeam section={sections["about-team"]!} members={members} />
+        <AboutField />
         <AboutApproach section={sections["about-approach"]!} />
       </main>
 
