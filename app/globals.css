@@ -39,6 +39,49 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+
+  /* ---- Imarisha Dada brand tokens ---------------------------------------
+     Every one of these is a `var()` indirection, NOT a literal. That is what
+     makes a token respond to dark mode: the utility class compiles once, but
+     reads whatever `:root` or `.dark` currently resolves it to. A literal in
+     a bare `@theme` block cannot change per mode and would silently stay light.
+     Values live in `:root` (light) and `.dark` (dark) further down this file.
+   */
+
+  /* Brand — dominant surface and primary fill */
+  --color-brand: var(--brand);
+  --color-brand-600: var(--brand-heading);
+  --color-brand-700: var(--brand-focus);
+  --color-brand-100: var(--brand-subtle);
+  --color-brand-50: var(--brand-tint);
+
+  /* Secondary — same family, quieter steps used for borders and hairlines */
+  --color-secondary-600: var(--secondary-strong);
+  --color-secondary-50: var(--secondary-tint);
+
+  /* Accent — pink. Links and icons only, never large fills. */
+  --color-accent-600: var(--accent-strong);
+  --color-accent-50: var(--accent-tint);
+
+  /* Surfaces */
+  --color-surface: var(--surface);
+  --color-surface-lilac: var(--surface-lilac);
+  --color-surface-pink: var(--surface-pink);
+  --color-surface-raised: var(--surface-raised);
+
+  /* Ink */
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-inverse: var(--ink-inverse);
+
+  /* Gold — Donate only. Static across modes: #2A1445 on #F5B82E is very high
+     contrast in both, and the button must look identical either way. */
+  --color-gold: #f5b82e;
+  --color-gold-ink: #2a1445;
+
+  /* Neutral for background pattern fields */
+  --color-pattern: var(--pattern);
+
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -67,72 +110,126 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  --background: #FFFAF7;
+  --foreground: #2A1445;
+  --card: #FFFFFF;
+  --card-foreground: #2A1445;
+  --popover: #FFFFFF;
+  --popover-foreground: #2A1445;
+  --primary: #5B2A86;
+  --primary-foreground: #FFFFFF;
+  --secondary: #E4D9EE;
+  --secondary-foreground: #2A1445;
+  --muted: #EFE6F7;
+  --muted-foreground: #4A4458;
+  --accent: #C71F6E;
+  --accent-foreground: #2A1445;
+  --destructive: #C71F6E;
+  --border: #E4D9EE;
+  --input: #E4D9EE;
+  --ring: #5B2A86;
+  --chart-1: #5B2A86;
+  --chart-2: #C71F6E;
+  --chart-3: #7B45B5;
+  --chart-4: #F06BA8;
+  --chart-5: #F5B82E;
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: #FFFAF7;
+  --sidebar-foreground: #2A1445;
+  --sidebar-primary: #5B2A86;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #EFE6F7;
+  --sidebar-accent-foreground: #2A1445;
+  --sidebar-border: #E4D9EE;
+  --sidebar-ring: #5B2A86;
+
+  /* ---- Imarisha Dada brand tokens (light) --------------------------------
+     Backed by the light column of the table in
+     .opencode/rules/frontend-design.md. `--background` is #FFFAF7, so every
+     ratio below is measured against that, not against the dark column.
+   */
+  --brand: #5B2A86;
+  --brand-heading: #5B2A86;
+  --brand-focus: #5B2A86;
+  --brand-subtle: #EFE6F7;
+  --brand-tint: #FBEEFC;
+  --secondary-strong: #5B2A86;
+  --secondary-tint: #FBEEFC;
+  --accent-strong: #C71F6E;
+  --accent-tint: #FBE4EF;
+  --surface: #FFFAF7;
+  --surface-lilac: #EFE6F7;
+  --surface-pink: #FBE4EF;
+  --surface-raised: #FFFFFF;
+  --ink: #2A1445;
+  --ink-muted: #4A4458;
+  --ink-inverse: #FFFFFF;
+  --pattern: #E4D9EE;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #170B26;
+  --foreground: #F5EEFA;
+  --card: #241238;
+  --card-foreground: #F5EEFA;
+  --popover: #241238;
+  --popover-foreground: #F5EEFA;
+  --primary: #7B45B5;
+  --primary-foreground: #FFFFFF;
+  --secondary: #4A3366;
+  --secondary-foreground: #F5EEFA;
+  --muted: #2A1A45;
+  --muted-foreground: #BFB3CC;
+  --accent: #F06BA8;
+  --accent-foreground: #170B26;
+  --destructive: #F06BA8;
+  --border: #4A3366;
+  --input: #4A3366;
+  --ring: #7B45B5;
+  --chart-1: #7B45B5;
+  --chart-2: #F06BA8;
+  --chart-3: #C9A7F0;
+  --chart-4: #BFB3CC;
+  --chart-5: #F5B82E;
+  --radius: 0.625rem;
+  --sidebar: #170B26;
+  --sidebar-foreground: #F5EEFA;
+  --sidebar-primary: #7B45B5;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #2A1A45;
+  --sidebar-accent-foreground: #F5EEFA;
+  --sidebar-border: #4A3366;
+  --sidebar-ring: #7B45B5;
+
+  /* ---- Imarisha Dada brand tokens (dark) --------------------------------
+     Backed by the dark column of the table in
+     .opencode/rules/frontend-design.md. `--background` is #170B26, so every
+     ratio below is measured against that, not against the light column.
+
+     Note `--brand-heading` is #C9A7F0, not the brand fill. On a dark ground
+     the brand fill #7B45B5 would fall below AA for body text, so headings
+     switch to a lighter step of the same hue.
+   */
+  --brand: #7B45B5;
+  --brand-heading: #C9A7F0;
+  --brand-focus: #C9A7F0;
+  /* Pale in BOTH modes. This is text ON the brand fill (programme card stat
+     labels, the How-we-work band), not a background. Darkening it to the soft
+     pink surface made those labels invisible on #7B45B5 (2.41:1). */
+  --brand-subtle: #EFE6F7;
+  --brand-tint: #2A1A45;
+  --secondary-strong: #C9A7F0;
+  --secondary-tint: #2A1A45;
+  --accent-strong: #F06BA8;
+  --accent-tint: #3B1A3A;
+  --surface: #170B26;
+  --surface-lilac: #2A1A45;
+  --surface-pink: #3B1A3A;
+  --surface-raised: #2F1A48;
+  --ink: #F5EEFA;
+  --ink-muted: #BFB3CC;
+  --ink-inverse: #FFFFFF;
+  --pattern: #4A3366;
 }
 
 @layer base {
@@ -148,68 +245,15 @@
 }
 /* ==========================================================================
    Imarisha Dada design tokens
-   Warm, natural palette — clay, earth and deep green. Kenyan context, not
-   generic Tailwind. Every component reads from these; no hex in components.
+   Analogous purple base with gold accent. Light and dark variants below.
+   Every component reads from these; no hex in components.
    ========================================================================== */
 
+/* Colour lives in `@theme inline` above, wired to `:root` / `.dark` so every
+   token responds to the active mode. Only mode-independent scales belong here.
+   Full light/dark table: .opencode/rules/frontend-design.md */
+
 @theme {
-  /* ---- Brand palette --------------------------------------------------
-     #E30B5D is the brand colour. It occupies the DOMINANT surface role that
-     the deep green #14342a used to hold — announcement bar, stats band and
-     closing CTA band. #004B49 is the accent.
-
-     Ratios are measured against --color-surface-warm (#F4F8F1) and against
-     the brand surface. Recompute before changing either token.
-
-       brand       #E30B5D  white on it 4.70:1 (AA) | as text on bg 4.37 (LARGE ONLY)
-       brand-600   #C00950  white on it 6.18:1 (AA) | as text on bg 5.75:1 (AA)
-       accent      #004B49  white on it 9.99:1 (AAA) | as text on bg 9.29:1 (AAA)
-  */
-
-  /* Brand — the dominant colour. Dark/saturated surfaces only. */
-  --color-brand: #e30b5d;
-  --color-brand-bright: #f2599c;
-  /* Text-safe brand. Use for any brand-coloured TEXT or link on a light
-     background, at any size. #E30B5D itself only reaches 4.37:1 there. */
-  --color-brand-600: #c00950;
-  /* Focus rings, borders, decorative rules. Same shade as brand-600:
-     5.75:1 on the page background clears the 3:1 non-text threshold. */
-  --color-brand-700: #c00950;
-  --color-brand-100: #fbd5e2;
-  --color-brand-50: #fdeef4;
-
-  /* Same colour, second name. Kept so shadcn's `secondary` button variant
-     resolves. There is only one brand hue — do not treat these as two
-     separate brand colours. */
-  --color-secondary: #e30b5d;
-  --color-secondary-bright: #f2599c;
-  --color-secondary-600: #c00950;
-  --color-secondary-50: #fdeef4;
-
-  /* Accent — dark teal. Safe for text at any size on light backgrounds.
-     2.13:1 on the brand surface, so never place it there. */
-  --color-accent: #004b49;
-  --color-accent-bright: #1a6b68;
-  --color-accent-600: #003836;
-  --color-accent-50: #e6f0ef;
-
-  /* Surfaces. --color-surface-warm is the page background every brand ratio
-     is measured against. Changing it invalidates the whole table. */
-  --color-surface-warm: #f4f8f1;
-  --color-surface-sand: #e6efe4;
-  --color-surface-deep: #e30b5d;
-
-  /* Ink */
-  --color-ink: #1c1917;
-  --color-ink-muted: #57534e;
-  /* Pure white, NOT the page background. On the brand surface #F4F8F1 text
-     drops to 4.37:1 (large only); pure white holds 4.70:1 (AA). */
-  --color-ink-inverse: #ffffff;
-
-  /* Neutral for background patterns. 3.35:1 on the page background, which
-     clears the 3:1 non-text threshold without competing with the copy. */
-  --color-pattern: #7c8a86;
-
   /* Type scale — deliberate contrast between display and body */
   --text-display: 3.75rem;
   --text-display--line-height: 1.02;
