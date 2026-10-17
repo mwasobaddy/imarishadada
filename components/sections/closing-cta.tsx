@@ -19,7 +19,7 @@ export function ClosingCta() {
           <div className="flex flex-col items-start gap-4 lg:items-end">
             <a
               href="/donate"
-              className="inline-flex min-h-13 w-full items-center justify-center rounded-lg bg-accent px-8 text-base font-semibold text-white transition-colors hover:bg-accent-bright focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink-inverse sm:w-auto"
+              className="inline-flex min-h-13 w-full items-center justify-center rounded-lg bg-gold px-8 text-base font-semibold text-gold-ink transition-colors hover:bg-gold/90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink-inverse sm:w-auto"
             >
               Help the next one
             </a>
