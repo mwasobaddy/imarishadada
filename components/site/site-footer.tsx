@@ -1,3 +1,4 @@
+import Image from "next/image";
 // Evaluated once at module load, not per render. Calling `new Date()` inside
 // the component body is an unstable value under `cacheComponents` and fails
 // prerendering. Update the start year when the org is founded/renamed.
@@ -31,10 +32,15 @@ export function SiteFooter() {
       <div className="mx-auto max-w-6xl px-5 py-14 sm:px-8">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-1">
-            <p className="text-lg font-semibold tracking-tight text-brand-600">
-              Imarisha Dada
-            </p>
-            <p className="mt-1 text-sm text-ink-muted">Empower a Sister</p>
+            <Image
+              src="/brand/logo.webp"
+              alt="Imarisha Dada"
+              width={1040}
+              height={950}
+              sizes="80px"
+              className="h-20 w-auto"
+            />
+            <p className="mt-3 text-sm text-ink-muted">Empower a Sister</p>
             <p className="measure mt-4 text-sm leading-relaxed text-ink-muted">
               A girl-centred, community-led organisation working with girls and young
               women in Kibera, Nairobi, Kenya.
