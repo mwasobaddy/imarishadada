@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -107,12 +108,22 @@ export function SiteHeader() {
         >
           <Link
             href="/"
-            className="flex items-baseline gap-2 rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-700"
+            className="flex items-center gap-2.5 rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-700"
           >
-            <span className="text-lg font-semibold tracking-tight text-brand-600">
-              Imarisha Dada
+            {/* The logo already carries the wordmark, so the accessible name
+                comes from alt and no adjacent text duplicates it. */}
+            <Image
+              src="/brand/logo.webp"
+              alt="Imarisha Dada"
+              width={1040}
+              height={950}
+              priority
+              sizes="(max-width: 640px) 44px, (max-width: 1024px) 48px, 52px"
+              className="h-10 w-auto sm:h-11 lg:h-12"
+            />
+            <span className="hidden text-xs text-ink-muted xl:inline">
+              Empower a Sister
             </span>
-            <span className="hidden text-xs text-ink-muted sm:inline">Empower a Sister</span>
           </Link>
 
           <ul className="hidden items-center gap-1 lg:flex">
