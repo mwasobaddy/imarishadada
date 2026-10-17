@@ -63,7 +63,7 @@ export const metadata: Metadata = {
 
 // themeColor and colorScheme are deprecated inside `metadata` in Next 16.
 export const viewport: Viewport = {
-  themeColor: "#14342a",
+  themeColor: "#5B2A86",
   width: "device-width",
   initialScale: 1,
 };
@@ -85,7 +85,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           }}
         />
       </head>
-      <body className="flex min-h-full flex-col bg-surface-warm text-ink">
+      <body className="flex min-h-full flex-col bg-surface text-ink">
         <AnnouncementBar />
         <SiteHeader />
         {children}
