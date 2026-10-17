@@ -32,7 +32,7 @@ export default async function OpengraphImage() {
           justifyContent: "space-between",
           width: "100%",
           height: "100%",
-          background: "#e30b5d",
+          background: "#5B2A86",
           color: "#ffffff",
           padding: 72,
         }}
