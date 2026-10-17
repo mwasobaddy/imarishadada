@@ -21,12 +21,12 @@ export function Programmes({
   if (programmes.length === 0) return null;
 
   return (
-    <section aria-labelledby="programmes-heading" className="py-section bg-surface-warm">
+    <section aria-labelledby="programmes-heading" className="py-section bg-surface">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div className="max-w-2xl">
             {section.eyebrow ? (
-              <p className="mb-3 text-sm font-medium tracking-wide text-secondary uppercase">
+              <p className="mb-3 text-sm font-medium tracking-wide text-brand-600 uppercase">
                 {section.eyebrow}
               </p>
             ) : null}
