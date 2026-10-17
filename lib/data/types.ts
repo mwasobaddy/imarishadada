@@ -2,9 +2,27 @@ export type Programme = {
   slug: string;
   title: string;
   summary: string;
+  /** Stable key, unused for rendering now that cards are image-based. */
   icon: string;
   stat: string | null;
+  statLabel: string | null;
+  /** Null until a consented photograph exists. */
+  imagePath: string | null;
+  imageAlt: string | null;
   sortOrder: number;
+};
+
+/**
+ * Editorial copy for a page section. Managed in `site_sections`, so a heading
+ * can change without a deploy — see the rationale on that table.
+ */
+export type SiteSection = {
+  key: string;
+  eyebrow: string | null;
+  heading: string;
+  body: string | null;
+  ctaLabel: string | null;
+  ctaHref: string | null;
 };
 
 export type ImpactStat = {
@@ -64,3 +82,27 @@ export function mayRenderImage(tier: ConsentTier, consentExpiresAt: string | nul
 export function mayRenderName(tier: ConsentTier, consentExpiresAt: string | null, now?: Date): boolean {
   return effectiveConsentTier(tier, consentExpiresAt, now) !== "anonymised";
 }
+/** A stated organisational commitment. Managed in `core_values`. */
+export type CoreValue = {
+  slug: string;
+  name: string;
+  description: string;
+  sortOrder: number;
+};
+
+/**
+ * A public team or governance entry.
+ *
+ * `consentRecorded` is a publishing gate, not a content field — a member
+ * without recorded consent must never render. The About page omits the team
+ * section entirely when the table is empty rather than showing placeholders.
+ */
+export type TeamMember = {
+  slug: string;
+  name: string;
+  role: string;
+  bio: string | null;
+  photoPath: string | null;
+  safeguardingOfficer: boolean;
+  sortOrder: number;
+};
