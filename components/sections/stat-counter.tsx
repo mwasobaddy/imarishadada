@@ -43,7 +43,9 @@ export function StatCounter({ stats }: { stats: ImpactStat[] }) {
             duration: 1.2,
             ease: "power2.out",
             onUpdate: () => {
-              node.textContent = format.format(counter.value);
+              // counter.value is a float mid-tween; formatting it raw
+              // rendered "13.349" instead of a whole number.
+              node.textContent = format.format(Math.round(counter.value));
             },
           });
 
