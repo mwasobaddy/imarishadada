@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="Field session in Kibera">
+  <defs>
+    <pattern id="p" width="48" height="48" patternUnits="userSpaceOnUse">
+      <circle cx="24" cy="24" r="2.5" fill="#C71F6E" opacity="0.18"/>
+    </pattern>
+  </defs>
+  <rect width="1600" height="900" fill="#FBE4EF"/>
+  <rect width="1600" height="900" fill="url(#p)"/>
+  <g fill="none" stroke="#C71F6E" stroke-width="4" opacity="0.45">
+    <rect x="610.0" y="354.0" width="380" height="192" rx="16"/>
+    <circle cx="682.0" cy="430.0" r="34"/>
+    <path d="M614.0 520.0 l70 -58 l54 44 l40 -30 l62 44"/>
+  </g>
+  <text x="800.0" y="600.0" font-family="ui-sans-serif, system-ui, sans-serif"
+        font-size="30" font-weight="600" fill="#C71F6E" opacity="0.75"
+        text-anchor="middle">Placeholder</text>
+  <text x="800.0" y="636.0" font-family="ui-sans-serif, system-ui, sans-serif"
+        font-size="19" fill="#C71F6E" opacity="0.55"
+        text-anchor="middle">Field session in Kibera</text>
+</svg>
