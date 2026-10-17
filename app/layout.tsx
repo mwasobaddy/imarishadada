@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import { AnnouncementBar } from "@/components/site/announcement-bar";
 import { SiteHeader } from "@/components/site/site-header";
+import { SiteFooter } from "@/components/site/site-footer";
 import { SITE_URL, jsonLdScript, organisationJsonLd, webSiteJsonLd } from "@/lib/seo";
 
 import "./globals.css";
@@ -88,6 +89,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <AnnouncementBar />
         <SiteHeader />
         {children}
+        <SiteFooter />
       </body>
     </html>
   );
