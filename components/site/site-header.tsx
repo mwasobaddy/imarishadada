@@ -101,7 +101,7 @@ export function SiteHeader() {
         Skip to content
       </a>
 
-      <div className="border-b border-brand/20 bg-surface-warm/90 backdrop-blur-md">
+      <div className="border-b border-brand/20 bg-surface/90 backdrop-blur-md">
         <nav
           aria-label="Main"
           className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3 sm:px-8"
@@ -148,7 +148,7 @@ export function SiteHeader() {
 
             <Link
               href={DONATE_LINK}
-              className="inline-flex min-h-11 items-center rounded-lg bg-accent px-5 text-sm font-semibold text-white transition-colors hover:bg-accent/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
+              className="inline-flex min-h-11 items-center rounded-lg bg-gold px-5 text-sm font-semibold text-gold-ink transition-colors hover:bg-gold/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
             >
               Donate
             </Link>
@@ -197,7 +197,7 @@ export function SiteHeader() {
             role="dialog"
             aria-modal="true"
             aria-label="Menu"
-            className="fixed inset-x-0 top-[57px] z-50 max-h-[calc(100dvh-57px)] overflow-y-auto border-b border-brand/20 bg-surface-warm px-5 py-6 shadow-lg sm:px-8 lg:hidden"
+            className="fixed inset-x-0 top-[57px] z-50 max-h-[calc(100dvh-57px)] overflow-y-auto border-b border-brand/20 bg-surface px-5 py-6 shadow-lg sm:px-8 lg:hidden"
           >
             <ul className="flex flex-col gap-1">
               {NAV_ITEMS.map((item) => (
@@ -263,7 +263,7 @@ function LocaleSwitcher({
         <ul
           role="listbox"
           aria-label="Language"
-          className="absolute right-0 z-50 mt-1 min-w-40 rounded-lg border border-brand/20 bg-surface-warm py-1 shadow-lg"
+          className="absolute right-0 z-50 mt-1 min-w-40 rounded-lg border border-brand/20 bg-surface py-1 shadow-lg"
         >
           {live.map((locale) => (
             <li key={locale.code} role="option" aria-selected={locale.code === live[0]?.code}>
