@@ -50,7 +50,7 @@ export const BentoGridItem = ({
     <>
       {header}
       <div className="flex h-full flex-col justify-between gap-4">
-        <div className="text-secondary transition-colors group-hover/bento:text-secondary-bright">
+        <div className="text-brand-600 transition-colors group-hover/bento:text-accent">
           {icon}
         </div>
 
@@ -74,7 +74,7 @@ export const BentoGridItem = ({
   );
 
   const shell = cn(
-    "group/bento rounded-card border border-brand/20 bg-white p-6 transition-colors duration-200 hover:border-accent/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700",
+    "group/bento rounded-card border border-brand/20 bg-card p-6 transition-colors duration-200 hover:border-accent/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700",
     className,
   );
 
