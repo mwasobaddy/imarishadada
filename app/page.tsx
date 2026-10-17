@@ -7,13 +7,13 @@ import { GivingWays } from "@/components/sections/giving-ways";
 import { Hero } from "@/components/sections/hero";
 import { Programmes } from "@/components/sections/programmes";
 import { StatCounter } from "@/components/sections/stat-counter";
-import { SiteFooter } from "@/components/site/site-footer";
 import { TrustStrip } from "@/components/site/trust-strip";
 import {
   getFeaturedStory,
   getGivingTiers,
   getImpactStats,
   getProgrammes,
+  getSection,
 } from "@/lib/data/home";
 import { HERO_PORTRAIT } from "@/lib/data/hero-portrait";
 import { buildLanguageAlternates, jsonLdScript, webSiteJsonLd } from "@/lib/seo";
@@ -52,17 +52,17 @@ export default function HomePage() {
           <HomeContent />
         </Suspense>
       </main>
-      <SiteFooter />
     </>
   );
 }
 
 async function HomeContent() {
-  const [programmes, stats, tiers, story] = await Promise.all([
+  const [programmes, stats, tiers, story, programmesSection] = await Promise.all([
     getProgrammes(),
     getImpactStats(),
     getGivingTiers(),
     getFeaturedStory(),
+    getSection("home-programmes"),
   ]);
 
   return (
@@ -84,7 +84,7 @@ async function HomeContent() {
         <StatCounter stats={stats} />
       </div>
 
-      <Programmes programmes={programmes} />
+      <Programmes programmes={programmes} section={programmesSection} />
       <FeaturedStory story={story} />
       <GivingWays tiers={tiers} />
       <ClosingCta />
