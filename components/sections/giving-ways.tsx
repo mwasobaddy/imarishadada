@@ -22,7 +22,7 @@ export function GivingWays({ tiers }: { tiers: GivingTier[] }) {
   const monthlyAvailable = active.some((t) => t.cadence === "monthly");
 
   return (
-    <section aria-labelledby="giving-heading" className="bg-surface-warm py-section">
+    <section aria-labelledby="giving-heading" className="bg-surface py-section">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <div className="max-w-2xl">
           <p className="text-sm font-medium tracking-wide text-accent uppercase">
@@ -49,7 +49,7 @@ export function GivingWays({ tiers }: { tiers: GivingTier[] }) {
               <Link
                 href="/donate"
                 data-hex-focus
-                className="group flex h-full flex-col rounded-card border border-brand/20 bg-white p-6 transition-colors hover:border-secondary/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
+                className="group flex h-full flex-col rounded-card border border-brand/20 bg-card p-6 transition-colors hover:border-secondary/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
               >
                 <span className="tabular text-2xl font-semibold tracking-tight text-brand-600">
                   {formatKsh(tier.amount)}
@@ -70,7 +70,7 @@ export function GivingWays({ tiers }: { tiers: GivingTier[] }) {
         <div className="mt-10 flex flex-wrap items-center gap-4">
           <Link
             href="/donate"
-            className="inline-flex min-h-12 items-center rounded-lg bg-accent px-7 text-base font-semibold text-white transition-colors hover:bg-accent/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
+            className="inline-flex min-h-12 items-center rounded-lg bg-gold px-7 text-base font-semibold text-gold-ink transition-colors hover:bg-gold/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
           >
             Donate
           </Link>
