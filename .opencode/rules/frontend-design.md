@@ -32,79 +32,129 @@ Both are allowed. The rule is: **if it moves in response to scroll, it is GSAP. 
 
 - `@aceternity/*` — shadcn registry, 113 components, **free**, no auth needed
 - `@magicui/*` — shadcn registry, free
-- Magic UI has its own MCP (`magicui`) for discovery. Aceternity needs no MCP — the `shadcn` MCP reaches it.
+- `@react-bits/*` — shadcn registry, free. 218 components, 4 variants each.
+  Magic UI has its own MCP (`magicui`) for discovery. Aceternity needs no MCP — the `shadcn` MCP reaches it.
 - Aceternity **blocks** (181 of them) are Pro and return `401`. Do not plan around them without a paid licence.
 
 ```sh
-npx shadcn@latest add @aceternity/spotlight @magicui/marquee
+npx shadcn@latest add @aceternity/spotlight @magicui/marquee @react-bits/SplitText-TS-TW
 ```
+
+All three are wired in `components.json` under `registries`. Install React Bits with
+the **`-<JS|TS>-<TW|CSS>` suffix** — the bare component name will not resolve, because
+each component ships as four separate registry items:
+
+| Suffix | Result |
+|---|---|
+| `-TS-TW` | TypeScript + Tailwind classes — **use this one** |
+| `-TS-CSS` | TypeScript + plain CSS modules |
+| `-JS-TW` / `-JS-CSS` | JavaScript variants. Do not add; the project is `strict` TypeScript |
+
+```sh
+# correct
+npx shadcn@latest add @react-bits/CountUp-TS-TW
+# wrong — no such item
+npx shadcn@latest add @react-bits/CountUp
+```
+
+### React Bits caveats
+
+Dependency picture across the 218 `-TS-TW` items:
+
+| Dependency | Items | Project has | Effect of installing |
+|---|---|---|---|
+| `motion@^12.23.12` | **28** | `^14.3.0` | **Conflict — see below** |
+| `gsap@^3.13.0` | 18 | `^3.15.0` | none, already satisfied |
+| `three` / `ogl` / `@react-three/*` | 16 | not installed | very large, and WebGL on mobile |
+| `react-dom@^19` | 5 | React 19 | none |
+| `matter-js`, `vgpu` | 2 each | not installed | heavy, physics / GPU |
+
+- **The `motion` pin is the sharp edge.** 28 components request `motion@^12.23.12`
+  while the project is on `^14.3.0`. `shadcn add` will happily install v12 beside
+  v14, giving two copies of the same library and doubling it in the bundle. Install
+  those with `--no-deps` and rely on the existing `^14`:
+  ```sh
+  npx shadcn@latest add @react-bits/CountUp-TS-TW --no-deps
+  ```
+  If a component genuinely needs v12 APIs it will fail typecheck — pick a different
+  component rather than downgrading a shared dependency.
+
+- **16 items mount WebGL** (pull `three` / `ogl` / `@react-three/fiber`):
+  `BlobCursor`, `ColorBends`, `CrystalizedBall`, `DitherVeil`, `ElectricLogo`,
+  `EvilEye`, `FlexCarousel`, `Hyperspeed`, `Lanyard`, `MicroSlats`, `ModelViewer`,
+  `MorphSlider`, `PaperCrumple`, `PatternWaves`, `RippleDistortion`, `WarpText`.
+  These are **forbidden on mobile** — see the hard performance ceiling below. Guard
+  with `gsap.matchMedia()` or render desktop-only, and expect the first-load JS
+  budget to be blown by an order of magnitude.
+
+- Prefer items that are pure CSS/SVG/transform over canvas items even on desktop —
+  the About page masthead uses Magic UI `WarpBackground` for exactly this reason.
 
 Installed components are vendored into `components/ui/`. They are yours to edit. Fix `'use client'` boundaries, hydration errors, and accessibility on arrival — the registry does not check those.
 
-## Brand palette — derived by measurement, not assumed (2026-10-15)
+## Brand palette — analogous purple base with gold accent
 
-**#E30B5D is the brand colour and holds the dominant surface role** — announcement bar,
-stats band, closing CTA band. **#004B49 is the accent.** The deep green #14342a that
-previously held those surfaces is retired.
+**Primary brand: `#5B2A86` (purple).** Header, buttons, primary fills. **Pink: `#C71F6E`.**
+Links and icons. **Gold: `#F5B82E`.** Donate button only — keep it rare so it stands out.
+Dark mode swaps to `#7B45B5`, `#F06BA8`, and the same gold with `#2A1445` text.
 
 Every ratio below is **computed** with WCAG relative luminance. Recompute before changing
 any token; do not eyeball.
 
-### Against the page background `#F4F8F1` (`--color-surface-warm`)
+### Light mode — against page background `#FFFAF7`
 
-| Colour | Ratio | Verdict |
+| Colour | Hex | Ratio | Verdict |
+|---|---|---|---|
+| Main text | `#2A1445` | ~20:1 | AAA, all sizes |
+| Muted text | `#4A4458` | ~8:1 | AAA, all sizes |
+| Primary brand fill | `#5B2A86` | ~5.5:1 | AA, all sizes (as bg with white text) |
+| Purple headings/accents | `#5B2A86` | ~5.5:1 | AA, all sizes |
+| Pink links/icons | `#C71F6E` | ~3.6:1 | large/UI only |
+| Gold Donate bg | `#F5B82E` | gold with `#2A1445` text | very high contrast |
+
+### Dark mode — against page background `#170B26`
+
+| Colour | Hex | Ratio | Verdict |
+|---|---|---|---|
+| Main text | `#F5EEFA` | ~17:1 | AAA, all sizes |
+| Muted text | `#BFB3CC` | ~5:1 | AA, all sizes |
+| Primary brand fill | `#7B45B5` | ~6:1 | AA, all sizes (as bg with white text) |
+| Purple headings/accents | `#C9A7F0` | large text only | UI only |
+| Pink links/icons | `#F06BA8` | ~6.5:1 | AA, all sizes |
+| Gold Donate bg | `#F5B82E` | gold with `#2A1445` text | very high contrast |
+
+### Surface pairings
+
+| Role | Light | Dark |
 |---|---|---|
-| `--color-ink` `#1C1917` | 16.28:1 | AAA, all sizes |
-| `--color-accent` `#004B49` | 9.29:1 | AAA, all sizes |
-| `--color-brand-600` `#C00950` | 5.75:1 | AA, all sizes |
-| `--color-ink-muted` `#57534E` | 7.10:1 | AAA |
-| **`--color-brand` `#E30B5D`** | **4.37:1** | **LARGE TEXT / UI ONLY** |
+| Page background | `#FFFAF7` | `#170B26` |
+| Surface (cards) | `#FFFFFF` | `#241238` |
+| Elevated surface | `#FFFFFF` + shadow | `#2F1A48` |
+| Border | `#E4D9EE` | `#4A3366` |
+| Soft pink section bg | `#FBE4EF` | `#3B1A3A` |
+| Lilac section bg | `#EFE6F7` | `#2A1A45` |
 
-### On the brand surface `#E30B5D`
+### The rules that matter
 
-| Foreground | Ratio | Verdict |
-|---|---|---|
-| pure white `#FFFFFF` | 4.70:1 | AA, all sizes |
-| `#F4F8F1` (page bg) | 4.37:1 | large only — **do not use** |
-| `--color-accent` `#004B49` | 2.13:1 | **FAIL — never** |
+**1. Don't put text in `#F06BA8` on dark backgrounds — it's too light.** Use `#BFB3CC`
+for muted dark text instead.
 
-### The two rules that matter
+**2. Keep the gold rare.** If the Donate button is the only gold element, it becomes the
+most visible thing on every page — that's the intent.
 
-**1. `#E30B5D` fails as small text on a light background. Use `--color-brand-600`
-`#C00950` (5.75:1) instead** — same hue, dark enough for labels, links and eyebrows at
-any size. This is why there are two brand tokens.
+**3. Contrast pairs must run through WebAIM or Figma before sign-off.** The values above
+are approximate measured ratios, not guarantees.
 
-**2. On the brand surface, text must be 100% white — opacity variants fail.**
-
-| White at | Ratio | Verdict |
-|---|---|---|
-| 100% | 4.70:1 | AA |
-| 85% | 3.64:1 | large/UI only |
-| 70% | 2.80:1 | **FAIL** |
-| 60% | 2.33:1 | **FAIL** |
-
-Never write `text-ink-inverse/70` on a brand band. If text needs to feel softer, use a
-**larger size** rather than lower opacity. `--color-ink-inverse` is deliberately pure
-white, not the page background, for this reason.
-
-### Other measured facts
-
-- White on `--color-brand-600` = 6.18:1 — so `#C00950` also works as a band surface if
-  `4.70:1` on white ever feels tight. One token change.
-- `--color-accent` is **2.13:1** on the brand surface — it must never appear there.
-- `--color-pattern` `#7C8A86` = 3.35:1 on the page background: the neutral used for
-  background hexagon fields so they never compete with copy.
-- `#E30B5D` as a *button* background with a white label is **4.70:1 — legal**. The same
-  hex as *text* on a light background is not. Same colour, opposite verdict.
+**4. No color-alone meaning.** Pair color with icons, underlines, or text labels.
 
 ### 60/30/10
 
-- **60%** — ground: `--color-surface-warm` `#F4F8F1`, white cards
-- **30%** — brand `#E30B5D`: announcement bar, stats band, closing CTA band
-- **10%** — accent `#004B49` for Donate buttons and secondary actions; `--color-brand-600`
-  for headings and links; `--color-pattern` for background fields
+- **60%** — ground: page background `#FFFAF7` (light) / `#170B26` (dark), white cards
+- **30%** — brand `#5B2A86` (light) / `#7B45B5` (dark): header, buttons, primary fills
+- **10%** — accent `#C71F6E` (light) / `#F06BA8` (dark) for links and icons; gold `#F5B82E`
+  for Donate only
 
-If a page reads as all-magenta, the 30% share has crept. Check the band sizes.
+If a page reads as all-purple, the 30% share has crept. Check the band sizes.
 
 ## Break the AI monoculture
 
