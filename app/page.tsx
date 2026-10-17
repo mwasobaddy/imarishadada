@@ -48,7 +48,7 @@ export default function HomePage() {
   return (
     <>
       <main id="main" className="flex-1">
-        <Suspense fallback={<div className="min-h-[70vh] bg-surface-warm" />}>
+        <Suspense fallback={<div className="min-h-[70vh] bg-surface" />}>
           <HomeContent />
         </Suspense>
       </main>
