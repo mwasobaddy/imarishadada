@@ -1,7 +1,13 @@
 import { cache } from "react";
 
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
-import type { FeaturedStory, GivingTier, ImpactStat, Programme } from "@/lib/data/types";
+import type {
+  FeaturedStory,
+  GivingTier,
+  ImpactStat,
+  Programme,
+  SiteSection,
+} from "@/lib/data/types";
 import { effectiveConsentTier } from "@/lib/data/types";
 
 /**
@@ -25,6 +31,9 @@ const SEED: {
         "Mentorship, school fees and advocacy that walk a young mother back into education.",
       icon: "book",
       stat: "19 returned to school",
+      statLabel: "19 returned to school",
+      imagePath: null,
+      imageAlt: null,
       sortOrder: 1,
     },
     {
@@ -34,6 +43,9 @@ const SEED: {
         "Financial literacy, business mentorship and start-up capital for young women.",
       icon: "sprout",
       stat: "23 funded",
+      statLabel: "23 funded",
+      imagePath: null,
+      imageAlt: null,
       sortOrder: 2,
     },
     {
@@ -42,6 +54,9 @@ const SEED: {
       summary: "Safe spaces for girls aged 9–16 to learn, connect and grow.",
       icon: "heart",
       stat: "Running since 2024",
+      statLabel: "Running since 2024",
+      imagePath: null,
+      imageAlt: null,
       sortOrder: 3,
     },
   ],
@@ -134,12 +149,119 @@ function programmeSlugOf(value: unknown): string | null {
   return null;
 }
 
+const SECTIONS: SiteSection[] = [
+  {
+    key: "home-programmes",
+    eyebrow: "Our work",
+    heading: "Three programmes, one aim: a girl in Kibera decides her own future",
+    body: "School re-entry, economic empowerment, and safe spaces — designed with girls and community leaders, not delivered to them.",
+    ctaLabel: "All programmes",
+    ctaHref: "/programmes",
+  },
+  {
+    key: "about-hero",
+    eyebrow: null,
+    heading: "Imarisha Dada",
+    body: "Empower a Sister",
+    ctaLabel: null,
+    ctaHref: null,
+  },
+  {
+    key: "about-story",
+    eyebrow: "Our story",
+    heading: "We started with nineteen of them.",
+    body: "Imarisha Dada began in Kibera with a simple observation: the girls who fell out of school here were not girls who had stopped learning. They were girls who had been pushed out \u2014 by pregnancy, by cost, by stigma, and by the assumption that a young mother had already chosen her path.",
+    ctaLabel: null,
+    ctaHref: null,
+  },
+  {
+    key: "about-vision",
+    eyebrow: "Vision",
+    heading: "A safe, equal, and inclusive community where every girl thrives.",
+    body: null,
+    ctaLabel: null,
+    ctaHref: null,
+  },
+  {
+    key: "about-mission",
+    eyebrow: "Mission",
+    heading: "To amplify the voices of girls and young women and empower them to lead positive change in their communities.",
+    body: null,
+    ctaLabel: null,
+    ctaHref: null,
+  },
+  {
+    key: "about-values",
+    eyebrow: "What guides us",
+    heading: "Six commitments we are held to.",
+    body: null,
+    ctaLabel: null,
+    ctaHref: null,
+  },
+  {
+    key: "about-work",
+    eyebrow: "What we do",
+    heading: "Three programmes, one aim: a girl in Kibera decides her own future.",
+    body: null,
+    ctaLabel: "Support our work",
+    ctaHref: "/donate",
+  },
+  {
+    key: "about-team",
+    eyebrow: "Our team",
+    heading: "The people behind the work",
+    body: null,
+    ctaLabel: null,
+    ctaHref: null,
+  },
+  {
+    key: "about-approach",
+    eyebrow: "How we work",
+    heading: "Community-owned, girl-led, evidence-informed.",
+    body: null,
+    ctaLabel: null,
+    ctaHref: null,
+  },
+  {
+    key: "home-giving",
+    eyebrow: "Ways to give",
+    heading: "What your gift actually does",
+    body: "Every amount below is tied to a specific outcome. Give monthly and a mentor's continuity matters as much as a single emergency.",
+    ctaLabel: null,
+    ctaHref: null,
+  },
+];
+
+/** Section copy from `site_sections`. Falls back to the mirrored seed copy. */
+export const getSection = cache(async (key: string): Promise<SiteSection> => {
+  const fallback = SECTIONS.find((s) => s.key === key);
+  if (!isSupabaseConfigured() || !fallback) return fallback!;
+
+  const { data, error } = await createClient()
+    .from("site_sections")
+    .select("section_key, eyebrow, heading, body, cta_label, cta_href")
+    .eq("section_key", key)
+    .eq("active", true)
+    .maybeSingle();
+
+  if (error || !data) return fallback;
+
+  return {
+    key,
+    eyebrow: (data.eyebrow as string | null) ?? fallback.eyebrow,
+    heading: (data.heading as string) ?? fallback.heading,
+    body: (data.body as string | null) ?? fallback.body,
+    ctaLabel: (data.cta_label as string | null) ?? null,
+    ctaHref: (data.cta_href as string | null) ?? null,
+  };
+});
+
 export const getProgrammes = cache(async (): Promise<Programme[]> => {
   if (!isSupabaseConfigured()) return SEED.programmes;
 
   const { data, error } = await createClient()
     .from("programmes")
-    .select("slug, title, summary, icon, stat, sort_order")
+    .select("slug, title, summary, icon, stat, stat_label, image_path, image_alt, sort_order")
     .eq("active", true)
     .order("sort_order");
 
@@ -155,6 +277,9 @@ export const getProgrammes = cache(async (): Promise<Programme[]> => {
     summary: r.summary as string,
     icon: (r.icon as string) ?? "heart",
     stat: (r.stat as string) ?? null,
+    statLabel: (r.stat_label as string | null) ?? (r.stat as string | null) ?? null,
+    imagePath: (r.image_path as string | null) ?? null,
+    imageAlt: (r.image_alt as string | null) ?? null,
     sortOrder: (r.sort_order as number) ?? 0,
   }));
 });
