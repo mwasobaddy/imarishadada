@@ -1,15 +1,24 @@
 import { Container } from "@/components/site/container";
+import { PlaceholderImage } from "@/components/site/placeholder-image";
+import { AboutPhotoCarousel } from "@/components/about/photo-carousel";
 import { Programmes } from "@/components/sections/programmes";
 import type { Programme, SiteSection } from "@/lib/data/types";
 
 export function AboutStory({ section }: { section: SiteSection }) {
   return (
-    <section aria-labelledby="about-story-heading" className="py-section bg-surface-warm">
+    <section aria-labelledby="about-story-heading" className="py-section bg-surface">
       <Container>
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16">
-          <div>
+        {/*
+          Image leads on desktop, text leads on mobile. The order is chosen so
+          the narrative opens with the people, not a heading, and the columns
+          stay visually balanced once the image has real height.
+        */}
+        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16">
+          <AboutPhotoCarousel className="lg:order-1" />
+
+          <div className="lg:order-2">
             {section.eyebrow ? (
-              <p className="mb-3 text-sm font-medium tracking-wide text-secondary uppercase">
+              <p className="mb-3 text-sm font-medium tracking-wide text-brand-600 uppercase">
                 {section.eyebrow}
               </p>
             ) : null}
@@ -19,15 +28,15 @@ export function AboutStory({ section }: { section: SiteSection }) {
             >
               {section.heading}
             </h2>
-          </div>
 
-          {section.body ? (
-            <div className="space-y-5 text-lg text-ink-muted">
-              {section.body.split("\n\n").map((para) => (
-                <p key={para.slice(0, 32)}>{para}</p>
-              ))}
-            </div>
-          ) : null}
+            {section.body ? (
+              <div className="mt-5 space-y-5 text-lg text-ink-muted">
+                {section.body.split("\n\n").map((para) => (
+                  <p key={para.slice(0, 32)}>{para}</p>
+                ))}
+              </div>
+            ) : null}
+          </div>
         </div>
       </Container>
     </section>
@@ -46,7 +55,7 @@ export function AboutVisionMission({
   mission: SiteSection;
 }) {
   return (
-    <section aria-labelledby="about-vision-heading" className="bg-surface-warm pb-section">
+    <section aria-labelledby="about-vision-heading" className="bg-surface pb-section">
       <Container>
         <div className="grid gap-5 sm:grid-cols-2">
           {[
@@ -55,11 +64,11 @@ export function AboutVisionMission({
           ].map(({ section, id }) => (
             <article
               key={id}
-              className="rounded-2xl bg-surface-sand p-8 sm:p-10"
+              className="rounded-2xl bg-surface-lilac p-8 sm:p-10"
               aria-labelledby={id}
             >
               {section.eyebrow ? (
-                <p className="mb-3 text-sm font-medium tracking-wide text-secondary uppercase">
+                <p className="mb-3 text-sm font-medium tracking-wide text-brand-600 uppercase">
                   {section.eyebrow}
                 </p>
               ) : null}
@@ -87,30 +96,39 @@ export function AboutValues({
   if (values.length === 0) return null;
 
   return (
-    <section aria-labelledby="about-values-heading" className="py-section bg-surface-warm">
+    <section aria-labelledby="about-values-heading" className="py-section bg-surface">
       <Container>
-        <div className="max-w-2xl">
-          {section.eyebrow ? (
-            <p className="mb-3 text-sm font-medium tracking-wide text-secondary uppercase">
-              {section.eyebrow}
-            </p>
-          ) : null}
-          <h2
-            id="about-values-heading"
-            className="text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
-          >
-            {section.heading}
-          </h2>
-        </div>
+        {/*
+          Heading and image share a row so the section does not open as a wall
+          of six identical definition pairs. The image is pulled onto the
+          lilac band to break the long run of identical page background.
+        */}
+        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-16">
+          <div>
+            {section.eyebrow ? (
+              <p className="mb-3 text-sm font-medium tracking-wide text-brand-600 uppercase">
+                {section.eyebrow}
+              </p>
+            ) : null}
+            <h2
+              id="about-values-heading"
+              className="text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
+            >
+              {section.heading}
+            </h2>
 
-        <dl className="mt-12 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-          {values.map((value) => (
-            <div key={value.slug}>
-              <dt className="text-lg font-semibold text-brand-600">{value.name}</dt>
-              <dd className="mt-2 text-base text-ink-muted">{value.description}</dd>
-            </div>
-          ))}
-        </dl>
+            <dl className="mt-10 grid gap-x-8 gap-y-8 sm:grid-cols-2">
+              {values.map((value) => (
+                <div key={value.slug}>
+                  <dt className="text-lg font-semibold text-brand-600">{value.name}</dt>
+                  <dd className="mt-1.5 text-base text-ink-muted">{value.description}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+
+          <AboutPhotoCarousel className="lg:order-last" />
+        </div>
       </Container>
     </section>
   );
@@ -148,7 +166,7 @@ const APPROACH = [
 
 export function AboutApproach({ section }: { section: SiteSection }) {
   return (
-    <section aria-labelledby="about-approach-heading" className="py-section bg-surface-deep">
+    <section aria-labelledby="about-approach-heading" className="py-section bg-brand">
       <Container>
         <div className="max-w-2xl">
           {section.eyebrow ? (
@@ -172,6 +190,35 @@ export function AboutApproach({ section }: { section: SiteSection }) {
             </li>
           ))}
         </ul>
+      </Container>
+    </section>
+  );
+}
+
+/**
+ * Field media slot, its own section.
+ *
+ * This was previously nested inside the purple "How we work" band, which put a
+ * pale placeholder image and its caption directly on the brand fill — the
+ * caption rendered purple-on-purple. Its own section on the page background
+ * keeps the band a single clean colour.
+ *
+ * This slot is reserved for a VIDEO, not a still. When the footage is ready it
+ * becomes Magic UI `HeroVideoDialog` (`npx shadcn@latest add @magicui/hero-video-dialog`),
+ * which opens a lightbox on click. Until then it holds a static poster so the
+ * section is not an empty gap — a `<video>` with no real source would reserve
+ * a black box and add weight for nothing.
+ */
+export function AboutField() {
+  return (
+    <section aria-label="Our work in the field" className="bg-surface py-section">
+      <Container>
+        <PlaceholderImage
+          src="/placeholders/field.svg"
+          alt="Placeholder for a video still from an Imarisha Dada session in Kibera"
+          note="Placeholder — a consented field video will replace this and open in a lightbox on click."
+          sizes="(max-width: 768px) 92vw, 1152px"
+        />
       </Container>
     </section>
   );
