@@ -1,23 +1,36 @@
+/**
+ * Primary navigation.
+ *
+ * `labelKey` is the key into the `nav` namespace of the message catalogue.
+ * `name` is the English string and is a *fallback*, used only where there is
+ * no locale context — specifically the global 404, which Next renders outside
+ * the `[locale]` tree and therefore outside any message catalogue.
+ *
+ * Inside the locale tree the catalogue always wins, so a Swahili visitor
+ * never sees an English nav bar.
+ */
 export const NAV_ITEMS = [
-  { name: "Our work", link: "/programmes" },
-  { name: "Impact", link: "/impact" },
-  { name: "Stories", link: "/stories" },
-  { name: "About", link: "/about" },
-  { name: "Contact", link: "/contact" },
+  { name: "Our work", labelKey: "ourWork", link: "/programmes" },
+  { name: "Impact", labelKey: "impact", link: "/impact" },
+  { name: "Stories", labelKey: "stories", link: "/stories" },
+  { name: "About", labelKey: "about", link: "/about" },
+  { name: "Contact", labelKey: "contact", link: "/contact" },
 ] as const;
 
 export const DONATE_LINK = "/donate";
 
-export const LOCALES = [
-  { code: "en", label: "English", short: "EN" },
-  { code: "sw", label: "Kiswahili", short: "SW" },
-  { code: "fr", label: "Français", short: "FR" },
-  { code: "de", label: "Deutsch", short: "DE" },
-  { code: "pt", label: "Português", short: "PT" },
-] as const;
-
 /**
- * `sw`, `fr`, `de` and `pt` are Phase 2–3 (doc/roadmap/localisation.md §5).
- * Until those message files exist we must not advertise a locale that 404s.
+ * Display names for each locale.
+ *
+ * The list of locales and which ones are live live in `lib/seo.ts`
+ * (`LOCALES` / `PUBLISHED_LOCALES`). They are deliberately not duplicated
+ * here: two rollout lists drift, and a locale that is live in SEO but not in
+ * the switcher — or the reverse — is a 404 either way.
  */
-export const ROLLOUT_LOCALE_CODES = ["en"] as const;
+export const LOCALE_LABELS: Record<string, { label: string; short: string }> = {
+  en: { label: "English", short: "EN" },
+  sw: { label: "Kiswahili", short: "SW" },
+  fr: { label: "Français", short: "FR" },
+  de: { label: "Deutsch", short: "DE" },
+  pt: { label: "Português", short: "PT" },
+};

@@ -11,17 +11,51 @@ export const DEFAULT_LOCALE = "en";
 export const LOCALES = ["en", "sw", "fr", "de", "pt"] as const;
 export type Locale = (typeof LOCALES)[number];
 
+/**
+ * Locales that are **actually served right now**.
+ *
+ * `LOCALES` above is the roadmap; this is reality. They differ today, and
+ * conflating them produces a real SEO defect rather than a cosmetic one.
+ *
+ * Hreflang is a promise: "this page exists in these languages, and here they
+ * are". Advertising `sw`/`fr`/`de`/`pt` while none of those routes resolve tells
+ * a search engine the translations are missing or broken, which can pull the
+ * English pages out of the index as duplicate/incorrect-hreflang. That is worse
+ * than advertising nothing.
+ *
+ * So every alternates map and the sitemap draw from THIS list. When
+ * localisation ships, add the locale here and every page, the sitemap and the
+ * structured data follow automatically — there is no second place to remember
+ * to update.
+ *
+ * @see doc/roadmap/localisation.md §2
+ */
+export const PUBLISHED_LOCALES = ["en"] as const satisfies readonly Locale[];
+export type PublishedLocale = (typeof PUBLISHED_LOCALES)[number];
+
+/** True once a locale is genuinely served, and therefore safe to advertise. */
+export function isPublishedLocale(locale: string): locale is PublishedLocale {
+  return (PUBLISHED_LOCALES as readonly string[]).includes(locale);
+}
+
 /** `en` is unprefixed; every other locale is prefixed. */
 export function localePath(locale: Locale, path = ""): string {
   const clean = path === "/" ? "" : path;
   return locale === DEFAULT_LOCALE ? clean || "/" : `/${locale}${clean}`;
 }
 
-/** Builds a complete, self-referencing alternates map. No orphans. */
+/**
+ * Self-referencing alternates map for the locales we actually serve.
+ *
+ * Includes `x-default` pointing at the English URL, which is where a search
+ * engine should send a visitor whose language matches none of ours.
+ */
 export function buildLanguageAlternates(path = ""): Record<string, string> {
-  return Object.fromEntries(
-    LOCALES.map((locale) => [locale, localePath(locale, path)]),
+  const map: Record<string, string> = Object.fromEntries(
+    PUBLISHED_LOCALES.map((locale) => [locale, localePath(locale, path)]),
   );
+  map["x-default"] = localePath(DEFAULT_LOCALE, path);
+  return map;
 }
 
 export function absoluteUrl(path = "/"): string {

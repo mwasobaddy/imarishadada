@@ -88,6 +88,7 @@ const SEED: {
   ],
   givingTiers: [
     {
+      id: null,
       slug: "materials-one-term",
       amount: 500,
       currency: "KES",
@@ -97,6 +98,7 @@ const SEED: {
       sortOrder: 1,
     },
     {
+      id: null,
       slug: "psychosocial-month",
       amount: 2500,
       currency: "KES",
@@ -106,6 +108,7 @@ const SEED: {
       sortOrder: 2,
     },
     {
+      id: null,
       slug: "startup-capital-share",
       amount: 10000,
       currency: "KES",
@@ -115,6 +118,7 @@ const SEED: {
       sortOrder: 3,
     },
     {
+      id: null,
       slug: "re-entry-package",
       amount: 50000,
       currency: "KES",
@@ -124,6 +128,7 @@ const SEED: {
       sortOrder: 4,
     },
     {
+      id: null,
       slug: "dada-space-term",
       amount: 250000,
       currency: "KES",
@@ -314,7 +319,7 @@ export const getGivingTiers = cache(async (): Promise<GivingTier[]> => {
 
   const { data, error } = await createClient()
     .from("giving_tiers")
-    .select("slug, amount, currency, cadence, outcome_label, sort_order, programmes(slug)")
+    .select("id, slug, amount, currency, cadence, outcome_label, sort_order, programmes(slug)")
     .eq("active", true)
     .order("sort_order");
 
@@ -325,6 +330,7 @@ export const getGivingTiers = cache(async (): Promise<GivingTier[]> => {
   if (!data?.length) return SEED.givingTiers;
 
   return data.map((r) => ({
+    id: (r.id as string) ?? null,
     slug: r.slug as string,
     amount: Number(r.amount),
     currency: (r.currency as string) ?? "KES",

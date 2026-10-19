@@ -36,6 +36,8 @@ export type ImpactStat = {
 };
 
 export type GivingTier = {
+  /** Null in the development seed fallback; real rows always have one. */
+  id: string | null;
   slug: string;
   amount: number;
   currency: string;
@@ -104,5 +106,36 @@ export type TeamMember = {
   bio: string | null;
   photoPath: string | null;
   safeguardingOfficer: boolean;
+  sortOrder: number;
+};
+
+/** One step of a programme's structure. Rendered in array order. */
+export type ProgrammeOutcome = {
+  title: string;
+  description: string;
+};
+
+/**
+ * A programme detail page.
+ *
+ * `body` is the long-form "why it matters" copy; `outcomes` is the ordered
+ * step list. Both are admin-editable — a step can be reworded without a deploy.
+ */
+export type ProgrammePage = {
+  /** Null in the development fallback that predates the database. */
+  id: string | null;
+  slug: string;
+  title: string;
+  summary: string;
+  /** Long-form "why it matters" copy. Blank paragraphs are split on "\n\n". */
+  body: string;
+  /** Stable key, unused now that cards are image-based. */
+  icon: string;
+  stat: string | null;
+  statLabel: string | null;
+  /** Null until a consented photograph exists. */
+  imagePath: string | null;
+  imageAlt: string | null;
+  outcomes: ProgrammeOutcome[];
   sortOrder: number;
 };
