@@ -275,9 +275,9 @@ export default async function ImpactPage({
                   caption: "Community outreach, Kibera",
                 },
                 {
-                  src: "/images/impact/impact-outdoor-group.avif",
-                  alt: "Participants gathered outdoors under the trees after a session",
-                  caption: "Sessions in Kibera",
+                  src: "/images/impact/impact-group-outdoors.avif",
+                  alt: "Participants and staff standing together outside the community centre, smiling",
+                  caption: "The team and the girls, Kibera",
                 },
               ].map((photo) => (
                 <li key={photo.src} className="overflow-hidden rounded-card bg-brand-100/10">

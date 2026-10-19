@@ -326,3 +326,56 @@
     animation: none;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Mobile navigation sheet
+   ---------------------------------------------------------------------------
+   A bottom sheet, not a top dropdown.
+
+   The previous implementation was a panel anchored under the header. That is
+   the older pattern and it has two problems on a phone: the controls sit at
+   the very top of the screen, which is the hardest place to reach one-handed,
+   and it reads as a dropdown rather than a destination chooser.
+
+   A bottom sheet is the current convention (Material 3, NN/g). It puts every
+   control inside the thumb zone, and it gives the page behind it a visible
+   scrim the user can tap to dismiss.
+
+   The animation is CSS, not Motion. It plays on a state change — the sheet
+   opening — which the hybrid policy would normally route to Motion, but a
+   keyframe here avoids shipping a runtime for one transform and keeps the
+   animation on the compositor. `prefers-reduced-motion` disables it.
+--------------------------------------------------------------------------- */
+
+@keyframes imarisha-sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes imarisha-scrim-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.sheet-up {
+  animation: imarisha-sheet-up 0.32s var(--ease-out-expo) both;
+}
+
+.scrim-in {
+  animation: imarisha-scrim-in 0.2s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet-up,
+  .scrim-in {
+    animation: none;
+  }
+}

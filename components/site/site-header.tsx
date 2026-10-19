@@ -3,8 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
-import { usePathname } from "next/navigation";
+import { usePathname } from "@/i18n/navigation";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 
 import { DONATE_LINK, LOCALE_LABELS, NAV_ITEMS } from "@/lib/nav";
@@ -20,6 +21,25 @@ import { PUBLISHED_LOCALES } from "@/lib/seo";
  * Hide-on-scroll is Motion, not GSAP: it is driven by scroll *state*, and
  * scroll-linked motion belongs to GSAP (frontend-design.md, hybrid policy).
  */
+
+/**
+ * Is this nav item the page the visitor is on?
+ *
+ * `href` matches the path exactly, and also matches its descendants — so
+ * "Our work" stays active on `/programmes/school-reentry`, which is what a
+ * visitor expects from a section link. The home link only matches the root,
+ * or every page would highlight it.
+ *
+ * The pathname comes from `@/i18n/navigation`, which strips the locale
+ * prefix. Using `next/navigation` instead would leave `/sw/donate` in the
+ * string and every active state would silently break the day a second locale
+ * ships.
+ */
+function isCurrentPath(pathname: string, href: string): boolean {
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 export function SiteHeader() {
   const t = useTranslations("nav");
   const tc = useTranslations("common");
@@ -137,16 +157,34 @@ export function SiteHeader() {
           </Link>
 
           <ul className="hidden items-center gap-1 lg:flex">
-            {NAV_ITEMS.map((item) => (
-              <li key={item.link}>
-                <Link
-                  href={item.link}
-                  className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm text-ink transition-colors hover:bg-brand-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
-                >
-                  {t(item.labelKey)}
-                </Link>
-              </li>
-            ))}
+            {NAV_ITEMS.map((item) => {
+              const active = isCurrentPath(pathname, item.link);
+              return (
+                <li key={item.link}>
+                  <Link
+                    href={item.link}
+                    aria-current={active ? "page" : undefined}
+                    className={`relative inline-flex min-h-11 items-center rounded-lg px-3 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 ${
+                      active
+                        ? "bg-brand-50 font-semibold text-brand-600"
+                        : "text-ink hover:bg-brand-50 hover:text-brand-600"
+                    }`}
+                  >
+                    {t(item.labelKey)}
+                    {/* The active marker is a shape as well as a colour, so
+                        the current page is still obvious to a visitor who
+                        cannot distinguish the brand tint from the body text.
+                        The rules are explicit: never use colour alone. */}
+                    {active ? (
+                      <span
+                        aria-hidden="true"
+                        className="absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-brand-600"
+                      />
+                    ) : null}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
 
           <div className="flex items-center gap-2">
@@ -192,41 +230,129 @@ export function SiteHeader() {
         </nav>
       </div>
 
-      {open ? (
-        <>
+      {open
+        ? createPortal(
+            <>
+          {/* Scrim. Tapping it dismisses, and the blur keeps the page behind
+              legible enough to show where you will land. */}
           <button
             type="button"
             aria-label={tc("dismissMenu")}
             tabIndex={-1}
             onClick={() => setOpen(false)}
-            className="fixed inset-0 z-40 cursor-default bg-brand/20 lg:hidden"
+            className="scrim-in fixed inset-0 z-[55] cursor-default bg-brand/30 backdrop-blur-sm lg:hidden"
           />
+
           <div
             ref={sheetRef}
             id="mobile-menu"
             role="dialog"
             aria-modal="true"
             aria-label={tc("menu")}
-            className="fixed inset-x-0 top-[57px] z-50 max-h-[calc(100dvh-57px)] overflow-y-auto border-b border-brand/20 bg-surface px-5 py-6 shadow-lg sm:px-8 lg:hidden"
+            className="sheet-up fixed inset-x-0 bottom-0 z-[60] max-h-[88dvh] overflow-y-auto rounded-t-3xl border-t border-brand/20 bg-surface shadow-2xl pb-[max(1.5rem,env(safe-area-inset-bottom))] lg:hidden"
           >
-            <ul className="flex flex-col gap-1">
-              {NAV_ITEMS.map((item) => (
-                <li key={item.link}>
-                  <Link
-                    href={item.link}
-                    className="inline-flex min-h-11 items-center rounded-lg px-3 text-base text-ink hover:bg-brand-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
-                  >
-                    {t(item.labelKey)}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-6 border-t border-brand/20 pt-5">
-              <LocaleSwitcher open={localeOpen} setOpen={setLocaleOpen} />
+            {/* Grab handle. Swipe-to-dismiss is not discoverable and cannot be
+                performed precisely, so it is decoration — the close button
+                below is the real affordance. */}
+            <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-brand/20" />
+
+            {/* Title row. A visible close button, not just a swipe target —
+                NN/g is explicit that the grab handle is easy to ignore and
+                that relying on it excludes people who cannot swipe precisely. */}
+            <div className="flex items-center justify-between gap-4 px-5 pt-4 pb-2 sm:px-8">
+              <h2 className="text-lg font-semibold tracking-tight text-brand-600">
+                {tc("menu")}
+              </h2>
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  toggleRef.current?.focus();
+                }}
+                className="inline-flex size-11 items-center justify-center rounded-full text-ink-muted transition-colors hover:bg-brand-50 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
+              >
+                <span className="sr-only">{tc("close")}</span>
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  className="size-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.75"
+                  strokeLinecap="round"
+                >
+                  <path d="M6 6l12 12M18 6L6 18" />
+                </svg>
+              </button>
             </div>
+
+            <ul className="flex flex-col gap-1 px-3 pt-1 sm:px-6">
+              {NAV_ITEMS.map((item) => {
+                const active = isCurrentPath(pathname, item.link);
+                return (
+                  <li key={item.link}>
+                    <Link
+                      href={item.link}
+                      aria-current={active ? "page" : undefined}
+                      className={`flex min-h-14 items-center justify-between gap-3 rounded-xl px-4 text-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 ${
+                        active
+                          ? "bg-brand-50 font-semibold text-brand-600"
+                          : "text-ink hover:bg-surface-lilac"
+                      }`}
+                    >
+                      <span>{t(item.labelKey)}</span>
+                      {/* Active marker: a shape, not just a colour. */}
+                      {active ? (
+                        <span
+                          aria-hidden="true"
+                          className="size-2 shrink-0 rounded-full bg-brand-600"
+                        />
+                      ) : (
+                        <svg
+                          aria-hidden="true"
+                          viewBox="0 0 24 24"
+                          className="size-4 shrink-0 text-ink-muted/40"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M9 6l6 6-6 6" />
+                        </svg>
+                      )}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+
+            {/* The primary action belongs in the sheet, not only in the header
+                bar. On a phone the header's donate button is the easiest thing
+                to miss, and this is the single most important control on the
+                site. */}
+            <div className="px-5 pt-5 sm:px-8">
+              <InteractiveHoverButton
+                href={DONATE_LINK}
+                className="min-h-14 w-full justify-center rounded-full bg-gold px-8 text-base font-semibold text-gold-ink"
+              >
+                {tc("donate")}
+              </InteractiveHoverButton>
+            </div>
+
+            {/* The switcher renders nothing while only one locale is
+                published, so the divider is hidden with it — otherwise the
+                sheet ends in an empty ruled strip. */}
+            {PUBLISHED_LOCALES.length > 1 ? (
+              <div className="mt-5 border-t border-brand/20 px-5 pt-5 sm:px-8">
+                <LocaleSwitcher open={localeOpen} setOpen={setLocaleOpen} />
+              </div>
+            ) : null}
           </div>
-        </>
-      ) : null}
+            </>,
+            document.body,
+          )
+        : null}
     </header>
   );
 }

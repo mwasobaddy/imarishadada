@@ -13,7 +13,8 @@
     "changeLanguage": "Change language",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
-    "dismissMenu": "Dismiss menu"
+    "dismissMenu": "Dismiss menu",
+    "close": "Close"
   },
   "nav": {
     "ourWork": "Our work",

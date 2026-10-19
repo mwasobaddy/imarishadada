@@ -26,12 +26,19 @@ export const PROGRAMME_IMAGE_FALLBACK: Record<
     alt: "A young mother holding her baby writes with a pen during a school re-entry session",
   },
   "economic-empowerment": {
-    // Deliberately empty. The gallery contains no photograph of a business, a
-    // market stall or start-up capital being put to work, and using a
-    // classroom photograph to illustrate money would misrepresent the
-    // programme. This programme needs its own shoot.
-    path: "",
-    alt: "",
+    // A proxy, and labelled as one.
+    //
+    // The gallery contains no photograph of a business, a market stall, or
+    // start-up capital being put to work. This frame shows two participants in
+    // conversation outdoors — the closest honest representation of a programme
+    // about young women building their own income, and far better than
+    // reusing a classroom photograph to illustrate money.
+    //
+    // It is still a proxy. The alt text describes what is actually in the
+    // picture rather than claiming to show a business, and the programme still
+    // needs its own shoot.
+    path: "/images/programmes/economic-empowerment/economic-empowerment-conversation.avif",
+    alt: "Two participants talking together outdoors, one explaining something to the other",
   },
   "dada-space": {
     path: "/images/programmes/dada-space/dada-space-hand-raised.avif",
