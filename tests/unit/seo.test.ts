@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import {
   LOCALES,
+  PUBLISHED_LOCALES,
   breadcrumbJsonLd,
   buildLanguageAlternates,
+  isPublishedLocale,
   jsonLdScript,
   localePath,
   organisationJsonLd,
@@ -25,18 +27,56 @@ describe("localePath", () => {
   });
 });
 
+describe("PUBLISHED_LOCALES", () => {
+  it("never advertises a locale that is not actually served", () => {
+    // The regression this guards: the sitemap once emitted hreflang for all five
+    // locales while only `en` resolved. Pointing hreflang at 404s can get the
+    // English pages de-indexed as duplicate/incorrect-hreflang.
+    for (const locale of PUBLISHED_LOCALES) {
+      expect(LOCALES).toContain(locale);
+    }
+  });
+
+  it("includes English, which is the unprefixed default", () => {
+    expect(PUBLISHED_LOCALES).toContain("en");
+  });
+
+  it("recognises only published locales", () => {
+    expect(isPublishedLocale("en")).toBe(true);
+    expect(isPublishedLocale("sw")).toBe(false);
+    expect(isPublishedLocale("klingon")).toBe(false);
+  });
+});
+
 describe("buildLanguageAlternates", () => {
-  it("returns every rollout locale, including self-reference", () => {
+  it("advertises published locales only, plus x-default", () => {
     const alts = buildLanguageAlternates("/donate");
-    expect(Object.keys(alts).sort()).toEqual([...LOCALES].sort());
-    expect(alts.en).toBe("/donate");
-    expect(alts.sw).toBe("/sw/donate");
+    expect(Object.keys(alts).sort()).toEqual(
+      [...PUBLISHED_LOCALES, "x-default"].sort(),
+    );
+  });
+
+  it("omits locales that would 404", () => {
+    const alts = buildLanguageAlternates("/donate");
+    for (const locale of LOCALES) {
+      if (!isPublishedLocale(locale)) {
+        expect(alts).not.toHaveProperty(locale);
+      }
+    }
+  });
+
+  it("points x-default at the English url", () => {
+    expect(buildLanguageAlternates("/donate")["x-default"]).toBe("/donate");
   });
 
   it("produces no orphans — every entry points at a real locale path", () => {
     for (const path of ["/", "/donate", "/programmes/school-reentry"]) {
       const alts = buildLanguageAlternates(path);
       for (const [locale, href] of Object.entries(alts)) {
+        if (locale === "x-default") {
+          expect(href).toBe(localePath("en", path));
+          continue;
+        }
         expect(href).toBe(localePath(locale as (typeof LOCALES)[number], path));
       }
     }

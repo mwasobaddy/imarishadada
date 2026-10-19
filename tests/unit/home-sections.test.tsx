@@ -94,6 +94,7 @@ describe("GivingWays", () => {
       <GivingWays
         tiers={[
           {
+            id: null,
             slug: "re-entry-package",
             amount: 50000,
             currency: "KES",
@@ -117,7 +118,8 @@ describe("GivingWays", () => {
       <GivingWays
         tiers={[
           {
-            slug: "psychosocial-month",
+            id: null,
+      slug: "psychosocial-month",
             amount: 2500,
             currency: "KES",
             cadence: "monthly",
