@@ -1,15 +1,47 @@
 import type { ReactNode } from "react";
 
-import { WarpBackground } from "@/components/ui/warp-background";
+import Noise from "@/components/ui/noise";
 import { Container } from "@/components/site/container";
 
 /**
  * Shared masthead for interior pages.
  *
- * Background is the Magic UI `WarpBackground` — a CSS 3D grid warp. It is
- * deliberately NOT a canvas/WebGL scene: the project rules forbid WebGL on
- * mobile, and this effect is pure CSS transforms plus `motion/react`, so it
- * stays within budget on metered connections.
+ * ## Why the background changed
+ *
+ * This used to be the Magic UI `WarpBackground` — a CSS 3D grid of beams
+ * racing towards a vanishing point. It was removed for two reasons.
+ *
+ * **It read as a technology dashboard.** A perspective grid with beams is the
+ * visual grammar of a SaaS product and of a conference keynote. It is not the
+ * grammar of a girl-led organisation in Kibera, and the project rules are
+ * explicit about not emitting the "AI template" look.
+ *
+ * **It cost JavaScript on every interior page.** It was a client component
+ * driving `motion/react` transforms purely for decoration. On metered mobile
+ * data that is real bytes spent on nothing.
+ *
+ * The replacement is React Bits `Noise` — a grain texture, the kind printed
+ * paper has.
+ *
+ * React Bits **Pro** was considered first and is the better catalogue, but it
+ * is a paid product whose source is only available behind an authenticated
+ * account, so it cannot be installed or vendored here. In the free registry,
+ * the impressive backgrounds — `LightRays`, `Threads`, `Silk`, `Waves`,
+ * `Particles`, `SoftAurora` — are all WebGL now, and the project rules forbid
+ * WebGL on mobile. `Noise` is the one background that is neither, and it is
+ * the one that suits a human-rights charity. It reads as handmade rather than generated, and it costs a single
+ * canvas paint:
+ *
+ *   * `fps={0}` disables the animation loop entirely. The grain is painted
+ *     once and left still. The default is 24fps, which is a `requestAnimationFrame`
+ *     loop redrawing the texture forever — fine for a demo, wrong for a page
+ *     masthead on a metered connection.
+ *   * No WebGL, no `three.js`, no canvas animation. A 2D canvas is used once,
+ *     to render a tile that is then repeated as a CSS background.
+ *
+ * The colour underneath is a warm brand wash rather than the old grid. The
+ * brand rules ask for "warm natural palette, texture not gradients-everywhere"
+ * — the grain is the texture, and the wash is there to carry the colour.
  *
  * The effect is decorative and sits behind `aria-hidden` content separation
  * via `pointer-events-none`; all copy remains server-rendered text.
@@ -27,16 +59,27 @@ export function PageHero({
 }) {
   return (
     <section className="relative isolate overflow-hidden bg-surface-lilac">
-      <WarpBackground
+      {/* Warm brand wash. Three soft pools rather than a linear gradient, so
+          the field has depth without banding on large displays. */}
+      <div
         aria-hidden="true"
-        perspective={900}
-        beamsPerSide={3}
-        beamSize={6}
-        beamDelayMax={4}
-        beamDelayMin={0}
-        beamDuration={4}
-        gridColor="var(--color-brand-600)"
-        className="pointer-events-none absolute inset-0 rounded-none border-0 p-0 opacity-25"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_80%_at_15%_0%,var(--color-surface-pink)_0%,transparent_60%),radial-gradient(50%_70%_at_85%_20%,var(--color-brand-50)_0%,transparent_65%)]"
+      />
+
+      {/* Grain. `fps={0}` paints it once and stops — see the note above. */}
+      <Noise
+        aria-hidden="true"
+        opacity={0.09}
+        size={1.4}
+        fps={0}
+        blendMode="soft-light"
+        contrast={0.12}
+        colored={false}
+        dust={0}
+        scratches={0}
+        scanlines={0}
+        flicker={0}
+        className="pointer-events-none absolute inset-0"
       />
 
       <Container className="relative flex min-h-[380px] flex-col justify-center py-16 sm:min-h-[440px] sm:py-24">
