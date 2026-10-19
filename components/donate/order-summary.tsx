@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 
 import type { CurrencyCode, PaymentRail } from "@/lib/donate/money";
 import { formatMoney } from "@/lib/donate/money";
@@ -102,7 +103,7 @@ export function OrderSummary({
         {status === "error" && error ? error : null}
       </p>
 
-      <button
+      <InteractiveHoverButton
         type="button"
         onClick={onPay}
         disabled={disabled}
@@ -112,7 +113,7 @@ export function OrderSummary({
             ? pendingLabel
             : `Give ${formatMoney(total, currency)}${rail ? ` by ${rail}` : ""}`
         }
-        className="mt-4 inline-flex min-h-13 w-full items-center justify-center gap-2 rounded-lg bg-gold px-8 text-base font-semibold text-gold-ink transition-colors hover:bg-gold/90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink-inverse disabled:cursor-not-allowed disabled:opacity-70"
+        className="mt-4 min-h-13 w-full rounded-full bg-gold px-8 text-base font-semibold text-gold-ink disabled:cursor-not-allowed disabled:opacity-70"
       >
         {busy ? (
           <>
@@ -125,7 +126,7 @@ export function OrderSummary({
         ) : (
           <>{t("summary.give", { amount: formatMoney(total, currency) })}</>
         )}
-      </button>
+      </InteractiveHoverButton>
 
       {/* ---- Trust ----------------------------------------------------- */}
       <ul className="mt-6 space-y-2 text-sm text-ink-muted">

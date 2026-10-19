@@ -18,6 +18,8 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };
 
+export const instant = false;
+
 export default function NotFound() {
   return <NotFoundBody />;
 }

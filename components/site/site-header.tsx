@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
@@ -155,12 +156,12 @@ export function SiteHeader() {
               className="hidden sm:block"
             />
 
-            <Link
+            <InteractiveHoverButton
               href={DONATE_LINK}
-              className="inline-flex min-h-11 items-center rounded-lg bg-gold px-5 text-sm font-semibold text-gold-ink transition-colors hover:bg-gold/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
+              className="min-h-11 rounded-full bg-gold px-5 text-sm font-semibold text-gold-ink"
             >
               {tc("donate")}
-            </Link>
+            </InteractiveHoverButton>
 
             <button
               ref={toggleRef}

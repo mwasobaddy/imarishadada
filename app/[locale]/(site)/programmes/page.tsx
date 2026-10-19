@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import Link from "next/link";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 
 import { PageHero } from "@/components/site/page-hero";
 import { Container } from "@/components/site/container";
@@ -249,12 +250,12 @@ export default async function ProgrammesPage({
                   Restricted funds are easier to raise. Unrestricted funds change more
                   lives, because nobody has to guess the right programme in advance.
                 </p>
-                <Link
+                <InteractiveHoverButton
                   href="/donate"
-                  className="mt-6 inline-flex min-h-13 items-center justify-center rounded-lg bg-gold px-8 text-base font-semibold text-gold-ink transition-colors hover:bg-gold/90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-700"
+                  className="mt-6 min-h-13 rounded-full bg-gold px-8 text-base font-semibold text-gold-ink"
                 >
                   Give where it&rsquo;s needed
-                </Link>
+                </InteractiveHoverButton>
               </div>
             </div>
           </Container>

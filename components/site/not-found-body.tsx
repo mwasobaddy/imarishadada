@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 
 import { Container } from "@/components/site/container";
 import { NAV_ITEMS } from "@/lib/nav";
@@ -89,12 +90,12 @@ export function NotFoundBody() {
         </nav>
 
         <div className="mt-10 flex flex-wrap gap-4">
-          <Link
+          <InteractiveHoverButton
             href="/donate"
-            className="inline-flex min-h-13 items-center justify-center rounded-lg bg-gold px-8 text-base font-semibold text-gold-ink transition-colors hover:bg-gold/90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-700"
+            className="min-h-13 rounded-full bg-gold px-8 text-base font-semibold text-gold-ink"
           >
             Give now
-          </Link>
+          </InteractiveHoverButton>
           <Link
             href="/contact"
             className="inline-flex min-h-13 items-center justify-center rounded-lg border border-border bg-card px-8 text-base font-semibold text-ink transition-colors hover:bg-surface-lilac focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 
 import "./globals.css";
 
@@ -40,6 +41,8 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };
 
+export const instant = false;
+
 export default function GlobalNotFound() {
   return (
     <html lang="en-KE" className={geistClassName}>
@@ -64,11 +67,12 @@ export default function GlobalNotFound() {
           >
             Go to the homepage
           </Link>
-          <Link href="/donate"
-            className="inline-flex min-h-13 items-center justify-center rounded-lg border border-border bg-card px-8 text-base font-semibold text-ink transition-colors hover:bg-surface-lilac focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
+          <InteractiveHoverButton
+            href="/donate"
+            className="min-h-13 rounded-full border border-border bg-card px-8 text-base font-semibold text-ink"
           >
             Donate
-          </Link>
+          </InteractiveHoverButton>
         </div>
 
         <p className="measure mx-auto mt-10 text-sm text-ink-muted">

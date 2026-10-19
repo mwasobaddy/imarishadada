@@ -95,7 +95,7 @@ export default async function DonatePage({
   // page they wrap.
   setRequestLocale(locale);
 
-  const t = await getTranslations("donate");
+  const t = await getTranslations({ locale, namespace: "donate" });
 
   return (
     <>

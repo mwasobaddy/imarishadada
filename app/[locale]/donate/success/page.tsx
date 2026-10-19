@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import Link from "next/link";
 import { Suspense } from "react";
 
@@ -66,7 +66,8 @@ async function DonationOutcome({
   const params = await searchParams;
   const reference = typeof params.ref === "string" ? params.ref : undefined;
   const donation = await loadDonation(reference);
-  const t = await getTranslations("donate");
+  const locale = await getLocale();
+  const t = await getTranslations({ locale, namespace: "donate" });
 
   // ---- Not in the ledger at all ------------------------------------
   // Either the reference is wrong, or the service role / migrations are not in

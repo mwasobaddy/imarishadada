@@ -16,7 +16,7 @@ export async function AnnouncementBar() {
   const locale = await getLocale();
   setRequestLocale(locale);
 
-  const t = await getTranslations("announcement");
+  const t = await getTranslations({ locale, namespace: "announcement" });
 
   return (
     <div className="bg-brand px-5 py-2.5 text-center text-xs font-medium tracking-wide text-ink-inverse sm:px-8">

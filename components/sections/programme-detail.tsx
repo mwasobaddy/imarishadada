@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 
 import { Container } from "@/components/site/container";
 import type { ProgrammeOutcome } from "@/lib/data/types";
@@ -194,12 +194,12 @@ export function ProgrammeCost({
               directly to the school, tracked to completion.
             </p>
 
-            <Link
+            <InteractiveHoverButton
               href="/donate"
-              className="mt-8 inline-flex min-h-13 items-center justify-center rounded-lg bg-gold px-8 text-base font-semibold text-gold-ink transition-colors hover:bg-gold/90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-700"
+              className="mt-8 min-h-13 rounded-full bg-gold px-8 text-base font-semibold text-gold-ink"
             >
               Give to this programme
-            </Link>
+            </InteractiveHoverButton>
 
             <p className="mt-6 text-sm text-ink-muted">
               Prefer M-Pesa? It is the fastest way to give in Kenya and costs you

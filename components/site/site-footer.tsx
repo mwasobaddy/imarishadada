@@ -32,7 +32,7 @@ export async function SiteFooter() {
   const locale = await getLocale();
   setRequestLocale(locale);
 
-  const t = await getTranslations("footer");
+  const t = await getTranslations({ locale, namespace: "footer" });
 
   const programmes = [
     { label: t("programmes.schoolReentry"), href: "/programmes/school-reentry" },

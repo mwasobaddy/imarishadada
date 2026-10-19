@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 
 import type { GivingTier } from "@/lib/data/types";
 
@@ -68,12 +69,12 @@ export function GivingWays({ tiers }: { tiers: GivingTier[] }) {
         </ul>
 
         <div className="mt-10 flex flex-wrap items-center gap-4">
-          <Link
+          <InteractiveHoverButton
             href="/donate"
-            className="inline-flex min-h-12 items-center rounded-lg bg-gold px-7 text-base font-semibold text-gold-ink transition-colors hover:bg-gold/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
+            className="min-h-12 rounded-full bg-gold px-7 text-base font-semibold text-gold-ink"
           >
             Donate
-          </Link>
+          </InteractiveHoverButton>
           <Link
             href="/ways-to-give"
             className="inline-flex min-h-12 items-center rounded-lg px-2 text-base font-medium text-brand-600 underline decoration-brand-600/30 underline-offset-4 hover:decoration-brand-600 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-700"

@@ -55,7 +55,7 @@ export default async function DonateFailurePage({
   // the request, which is uncached data and fails the `cacheComponents` build.
   setRequestLocale(locale);
 
-  const t = await getTranslations("donate");
+  const t = await getTranslations({ locale, namespace: "donate" });
 
   return (
     <>

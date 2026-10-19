@@ -1,4 +1,5 @@
 import { NextIntlClientProvider } from "next-intl";
+import { Suspense } from "react";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 
@@ -75,7 +76,7 @@ export default async function LocaleLayout({
   // fails. It must be called before any `next-intl` server function.
   setRequestLocale(locale);
 
-  const messages = await getMessages();
+  const messages = await getMessages({ locale });
 
   return (
     <html
@@ -95,9 +96,11 @@ export default async function LocaleLayout({
         />
       </head>
       <body className="flex min-h-full flex-col bg-surface text-ink">
-        <NextIntlClientProvider messages={messages}>
-          {children}
-        </NextIntlClientProvider>
+        <Suspense fallback={null}>
+          <NextIntlClientProvider messages={messages}>
+            {children}
+          </NextIntlClientProvider>
+        </Suspense>
       </body>
     </html>
   );
