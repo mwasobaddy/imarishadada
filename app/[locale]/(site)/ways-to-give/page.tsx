@@ -77,7 +77,7 @@ export default async function WaysToGivePage({
             </h2>
             <p className="measure mt-4 text-lg text-ink-muted">
               M-Pesa is recommended because it is cheaper and faster for you in
-              Kenya — not because we prefer it.
+              Kenya, not because we prefer it.
             </p>
 
             <ul className="mt-10 grid gap-5 sm:grid-cols-3">
@@ -85,10 +85,10 @@ export default async function WaysToGivePage({
                 <h3 className="text-lg font-semibold text-brand-600">M-Pesa</h3>
                 <p className="mt-2 text-sm text-ink-muted">
                   Cheapest and fastest in Kenya. The payment prompt arrives on your
-                  phone — no app switching, no paybill to type.
+                  phone, no app switching, no paybill to type.
                 </p>
                 <p className="mt-3 text-xs font-medium text-brand-600">
-                  Being set up — coming soon
+                  Being set up, coming soon
                 </p>
               </li>
 
@@ -128,7 +128,7 @@ export default async function WaysToGivePage({
             <div className="mt-12">
               <InteractiveHoverButton
                 href="/donate"
-                className="min-h-13 rounded-full bg-gold px-8 text-base font-semibold text-gold-ink"
+                className="min-h-13 rounded-full bg-gold px-8 text-base font-semibold text-gold-ink w-fit"
               >
                 Give now
               </InteractiveHoverButton>

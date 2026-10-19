@@ -108,7 +108,7 @@ export function NeedsSignOff({ children }: { children: ReactNode }) {
   return (
     <div className="rounded-xl border-2 border-dashed border-brand-600/40 bg-brand-50 p-5">
       <p className="text-sm font-semibold text-brand-600">
-        Awaiting sign-off — not yet published
+        Awaiting sign-off, not yet published
       </p>
       <div className="mt-2 text-sm text-ink-muted">{children}</div>
     </div>

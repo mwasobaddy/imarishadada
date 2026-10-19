@@ -72,14 +72,14 @@ export function ContactForm({
         className="rounded-2xl border border-brand-600/30 bg-brand-50 p-8"
       >
         <h2 className="text-2xl font-semibold text-brand-600">
-          Thank you — your message is with us.
+          Thank you, your message is with us.
         </h2>
         <p className="measure mt-3 text-ink-muted">
           We reply within three working days. If it is urgent, WhatsApp is faster.
         </p>
         <p className="mt-4 text-sm text-ink-muted">
           Your reference is{" "}
-          <span className="tabular font-medium text-ink">{sent}</span> — quote it if
+          <span className="tabular font-medium text-ink">{sent}</span>, quote it if
           you follow up.
         </p>
       </div>

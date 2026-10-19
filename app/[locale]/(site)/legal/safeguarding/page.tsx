@@ -102,7 +102,7 @@ export default async function SafeguardingPage({
                 <p>
                   Every girl and young woman we work with is entitled to be safe, to
                   be believed, and to be treated with dignity. Safeguarding is not a
-                  separate activity from our work — it is the condition that makes the
+                  separate activity from our work, it is the condition that makes the
                   work possible.
                 </p>
                 <p>
@@ -153,7 +153,7 @@ export default async function SafeguardingPage({
               <p>
                 A concern is any indication that a child or young person may be being
                 harmed, is at risk of harm, or has been harmed. It includes abuse of
-                any kind — physical, sexual, emotional, or neglect — as well as
+                any kind: physical, sexual, emotional, or neglect and as well as
                 exploitation, and any action that breaches a child&rsquo;s rights.
               </p>
             ),
@@ -243,7 +243,7 @@ export default async function SafeguardingPage({
           },
           {
             id: "escalate",
-            heading: "Statutory reporting — Kenya",
+            heading: "Statutory reporting, Kenya",
             body: (
               <>
                 <NeedsSignOff>

@@ -204,7 +204,7 @@ export default async function ContactPage({
                   </h3>
                   <p className="mt-2 text-sm leading-relaxed text-ink-muted">
                     For institutional partnerships and funding proposals, ask for
-                    a partner in the dropdown — it routes faster than a general
+                    a partner in the dropdown because it routes faster than a general
                     enquiry.
                   </p>
                   <Link

@@ -160,7 +160,7 @@ const SECTIONS: SiteSection[] = [
     key: "home-programmes",
     eyebrow: "Our work",
     heading: "Three programmes, one aim: a girl in Kibera decides her own future",
-    body: "School re-entry, economic empowerment, and safe spaces — designed with girls and community leaders, not delivered to them.",
+    body: "School re-entry, economic empowerment, and safe spaces designed with girls and community leaders, not delivered to them.",
     ctaLabel: "All programmes",
     ctaHref: "/programmes",
   },

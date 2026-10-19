@@ -20,7 +20,7 @@ export const FAQS: FaqEntry[] = [
     group: "Giving",
     question: "Do you offer monthly giving?",
     answer:
-      "Yes — every amount on our giving ladder can be given monthly. Monthly gifts are what keep a mentor in a girl's life through the whole school year, rather than through one term.",
+      "Yes, every amount on our giving ladder can be given monthly. Monthly gifts are what keep a mentor in a girl's life through the whole school year, rather than through one term.",
   },
   {
     group: "Giving",
@@ -50,7 +50,7 @@ export const FAQS: FaqEntry[] = [
     group: "Programmes",
     question: "How long does a participant stay with you?",
     answer:
-      "It depends on what she needs. A re-entry package runs for a school year. Dada Space is open-ended — a girl can attend for as long as she finds it useful.",
+      "It depends on what she needs. A re-entry package runs for a school year. Dada Space is open-ended: a girl can attend for as long as she finds it useful.",
   },
   {
     group: "Programmes",
@@ -68,7 +68,7 @@ export const FAQS: FaqEntry[] = [
     group: "About us",
     question: "How is money spent?",
     answer:
-      "Unrestricted gifts go where the need is greatest that term. Restricted gifts fund the outcome label you selected — for example a single re-entry package — and we report against that specific figure.",
+      "Unrestricted gifts go where the need is greatest that term. Restricted gifts fund the outcome label you selected, for example a single re-entry package, and we report against that specific figure.",
   },
   {
     group: "Safeguarding",
@@ -80,7 +80,7 @@ export const FAQS: FaqEntry[] = [
     group: "Safeguarding",
     question: "Why are some names missing from your stories?",
     answer:
-      "Because consent is theirs to give and theirs to withdraw. Every story carries a consent tier, and the tier decides what we publish — not our judgement on the day.",
+      "Because consent is theirs to give and theirs to withdraw. Every story carries a consent tier, and the tier decides what we publish, not our judgement on the day.",
   },
 ];
 
@@ -165,10 +165,10 @@ export const VOLUNTEER_PAGE: ProsePage = {
         "We list roles only when we have a real need and someone able to supervise. A vague volunteering offer wastes your time and ours.",
       ],
       bullets: [
-        "Mentorship — for women who have been through re-entry or run a business.",
+        "Mentorship for women who have been through re-entry or run a business.",
         "Grant writing and institutional fundraising.",
         "Bookkeeping and data admin.",
-        "Photography, design and translation — with consent training first.",
+        "Photography, design and translation with consent training first.",
         "Professional services: legal, finance, safeguarding training.",
       ],
     },
@@ -227,7 +227,7 @@ export const TRANSPARENCY_PAGE: ProsePage = {
       id: "complaints",
       heading: "Complaints",
       paragraphs: [
-        "If something is wrong — a concern about a decision, about a staff member, or about how a safeguarding report was handled — we want to know. Complaints are handled separately from safeguarding reports, by someone not involved in the original decision where that is possible.",
+        "If something is wrong, a concern about a decision, about a staff member, or about how a safeguarding report was handled, we want to know. Complaints are handled separately from safeguarding reports, by someone not involved in the original decision where that is possible.",
         "Raise it through the contact page and ask for it to be treated as a complaint.",
       ],
     },
@@ -281,7 +281,7 @@ export const NEWS_PAGE: ProsePage = {
   slug: "news",
   title: "News",
   eyebrow: "News",
-  lede: "Updates from the organisation — programme news, announcements, and what we are learning.",
+  lede: "Updates from the organisation: programme news, announcements, and what we are learning.",
   draft: true,
   sections: [
     {
@@ -289,7 +289,7 @@ export const NEWS_PAGE: ProsePage = {
       heading: "Nothing published yet",
       paragraphs: [
         "We have not posted any news yet. Rather than fill this page with placeholder entries, it stays empty until there is something real to say.",
-        "If you want to hear from us, the fastest route is WhatsApp or the contact form — we do not run an email newsletter yet.",
+        "If you want to hear from us, the fastest route is WhatsApp or the contact form, we do not run an email newsletter yet.",
       ],
     },
     {

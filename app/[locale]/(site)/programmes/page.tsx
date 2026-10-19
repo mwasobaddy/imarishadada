@@ -66,7 +66,7 @@ const PATHWAY = [
   },
   {
     title: "She leaves school",
-    body: "Something happens — pregnancy, cost, or stigma. Without support she stays out.",
+    body: "Something happens: pregnancy, cost, or stigma. Without support she stays out.",
   },
   {
     title: "She returns",
@@ -154,7 +154,7 @@ export default async function ProgrammesPage({
                 id="pathway-heading"
                 className="mt-3 text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
               >
-                One girl, over years — not three programmes
+                One girl, over years and not three programmes
               </h2>
             </div>
 
@@ -224,7 +224,7 @@ export default async function ProgrammesPage({
                 </h2>
                 <p className="measure mt-4 text-lg text-ink-muted">
                   Unrestricted giving lets a participant move between programmes as
-                  her needs change — which is how the pathway above actually works.
+                  her needs change, which is how the pathway above actually works.
                 </p>
               </div>
 

@@ -23,7 +23,7 @@ import { breadcrumbJsonLd, jsonLdScript, absoluteUrl } from "@/lib/seo";
 export const metadata: Metadata = {
   title: "Donate",
   description:
-    "Donate by M-Pesa or card. KSh 50,000 gives one girl a full re-entry package — fees, materials and mentorship.",
+    "Donate by M-Pesa or card. KSh 50,000 gives one girl a full re-entry package: fees, materials and mentorship.",
   alternates: {
     canonical: "/donate",
     languages: { "en-KE": "/donate", "x-default": "/donate" },
@@ -33,13 +33,13 @@ export const metadata: Metadata = {
     url: "/donate",
     title: "Donate | Imarisha Dada",
     description:
-      "Donate by M-Pesa or card. KSh 50,000 gives one girl a full re-entry package — fees, materials and mentorship.",
+      "Donate by M-Pesa or card. KSh 50,000 gives one girl a full re-entry package: fees, materials and mentorship.",
   },
   twitter: {
     card: "summary_large_image",
     title: "Donate | Imarisha Dada",
     description:
-      "Donate by M-Pesa or card. KSh 50,000 gives one girl a full re-entry package — fees, materials and mentorship.",
+      "Donate by M-Pesa or card. KSh 50,000 gives one girl a full re-entry package: fees, materials and mentorship.",
   },
   // A charity that hides its donate page from search loses transactional
   // traffic. `noindex` is explicitly not appropriate here.

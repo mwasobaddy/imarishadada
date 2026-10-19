@@ -66,7 +66,7 @@ export function ContactMethods({ contact }: { contact: ContactDetails }) {
           </h2>
           <p className="measure mt-4 text-lg text-ink-muted">
             It is the fastest way to reach us, and every message is read by a
-            person on the team — not a bot, and not a shared inbox nobody
+            person on the team, not a bot, and not a shared inbox nobody
             opens.
           </p>
         </div>
@@ -278,7 +278,7 @@ function PlaceholderNote({ children }: { children: React.ReactNode }) {
 const CONTACT_FAQS = [
   {
     q: "Do you offer monthly giving?",
-    a: "Yes — every amount on our giving ladder can be given monthly. Monthly gifts are what keep a mentor in a girl's life through the whole school year.",
+    a: "Yes, every amount on our giving ladder can be given monthly. Monthly gifts are what keep a mentor in a girl's life through the whole school year.",
   },
   {
     q: "Can I give from outside Kenya?",

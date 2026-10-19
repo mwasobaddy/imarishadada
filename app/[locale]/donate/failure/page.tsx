@@ -95,8 +95,8 @@ export default async function DonateFailurePage({
             </div>
 
             <p className="mt-8 text-sm text-ink-muted">
-              If M-Pesa sent you a prompt, you can safely ignore it — approving a
-              prompt we did not send never charges you, and we never ask you to
+              If M-Pesa sent you a prompt, you can safely ignore it, as we never ask you to
+              approve a prompt we did not send. This will never charges you, and we never ask you to
               type a paybill number.
             </p>
           </div>

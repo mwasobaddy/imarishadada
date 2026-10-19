@@ -116,7 +116,7 @@ export function ConsentNote({
             </h2>
             <p className="measure mt-4 text-lg text-ink-muted">
               No story is published without a recorded consent tier, and the tier
-              decides what appears — not our judgement on the day.
+              decides what appears, not our judgement on the day.
             </p>
             <Link
               href="/legal/safeguarding#photography"

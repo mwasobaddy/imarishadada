@@ -105,7 +105,7 @@ export function PaymentMethod({
                 ) : null}
                 {!config.enabled && rail !== "bank" ? (
                   <span className="mt-1 block text-sm text-ink-muted">
-                    Coming soon — we are completing setup.
+                    Coming soon, we are completing setup.
                   </span>
                 ) : null}
               </span>

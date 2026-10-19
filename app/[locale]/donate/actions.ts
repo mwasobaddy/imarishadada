@@ -210,7 +210,7 @@ export async function submitDonation(input: {
       status: "failed",
       reference,
       message:
-        "We could not record your donation. Nothing has been charged — please try again.",
+        "We could not record your donation. Nothing has been charged, please try again.",
       redirectTo: "/donate/failure",
     };
   }
@@ -253,7 +253,7 @@ export async function submitDonation(input: {
     const message =
       error instanceof PaymentNotConfiguredError
         ? "That payment method is not available right now. Please choose another."
-        : "We could not reach the payment provider. Nothing has been charged — please try again.";
+        : "We could not reach the payment provider. Nothing has been charged, please try again.";
 
     await markFailed(reference, message);
 

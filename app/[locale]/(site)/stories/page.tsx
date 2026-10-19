@@ -117,7 +117,7 @@ async function StoriesBody({
                 <p className="measure mx-auto mt-2 text-ink-muted">
                   We publish a story only when the participant has given recorded
                   consent and we are certain the consent covers it. This space fills as
-                  stories are cleared — not before.
+                  stories are cleared and not before.
                 </p>
                 <Link
                   href="/programmes"

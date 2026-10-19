@@ -122,7 +122,7 @@ async function DonationOutcome({
           again, and we will email your receipt as soon as it clears.
         </p>
         <p className="mt-4 text-sm text-ink-muted">
-          Reference <span className="tabular">{donation.reference}</span> — quote this
+          Reference <span className="tabular">{donation.reference}</span>, quote this
           if you contact us.
         </p>
       </div>

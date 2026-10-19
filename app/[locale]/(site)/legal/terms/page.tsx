@@ -124,7 +124,7 @@ export default async function TermsPage({
                 </p>
                 <p>
                   A donation is treated as complete when our payment provider confirms
-                  it. If a payment fails, you have not been charged — see the{" "}
+                  it. If a payment fails, you have not been charged. See the{" "}
                   <Link href="/donate/failure" className="font-medium text-brand-600 underline decoration-brand-600/40 underline-offset-4">
                     payment failure page
                   </Link>{" "}

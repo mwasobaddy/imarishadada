@@ -109,7 +109,7 @@ const FALLBACK_TITLE: Record<string, string> = {
 const FALLBACK_BODY: Record<string, string> = {
   "school-reentry": `A girl does not stop learning when she becomes a mother. She gets pushed out.
 
-The barriers are specific and they compound. Childcare falls on her. Stigma follows her to school. Re-enrolment costs land on a household that has less of it. And the assumption everyone makes — that a young mother has already chosen her path — is the one that does the most damage, because it is the one nobody argues with.
+The barriers are specific and they compound. Childcare falls on her. Stigma follows her to school. Re-enrolment costs land on a household that has less of it. And the assumption everyone makes, that a young mother has already chosen her path, is the one that does the most damage, because it is the one nobody argues with.
 
 When she leaves, the consequences are not hers alone. Less education means less income, which means more vulnerability, which means the next generation starts further behind. The girl who was pushed out is the reason another girl gets pushed out.
 
@@ -123,7 +123,7 @@ The measure is not how many businesses were funded. It is how many are still tra
 
 For girls aged 9 to 16 in Kibera, a safe space is somewhere they can be without explaining themselves, without a parent deciding, without an audience. Somewhere the questions get asked and nobody treats them as trouble.
 
-It runs after school. It is free. It is staffed by women who are not afraid of a teenager's silence. And it is open to any girl who walks in — no referral, no means test, no waiting list.
+It runs after school. It is free. It is staffed by women who are not afraid of a teenager's silence. And it is open to any girl who walks in, no referral, no means test, no waiting list.
 
 Because the girls who never attend anything structured are the ones who most need somewhere structured to attend.`,
 };

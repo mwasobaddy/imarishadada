@@ -65,7 +65,7 @@ export default async function FaqPage({
         <PageHero
           eyebrow="Questions"
           heading="The things people ask us most"
-          body="If your question is not here, message us and we will answer it — and probably add it."
+          body="If your question is not here, message us and we will answer it and probably add it."
         />
 
         <Container className="py-section">

@@ -44,7 +44,7 @@ const PROCESSORS = [
   {
     name: "Supabase",
     role: "Database and file storage. Holds donor records, contact enquiries and programme content.",
-    location: "Supabase (US/EU regions) — see transfers below",
+    location: "Supabase (US/EU regions). See transfers below",
   },
   {
     name: "Stripe (payment processing)",
@@ -206,7 +206,7 @@ export default async function PrivacyPage({
               <>
                 <NeedsSignOff>
                   <p>
-                    Some of our processors are hosted outside Kenya — in the United
+                    Some of our processors are hosted outside Kenya i.e in the United
                     States and Europe. We will confirm the exact regions our data sits
                     in and state them here plainly, rather than relying on a general
                     assurance.
