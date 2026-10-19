@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { setRequestLocale } from "next-intl/server";
 
 import {
   AboutApproach,
@@ -39,7 +40,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function AboutPage() {
+export default async function AboutPage({
+  params,
+}: PageProps<"/[locale]/about">) {
+  const { locale } = await params;
+
+  // Pin the locale for static rendering. Without this, `next-intl` resolves it
+  // from the request, which is uncached data and fails the `cacheComponents`
+  // build. It must run in the page, not the layout: layouts execute after the
+  // page they wrap.
+  setRequestLocale(locale);
+
   const [sections, values, members, programmes] = await Promise.all([
     getAboutSections(),
     getCoreValues(),

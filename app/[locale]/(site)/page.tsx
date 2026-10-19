@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 
 import { ClosingCta } from "@/components/sections/closing-cta";
@@ -44,7 +45,17 @@ export const metadata: Metadata = {
 
 // Anything uncached is streamed through a Suspense boundary because
 // cacheComponents is enabled (next.config.ts).
-export default function HomePage() {
+export default async function HomePage({
+  params,
+}: PageProps<"/[locale]">) {
+  const { locale } = await params;
+
+  // Pin the locale for static rendering. Without this, `next-intl` resolves it
+  // from the request, which is uncached data and fails the `cacheComponents`
+  // build. It must run in the page, not the layout: layouts execute after the
+  // page they wrap.
+  setRequestLocale(locale);
+
   return (
     <>
       <main id="main" className="flex-1">
