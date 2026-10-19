@@ -5,9 +5,9 @@ import { ImageResponse } from "next/og";
 
 async function readLogo() {
   const buf = await readFile(
-    join(process.cwd(), "public/brand/logo.webp"),
+    join(process.cwd(), "public/brand/logo.svg"),
   );
-  return `data:image/webp;base64,${buf.toString("base64")}`;
+  return `data:image/svg+xml;base64,${buf.toString("base64")}`;
 }
 
 export const alt = "Imarisha Dada — Empowering Girls and Young Women in Kibera, Nairobi, Nairobi";

@@ -31,6 +31,7 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "Imarisha Dada",
     locale: "en_KE",
+      images: ["/opengraph-image"],
     url: "/",
     title: "Imarisha Dada — Empowering Girls and Young Women in Kibera, Nairobi",
     description:

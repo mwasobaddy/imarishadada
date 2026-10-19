@@ -31,6 +31,7 @@ export const metadata: Metadata = {
     type: "article",
     url: "/legal/privacy",
     locale: "en_KE",
+      images: ["/opengraph-image"],
     title: "Privacy notice | Imarisha Dada",
     description: "What we collect, why, who we share it with, and how to exercise your rights.",
   },

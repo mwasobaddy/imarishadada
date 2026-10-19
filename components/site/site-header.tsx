@@ -114,17 +114,22 @@ export function SiteHeader() {
             href="/"
             className="flex items-center gap-2.5 rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-700"
           >
-            {/* The logo already carries the wordmark, so the accessible name
-                comes from alt and no adjacent text duplicates it. */}
+            {/* The new logo is a mark only — no wordmark — so the name
+                sits beside it as text. Text scales, translates and re-themes
+                better than a raster wordmark, and keeps the header readable
+                even if the mark fails to load. */}
             <Image
-              src="/brand/logo.webp"
-              alt="Imarisha Dada"
-              width={1040}
-              height={950}
+              src="/brand/logo.svg"
+              alt=""
+              width={1200}
+              height={1200}
               priority
               sizes="(max-width: 640px) 44px, (max-width: 1024px) 48px, 52px"
               className="h-10 w-auto sm:h-11 lg:h-12"
             />
+            <span className="text-base font-semibold tracking-tight text-brand-600 sm:text-lg">
+              Imarisha Dada
+            </span>
             <span className="hidden text-xs text-ink-muted xl:inline">
               Empower a Sister
             </span>

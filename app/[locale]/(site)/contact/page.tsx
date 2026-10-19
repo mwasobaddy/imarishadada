@@ -31,6 +31,7 @@ export const metadata: Metadata = {
     type: "website",
     url: "/contact",
     locale: "en_KE",
+      images: ["/opengraph-image"],
     title: "Contact Imarisha Dada — Kibera, Nairobi, Kenya",
     description:
       "Reach Imarisha Dada by WhatsApp, phone, email or our contact form. We reply within three working days.",

@@ -30,6 +30,7 @@ export const metadata: Metadata = {
     type: "website",
     url: "/stories",
     locale: "en_KE",
+      images: ["/opengraph-image"],
     title: "Stories | Imarisha Dada",
     description: "Stories from Kibera, published only with recorded consent.",
   },

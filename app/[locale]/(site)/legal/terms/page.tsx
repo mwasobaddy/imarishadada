@@ -28,6 +28,7 @@ export const metadata: Metadata = {
     type: "article",
     url: "/legal/terms",
     locale: "en_KE",
+      images: ["/opengraph-image"],
     title: "Terms of use | Imarisha Dada",
     description: "The terms that apply when you use this website or donate to us.",
   },

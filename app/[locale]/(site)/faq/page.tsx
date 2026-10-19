@@ -28,6 +28,7 @@ export const metadata: Metadata = {
     type: "website",
     url: "/faq",
     locale: "en_KE",
+      images: ["/opengraph-image"],
     title: "Frequently asked questions | Imarisha Dada",
     description: "Answers about giving, our programmes, and safeguarding.",
   },

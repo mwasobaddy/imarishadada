@@ -31,6 +31,7 @@ export function proseMetadata(page: ProsePage): Metadata {
       type: "article",
       url: `/${page.slug}`,
       locale: "en_KE",
+      images: ["/opengraph-image"],
       title: `${page.title} | Imarisha Dada`,
       description: page.lede.slice(0, 160),
     },

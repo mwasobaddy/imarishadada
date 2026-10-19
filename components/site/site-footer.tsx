@@ -68,14 +68,19 @@ export async function SiteFooter() {
       <div className="mx-auto max-w-6xl px-5 py-14 sm:px-8">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-1">
-            <Image
-              src="/brand/logo.webp"
-              alt="Imarisha Dada"
-              width={1040}
-              height={950}
-              sizes="80px"
-              className="h-20 w-auto"
-            />
+            <div className="flex items-center gap-3">
+              <Image
+                src="/brand/logo.svg"
+                alt=""
+                width={5000}
+                height={5000}
+                sizes="80px"
+                className="h-16 w-auto sm:h-20"
+              />
+              <span className="text-xl font-semibold tracking-tight text-brand-600">
+                Imarisha Dada
+              </span>
+            </div>
             <p className="mt-3 text-sm text-ink-muted">{t("tagline")}</p>
             <p className="measure mt-4 text-sm leading-relaxed text-ink-muted">
               {t("description")}

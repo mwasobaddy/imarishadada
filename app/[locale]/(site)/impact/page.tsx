@@ -35,6 +35,7 @@ export const metadata: Metadata = {
     type: "article",
     url: "/impact",
     locale: "en_KE",
+      images: ["/opengraph-image"],
     title: "Our impact | Imarisha Dada",
     description: "Every figure we publish is dated, and we say how it was counted.",
   },

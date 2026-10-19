@@ -32,6 +32,7 @@ export async function generateMetadata({
       type: "article",
       url: `/stories/${story.slug}`,
       locale: "en_KE",
+      images: ["/opengraph-image"],
       title: "A story from Kibera | Imarisha Dada",
       description: story.quote.slice(0, 160),
     },

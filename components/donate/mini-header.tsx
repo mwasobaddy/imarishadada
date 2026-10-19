@@ -23,7 +23,7 @@ export function MiniHeader() {
           className="inline-flex items-center gap-2.5 rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-700"
         >
           <Image
-            src="/brand/mark.webp"
+            src="/brand/mark.svg"
             alt=""
             width={32}
             height={32}

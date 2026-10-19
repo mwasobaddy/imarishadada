@@ -63,6 +63,7 @@ export async function generateMetadata({
       type: "article",
       url: `/programmes/${programme.slug}`,
       locale: "en_KE",
+      images: ["/opengraph-image"],
       title: `${programme.title} | Imarisha Dada`,
       description: description.slice(0, 160),
     },
@@ -116,7 +117,7 @@ export default async function ProgrammePage({
     publisher: {
       "@type": "NGO",
       name: "Imarisha Dada",
-      logo: { "@type": "ImageObject", url: absoluteUrl("/brand/mark.webp") },
+      logo: { "@type": "ImageObject", url: absoluteUrl("/brand/mark.svg") },
     },
     inLanguage: "en-KE",
     mainEntityOfPage: absoluteUrl(`/programmes/${programme.slug}`),

@@ -34,12 +34,14 @@ export const metadata: Metadata = {
     title: "Imarisha Dada — Empowering Girls and Young Women in Kibera, Nairobi",
     description:
       "Girl-led organisation in Kibera, Nairobi supporting school re-entry, safe spaces and economic empowerment for girls and young mothers.",
+    images: ["/opengraph-image"],
   },
   twitter: {
     card: "summary_large_image",
     title: "Imarisha Dada — Empowering Girls and Young Women in Kibera, Nairobi",
     description:
       "Girl-led organisation in Kibera, Nairobi supporting school re-entry, safe spaces and economic empowerment for girls and young mothers.",
+    images: ["/opengraph-image"],
   },
 };
 

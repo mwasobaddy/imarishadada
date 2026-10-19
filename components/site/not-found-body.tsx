@@ -32,10 +32,10 @@ export function NotFoundBody() {
           className="inline-flex items-center rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-700"
         >
           <Image
-            src="/brand/logo.webp"
+            src="/brand/logo.svg"
             alt="Imarisha Dada"
-            width={400}
-            height={133}
+            width={5000}
+            height={5000}
             sizes="200px"
             className="h-11 w-auto"
           />

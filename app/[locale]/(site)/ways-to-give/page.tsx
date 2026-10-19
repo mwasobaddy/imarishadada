@@ -33,6 +33,7 @@ export const metadata: Metadata = {
     type: "website",
     url: "/ways-to-give",
     locale: "en_KE",
+      images: ["/opengraph-image"],
     title: "Ways to give | Imarisha Dada",
     description: "Give by M-Pesa, card or bank transfer. Every amount funds a specific outcome.",
   },

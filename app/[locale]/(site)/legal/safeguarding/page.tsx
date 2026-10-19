@@ -40,6 +40,7 @@ export const metadata: Metadata = {
     type: "article",
     url: "/legal/safeguarding",
     locale: "en_KE",
+      images: ["/opengraph-image"],
     title: "Safeguarding policy | Imarisha Dada",
     description:
       "How Imarisha Dada protects the children and young women we work with, and how to raise a concern.",

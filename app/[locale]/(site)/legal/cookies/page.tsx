@@ -30,6 +30,7 @@ export const metadata: Metadata = {
     type: "article",
     url: "/legal/cookies",
     locale: "en_KE",
+      images: ["/opengraph-image"],
     title: "Cookie notice | Imarisha Dada",
     description: "What cookies this site uses, and what it does not.",
   },

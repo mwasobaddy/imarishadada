@@ -31,6 +31,7 @@ export const metadata: Metadata = {
     type: "website",
     url: "/programmes",
     locale: "en_KE",
+      images: ["/opengraph-image"],
     title: "Our programmes | Imarisha Dada",
     description:
       "Three programmes in Kibera, Nairobi: school re-entry for young mothers, economic empowerment, and safe spaces for girls aged 9–16.",
