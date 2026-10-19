@@ -1,0 +1,130 @@
+{
+  "_meta": {
+    "note": "Chrome and donate-flow strings only. Programme, story and impact content comes from Supabase and is translated via the `translations` table, not here — see doc/roadmap/admin-panel.md §2 and doc/roadmap/localisation.md.",
+    "status": "published",
+    "reviewedBy": null,
+    "reviewedAt": null
+  },
+  "common": {
+    "skipToContent": "Skip to content",
+    "menu": "Menu",
+    "donate": "Donate",
+    "language": "Language",
+    "changeLanguage": "Change language",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "dismissMenu": "Dismiss menu"
+  },
+  "nav": {
+    "ourWork": "Our work",
+    "impact": "Impact",
+    "stories": "Stories",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "announcement": {
+    "short": "M-Pesa or card · Receipts for every gift",
+    "long": "Give by M-Pesa or card · Receipts for every gift · 100% of gifts fund our programmes in Kibera"
+  },
+  "footer": {
+    "tagline": "Empower a Sister",
+    "description": "A girl-centred, community-led organisation working with girls and young women in Kibera, Nairobi, Kenya.",
+    "programmes": {
+      "heading": "Programmes",
+      "schoolReentry": "School Re-entry",
+      "economicEmpowerment": "Economic Empowerment",
+      "dadaSpace": "Dada Space"
+    },
+    "organisation": {
+      "heading": "Organisation",
+      "aboutUs": "About us",
+      "ourImpact": "Our impact",
+      "transparency": "Transparency",
+      "annualReport": "Annual report",
+      "news": "News"
+    },
+    "support": {
+      "heading": "Support",
+      "waysToGive": "Ways to give",
+      "partnerWithUs": "Partner with us",
+      "volunteer": "Volunteer",
+      "contact": "Contact",
+      "faq": "FAQ"
+    },
+    "legal": {
+      "safeguarding": "Safeguarding policy",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "raiseConcern": "Raise a concern"
+    },
+    "location": "Kibera, Nairobi, Kenya",
+    "copyright": "© {year} Imarisha Dada. Registered NGO registration number to be published once issued."
+  },
+  "donate": {
+    "title": "Give a girl in Kibera her future",
+    "frequency": {
+      "heading": "How often?",
+      "ariaLabel": "How often?",
+      "once": "Once",
+      "monthly": "Monthly"
+    },
+    "amount": {
+      "heading": "Choose an amount",
+      "other": "Other amount"
+    },
+    "method": {
+      "ariaLabel": "How would you like to give?"
+    },
+    "summary": {
+      "heading": "Your gift",
+      "processingFee": "Processing fee",
+      "noFee": "No fee",
+      "total": "Total",
+      "give": "Give {amount}",
+      "pending": "Opening secure payment…"
+    },
+    "outcome": {
+      "whereNeededMost": "Where it is needed most"
+    },
+    "bank": {
+      "heading": "Bank details",
+      "accountName": "Account name:",
+      "bank": "Bank:",
+      "accountNumber": "Account number:",
+      "branch": "Branch:",
+      "notReady": "Bank transfer is being set up. Please use another method for now."
+    },
+    "consent": {
+      "heading": "Monthly gift",
+      "body": "I understand this is a monthly gift and can cancel any time."
+    },
+    "receipt": {
+      "optIn": "Email me a receipt and occasional programme updates."
+    },
+    "errors": {
+      "generic": "Something went wrong on our side. Nothing has been charged — please try again."
+    },
+    "success": {
+      "title": "Thank you",
+      "body": "Your {amount} will fund {outcome} this term.",
+      "monthlySuffix": " a month",
+      "share": "Share your support",
+      "shareSubject": "My gift to Imarisha Dada",
+      "shareBody": "I just gave to Imarisha Dada, a girl-led organisation in Kibera, Nairobi.",
+      "backToSite": "Back to the site",
+      "sisterhood": "You are now part of the sisterhood.",
+      "reference": "Reference {reference}. Your receipt is on its way by email."
+    },
+    "failure": {
+      "title": "Your gift did not go through",
+      "body": "Nothing has been charged, and no money has left your account. You can try again, or reach us directly and we will take your gift another way.",
+      "tryAgain": "Try again"
+    }
+  },
+  "errors": {
+    "emailInvalid": "Enter an email address so we can send your receipt.",
+    "phoneInvalid": "Enter a Kenyan mobile number, for example 0712 345 678.",
+    "consentRequired": "Please confirm you understand this is a monthly gift you can cancel any time.",
+    "amountInvalid": "Enter an amount of at least 1."
+  }
+}
