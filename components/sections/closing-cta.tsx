@@ -1,3 +1,4 @@
+import { Link } from "@/i18n/navigation";
 export function ClosingCta() {
   return (
     <section aria-labelledby="closing-heading" className="bg-brand py-section text-ink-inverse">
@@ -17,18 +18,16 @@ export function ClosingCta() {
           </div>
 
           <div className="flex flex-col items-start gap-4 lg:items-end">
-            <a
-              href="/donate"
+            <Link href="/donate"
               className="inline-flex min-h-13 w-full items-center justify-center rounded-lg bg-gold px-8 text-base font-semibold text-gold-ink transition-colors hover:bg-gold/90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink-inverse sm:w-auto"
             >
               Help the next one
-            </a>
-            <a
-              href="/partner"
+            </Link>
+            <Link href="/partner"
               className="inline-flex min-h-12 items-center justify-center rounded-lg px-2 text-base font-medium text-ink-inverse underline decoration-ink-inverse/40 underline-offset-4 hover:decoration-ink-inverse focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink-inverse"
             >
               Partner with us
-            </a>
+            </Link>
             <p className="text-sm text-ink-inverse">
               M-Pesa and card. Receipts for every gift.
             </p>

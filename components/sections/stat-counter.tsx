@@ -17,7 +17,24 @@ gsap.registerPlugin(ScrollTrigger);
  * innerHTML or a layout property. Final value is already in the DOM so screen
  * readers and no-JS users get the real number, not zero.
  */
-export function StatCounter({ stats }: { stats: ImpactStat[] }) {
+/**
+ * Headline impact figures with a GSAP count-up.
+ *
+ * Reused by `/impact` rather than rebuilt, per impact.md §4.2. `headingId`,
+ * `heading` and `intro` are optional and default to the homepage wording, so
+ * adding a second consumer cannot change the homepage.
+ */
+export function StatCounter({
+  stats,
+  headingId = "impact-heading",
+  heading = "Last year, in Kibera",
+  intro = "Every figure below carries the period it covers.",
+}: {
+  stats: ImpactStat[];
+  headingId?: string;
+  heading?: string;
+  intro?: string;
+}) {
   const container = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -66,7 +83,7 @@ export function StatCounter({ stats }: { stats: ImpactStat[] }) {
   return (
     <section
       ref={container}
-      aria-labelledby="impact-heading"
+      aria-labelledby={headingId}
       className="bg-brand py-20 text-ink-inverse sm:py-24 relative mt-8 lg:mt-0"
     >
       <div className="absolute h-[150px] w-[150px] right-0 scale-x-[-1] bg-brand p-4 rounded-t-full" aria-hidden="true" style={{ top: "-80px"}}>
@@ -88,15 +105,13 @@ export function StatCounter({ stats }: { stats: ImpactStat[] }) {
       </div>
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <h2
-          id="impact-heading"
+          id={headingId}
           className="max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl"
         >
-          Last year, in Kibera
+          {heading}
         </h2>
 
-        <p className="mt-3 max-w-xl text-base text-ink-inverse">
-          Every figure below carries the period it covers.
-        </p>
+        <p className="mt-3 max-w-xl text-base text-ink-inverse">{intro}</p>
 
         {/* Definition list: the value/label/period relationship is meaningful
             and should be exposed as such, not as loose divs. */}

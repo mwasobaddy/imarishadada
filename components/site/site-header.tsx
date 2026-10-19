@@ -4,8 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 
-import { DONATE_LINK, LOCALES, NAV_ITEMS, ROLLOUT_LOCALE_CODES } from "@/lib/nav";
+import { DONATE_LINK, LOCALE_LABELS, NAV_ITEMS } from "@/lib/nav";
+import { PUBLISHED_LOCALES } from "@/lib/seo";
 
 /**
  * Custom rather than @aceternity/floating-navbar.
@@ -18,6 +20,8 @@ import { DONATE_LINK, LOCALES, NAV_ITEMS, ROLLOUT_LOCALE_CODES } from "@/lib/nav
  * scroll-linked motion belongs to GSAP (frontend-design.md, hybrid policy).
  */
 export function SiteHeader() {
+  const t = useTranslations("nav");
+  const tc = useTranslations("common");
   const [visible, setVisible] = useState(true);
   const [open, setOpen] = useState(false);
   const [localeOpen, setLocaleOpen] = useState(false);
@@ -98,7 +102,7 @@ export function SiteHeader() {
         href="#main"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-50 focus:rounded-md focus:bg-brand-600 focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-ink-inverse"
       >
-        Skip to content
+        {tc("skipToContent")}
       </a>
 
       <div className="border-b border-brand/20 bg-surface/90 backdrop-blur-md">
@@ -133,7 +137,7 @@ export function SiteHeader() {
                   href={item.link}
                   className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm text-ink transition-colors hover:bg-brand-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
                 >
-                  {item.name}
+                  {t(item.labelKey)}
                 </Link>
               </li>
             ))}
@@ -150,7 +154,7 @@ export function SiteHeader() {
               href={DONATE_LINK}
               className="inline-flex min-h-11 items-center rounded-lg bg-gold px-5 text-sm font-semibold text-gold-ink transition-colors hover:bg-gold/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
             >
-              Donate
+              {tc("donate")}
             </Link>
 
             <button
@@ -161,7 +165,7 @@ export function SiteHeader() {
               aria-controls="mobile-menu"
               className="inline-flex size-11 items-center justify-center rounded-lg text-ink hover:bg-brand-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 lg:hidden"
             >
-              <span className="sr-only">{open ? "Close menu" : "Open menu"}</span>
+              <span className="sr-only">{open ? tc("closeMenu") : tc("openMenu")}</span>
               <svg
                 aria-hidden="true"
                 viewBox="0 0 24 24"
@@ -186,7 +190,7 @@ export function SiteHeader() {
         <>
           <button
             type="button"
-            aria-label="Dismiss menu"
+            aria-label={tc("dismissMenu")}
             tabIndex={-1}
             onClick={() => setOpen(false)}
             className="fixed inset-0 z-40 cursor-default bg-brand/20 lg:hidden"
@@ -196,7 +200,7 @@ export function SiteHeader() {
             id="mobile-menu"
             role="dialog"
             aria-modal="true"
-            aria-label="Menu"
+            aria-label={tc("menu")}
             className="fixed inset-x-0 top-[57px] z-50 max-h-[calc(100dvh-57px)] overflow-y-auto border-b border-brand/20 bg-surface px-5 py-6 shadow-lg sm:px-8 lg:hidden"
           >
             <ul className="flex flex-col gap-1">
@@ -206,7 +210,7 @@ export function SiteHeader() {
                     href={item.link}
                     className="inline-flex min-h-11 items-center rounded-lg px-3 text-base text-ink hover:bg-brand-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
                   >
-                    {item.name}
+                    {t(item.labelKey)}
                   </Link>
                 </li>
               ))}
@@ -230,9 +234,19 @@ function LocaleSwitcher({
   setOpen: (v: boolean) => void;
   className?: string;
 }) {
-  const live = LOCALES.filter((l) =>
-    (ROLLOUT_LOCALE_CODES as readonly string[]).includes(l.code),
-  );
+  const tc = useTranslations("common");
+  // Display metadata for locales that actually resolve. `PUBLISHED_LOCALES` is
+  // the same flag the sitemap uses for hreflang, so the switcher can never offer
+  // a language that 404s.
+  const live = PUBLISHED_LOCALES.map((code) => ({
+    code,
+    ...LOCALE_LABELS[code],
+  }));
+
+  // With one locale there is nothing to switch to, so render nothing rather than
+  // a globe button that opens a single-item menu. Once `sw` ships this becomes
+  // interactive again with no change here.
+  if (live.length < 2) return null;
 
   return (
     <div className={`relative ${className ?? ""}`}>
@@ -256,13 +270,13 @@ function LocaleSwitcher({
           <path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18" />
         </svg>
         <span aria-hidden="true">{live[0]?.short}</span>
-        <span className="sr-only">Change language</span>
+        <span className="sr-only">{tc("changeLanguage")}</span>
       </button>
 
       {open ? (
         <ul
           role="listbox"
-          aria-label="Language"
+          aria-label={tc("language")}
           className="absolute right-0 z-50 mt-1 min-w-40 rounded-lg border border-brand/20 bg-surface py-1 shadow-lg"
         >
           {live.map((locale) => (
@@ -275,13 +289,8 @@ function LocaleSwitcher({
               </a>
             </li>
           ))}
-          {live.length === 1 ? (
-            <li className="px-3 py-2 text-xs text-ink-muted">
-              More languages coming soon
-            </li>
-          ) : null}
         </ul>
       ) : null}
     </div>
-  );
+    );
 }
