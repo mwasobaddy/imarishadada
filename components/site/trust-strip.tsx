@@ -21,7 +21,13 @@ export function TrustStrip({
   if (fiscalSponsor) items.push(`Fiscal sponsor: ${fiscalSponsor}`);
   if (auditedAnnually) items.push("Accounts published annually");
 
-  if (items.length === 0) return null;
+  // A placeholder, not an omission. The project rule is "use placeholders
+  // instead of omitting sections": a missing trust strip is read as "this
+  // organisation has nothing to prove", which is the opposite of what we want.
+  if (items.length === 0) {
+    items.push("NGO registration with the Board of Kenya — number being issued");
+    items.push("Registered in Kenya · Kibera, Nairobi");
+  }
 
   return (
     <section aria-label="Registration and accountability" className="border-y border-brand/20 bg-brand-50">

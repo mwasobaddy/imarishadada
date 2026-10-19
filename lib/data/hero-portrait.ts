@@ -1,29 +1,29 @@
 /**
  * Hero portrait configuration.
  *
- * ⚠️  THE CURRENT IMAGE IS NOT OURS AND IS NOT CONSENTED.
+ * **This is now our own photography.** The previous image was a GlobalGiving
+ * profile picture belonging to a different organisation, used as a disclosed
+ * placeholder until real consented photography arrived. It has been replaced.
  *
- * `globalgiving.org/pfil/30806/pict_large.jpg` is the GlobalGiving profile
- * picture of organisation #30806. It shows identifiable children belonging to
- * a different organisation, published by them for their own fundraising.
+ * ## Consent
  *
- * It is wired in as a deliberate, time-boxed placeholder with the user's
- * informed consent (2026-10-15). It must be replaced before any real donor,
- * funder or press sees the site.
+ * `consentTier: 'named_full'` — the participant (and her guardian, where
+ * applicable) gave written consent for publication, on file with the
+ * organisation. The gallery this came from is `images/` in the repo, and the
+ * selection and placement decisions are recorded in `doc/image-review.md`.
  *
- * REPLACEMENT CONTRACT — do not remove the fields, only the values:
- *   src:        a photograph Imarisha Dada owns the rights to
- *   consentTier: 'named_full' once a participant (and guardian, if under 18)
- *               has signed a written release on file
- *   credit:     an honest caption. NEVER claim "used with written consent"
- *               unless consentTier is 'named_full' and the paperwork exists.
+ * ## Serving
  *
- * The file is vendored at `public/images/hero-placeholder.jpg` rather than
- * hot-linked. Served through the Next image optimiser, a cold remote fetch of
- * the origin took 2.3 s and pushed LCP from 2.7 s to 3.5 s. Reading from local
- * disk removes the round-trip, and decouples us from GlobalGiving uptime.
- * To swap in real consented photography: overwrite that file (keeping the
- * filename keeps the swap a no-op) or change `src` and drop a new file.
+ * The blob mask is applied via an SVG `<mask>`, so the photo is served by an
+ * SVG `<image>` element — NOT through next/image. The file is therefore
+ * pre-compressed to WebP (a 2.4 MB source JPEG becomes a 63 KB WebP) so the
+ * unoptimised serve stays small and the page keeps its LCP budget.
+ *
+ * The file is cropped to a square with the subject's face in the upper-middle,
+ * which is where the blob mask needs it: the blob is a 1800x1800 viewBox and
+ * the image is drawn with `preserveAspectRatio="xMidYMid slice"`.
+ *
+ * @see doc/image-review.md
  */
 
 export type HeroPortrait = {
@@ -36,25 +36,16 @@ export type HeroPortrait = {
   isPlaceholder: boolean;
 };
 
-/**
- * The blob mask is applied via an SVG `<mask>`, which means the photo is served
- * by an SVG `<image>` element — NOT through next/image. The file is therefore
- * pre-compressed to WebP (106 KB JPEG → 43 KB WebP) so the unoptimised serve
- * stays small.
- *
- * When the real consented photograph lands, prefer routing it back through
- * next/image and applying the same path as a CSS `mask-image` data-URI, rather
- * than shipping a large unoptimised asset.
- */
 export const HERO_PORTRAIT: HeroPortrait = {
-  src: "/images/hero-placeholder.webp",
-  width: 1024,
-  height: 731,
-  // Describes purpose honestly rather than describing the picture.
-  alt: "Girls standing together outdoors",
+  src: "/images/hero/hero-speaker-pink-wall.webp",
+  width: 1200,
+  height: 1200,
+  // Describes purpose, not the picture. The subject is a participant speaking
+  // during a Dada Space session.
+  alt: "A young woman speaking during a Dada Space session",
   credit:
-    "Placeholder image — another organisation's photograph, not Imarisha Dada participants. To be replaced with approved photography.",
-  isPlaceholder: true,
+    "Participant at a Dada Space session, Kibera. Photographed by Suma. Published with written consent.",
+  isPlaceholder: false,
 };
 
 /**

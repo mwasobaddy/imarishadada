@@ -11,6 +11,7 @@ import {
   type ProgrammeOutcome,
   type ProgrammePage,
 } from "@/lib/data/types";
+import { resolveProgrammeImage } from "@/lib/data/programme-images";
 
 /**
  * Programme detail data.
@@ -169,8 +170,7 @@ export const getProgramme = cache(
           icon: "heart",
           stat: null,
           statLabel: null,
-          imagePath: null,
-          imageAlt: null,
+          ...resolveProgrammeImage(slug, null, null),
           outcomes: OUTCOMES_BY_SLUG[slug],
           sortOrder: 0,
         } satisfies ProgrammePage
@@ -204,8 +204,11 @@ export const getProgramme = cache(
       icon: row.icon,
       stat: row.stat,
       statLabel: row.stat_label ?? row.stat,
-      imagePath: row.image_path,
-      imageAlt: row.image_alt,
+      ...resolveProgrammeImage(
+        row.slug,
+        row.image_path,
+        row.image_alt,
+      ),
       outcomes: parseOutcomes(row.outcomes),
       sortOrder: row.sort_order,
     };

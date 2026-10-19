@@ -1,5 +1,4 @@
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
-import { HexagonField } from "@/components/sections/hexagon-field";
 import {
   BLOB_VIEWBOX,
   type HeroPortrait,
@@ -52,7 +51,6 @@ export function Hero({
 }) {
   return (
     <section
-      data-hex-root
       aria-labelledby="hero-title"
       className="relative overflow-hidden bg-surface pt-16 pb-16 sm:pt-20 lg:pt-24 lg:pb-24"
     >
@@ -67,9 +65,12 @@ export function Hero({
         className="pointer-events-none absolute inset-0 bg-[linear-gradient(105deg,var(--surface)_0%,var(--surface)_42%,color-mix(in_oklab,var(--surface)_55%,transparent)_72%,transparent_100%)] lg:bg-[linear-gradient(100deg,var(--surface)_0%,var(--surface)_46%,color-mix(in_oklab,var(--surface)_50%,transparent)_80%,transparent_100%)]"
       />
 
-      <HexagonField />
+      {/* Warm wash — CSS only, no shader, no canvas.
 
-      {/* Warm wash — CSS only, no shader, no canvas. */}
+          The hexagon field that used to sit here has been removed. Now that the
+          hero carries a real photograph, a decorative pattern behind it read as
+          noise rather than atmosphere, and the project rules are explicit that
+          every element should be doing a job. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -right-32 -top-24 size-[34rem] rounded-full bg-surface-lilac opacity-70 blur-3xl"
@@ -88,7 +89,6 @@ export function Hero({
 
           <div
             className="hero-enter hero-enter-delay mt-9 flex flex-wrap items-center gap-4"
-            data-hex-focus
           >
             <InteractiveHoverButton
               href={primaryCta.href}
@@ -140,21 +140,26 @@ export function Hero({
         <figure className="relative h-full hidden lg:block">
           {/* Glow behind the portrait. Deliberately neutral, not --color-secondary.
 
-              The placeholder photograph is strongly magenta, so a secondary-tinted
-              glow doubles the pink and pushes the hero well past the 10% share
-              the 60/30/10 split allows. This should be re-evaluated once real
-              consented photography replaces it. */}
+              The portrait is warm and pink-toned against the page, so the glow
+              is a brand tint rather than the secondary pink — a pink glow
+              would double the hue and push the hero past the 10% accent share
+              the 60/30/10 split allows. */}
           <div
             aria-hidden="true"
             className="absolute inset-4 bg-brand-100/70 blur-3xl"
           />
 
+          {/* `relative` is load-bearing. The glow div above is absolutely
+              positioned, and positioned elements paint above static ones — so
+              without this the glow sat ON TOP of the photograph and washed the
+              subject out. It was invisible against the old magenta placeholder
+              and obvious against a real portrait. */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox={BLOB_VIEWBOX}
             role="img"
             aria-label={portrait.alt}
-            // className="relative w-full h-full overflow-visible"
+            className="relative h-full w-full"
           >
             <defs>
               <mask id="hero-blob-mask" className="mask-type-alpha">

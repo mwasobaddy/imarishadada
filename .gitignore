@@ -48,3 +48,19 @@ next-env.d.ts
 
 # personaal docs
 /doc
+
+# Photography.
+#
+# The 177 source photographs in `images/` show identifiable participants,
+# including minors. Consent was given for publication on the website, not for
+# publication in a public repository — and this repository is public. Keeping
+# them out of git is the difference between "published on imarishadada.org"
+# and "published on github.com/mwasobaddy/imarishadada", permanently and
+# outside the site's consent gating.
+#
+# The images the site actually serves live in `public/images/`. The ones under
+# a consent tier live in `private-assets/`.
+/images/
+
+# Consent-gated participant photographs, staged for Supabase Storage.
+/private-assets/

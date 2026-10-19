@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { setRequestLocale } from "next-intl/server";
 import Link from "next/link";
 
@@ -245,7 +246,58 @@ export default async function ImpactPage({
               </p>
             </div>
 
-            <ul className="mt-10 space-y-3">
+            {/* Photography.
+                A number with no picture behind it is an assertion. The figures
+                on this page are the organisation's own, and putting a face to
+                "19 young mothers back in school" is what makes the number
+                mean something to a donor who has never heard of Kibera.
+
+                Every photograph here is consented and credited in
+                doc/image-review.md. */}
+            <h3 className="mt-12 text-sm font-semibold tracking-wide text-brand-100 uppercase">
+              In the field
+            </h3>
+            <ul className="mt-5 grid gap-5 sm:grid-cols-2">
+              {[
+                {
+                  src: "/images/impact/impact-group-with-banner.avif",
+                  alt: "The full group of participants photographed with the organisation's banner",
+                  caption: "The cohort behind the 2025–26 figures",
+                },
+                {
+                  src: "/images/impact/impact-supplies-distributed.avif",
+                  alt: "Participants handing out supplies to families at the community centre",
+                  caption: "What a gift becomes on the ground",
+                },
+                {
+                  src: "/images/impact/impact-community-meal.avif",
+                  alt: "A community meal served at the community centre in Kibera",
+                  caption: "Community outreach, Kibera",
+                },
+                {
+                  src: "/images/impact/impact-outdoor-group.avif",
+                  alt: "Participants gathered outdoors under the trees after a session",
+                  caption: "Sessions in Kibera",
+                },
+              ].map((photo) => (
+                <li key={photo.src} className="overflow-hidden rounded-card bg-brand-100/10">
+                  <Image
+                    src={photo.src}
+                    alt={photo.alt}
+                    width={1400}
+                    height={933}
+                    sizes="(max-width: 640px) 92vw, (max-width: 1024px) 46vw, 560px"
+                    className="aspect-[3/2] w-full object-cover"
+                  />
+                  <p className="px-5 py-3 text-sm text-brand-100">{photo.caption}</p>
+                </li>
+              ))}
+            </ul>
+
+            <h3 className="mt-12 text-sm font-semibold tracking-wide text-brand-100 uppercase">
+              The written record
+            </h3>
+            <ul className="mt-5 space-y-3">
               <li className="rounded-card border border-brand-100/30 bg-brand-100/10 p-5">
                 <p className="font-semibold text-ink-inverse">
                   Annual Report {REPORTING_PERIOD.label}

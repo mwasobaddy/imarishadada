@@ -1,5 +1,6 @@
+import Image from "next/image";
+
 import { Container } from "@/components/site/container";
-import { PlaceholderImage } from "@/components/site/placeholder-image";
 import { AboutPhotoCarousel } from "@/components/about/photo-carousel";
 import { Programmes } from "@/components/sections/programmes";
 import type { Programme, SiteSection } from "@/lib/data/types";
@@ -213,12 +214,22 @@ export function AboutField() {
   return (
     <section aria-label="Our work in the field" className="bg-surface py-section">
       <Container>
-        <PlaceholderImage
-          src="/placeholders/field.svg"
-          alt="Placeholder for a video still from an Imarisha Dada session in Kibera"
-          note="Placeholder — a consented field video will replace this and open in a lightbox on click."
-          sizes="(max-width: 768px) 92vw, 1152px"
-        />
+        <figure className="flex flex-col gap-3">
+          <div className="relative overflow-hidden rounded-card bg-surface-lilac">
+            <Image
+              src="/images/about/about-outdoor-candid.avif"
+              alt="Participants in branded t-shirts talking together outdoors after a session in Kibera"
+              width={1400}
+              height={933}
+              sizes="(max-width: 768px) 92vw, 1152px"
+              className="h-full w-full object-cover"
+            />
+          </div>
+          <figcaption className="text-xs leading-relaxed text-ink-muted">
+            A session in Kibera. A consented field video will replace this
+            photograph and open in a lightbox on click.
+          </figcaption>
+        </figure>
       </Container>
     </section>
   );

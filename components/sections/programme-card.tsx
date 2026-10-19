@@ -23,7 +23,6 @@ export function ProgrammeCard({ programme }: { programme: Programme }) {
   return (
     <Link
       href={`/programmes/${programme.slug}`}
-      data-hex-focus
       className="group relative flex min-h-80 flex-col justify-end overflow-hidden rounded-card border border-brand/20 bg-brand p-6 transition-colors hover:border-secondary/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
     >
       {programme.imagePath ? (

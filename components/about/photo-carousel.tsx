@@ -15,26 +15,37 @@ import DepthCarousel, { type DepthCarouselItem } from "@/components/ui/depth-car
  * pauses on mouse hover AND on keyboard focus, and it skips tweening entirely
  * when `prefers-reduced-motion: reduce` is set.
  *
- * Swapping placeholders for real photography later means editing `CARDS` only —
- * the `alt` text is written to describe the eventual photograph, so it stays
- * correct once the real assets land.
+ * These are **real photographs** from the organisation's own sessions, published
+ * with written consent. The selection and placement decisions are recorded in
+ * `doc/image-review.md`.
+ *
+ * The `alt` text describes each photograph, not a placeholder, so it stays
+ * correct as the carousel is re-curated.
  */
 const CARDS: DepthCarouselItem[] = [
   {
-    image: "/placeholders/card-1.svg",
-    alt: "Placeholder for a photograph of students in a classroom in Kibera",
+    image: "/images/about/about-two-women-classroom.avif",
+    alt: "Two young women smiling together in a classroom in Kibera",
   },
   {
-    image: "/placeholders/card-2.svg",
-    alt: "Placeholder for a photograph of a mentor meeting with a student",
+    image: "/images/about/about-mentor-and-participant.avif",
+    alt: "A participant and a younger girl seated together during a session",
   },
   {
-    image: "/placeholders/card-3.svg",
-    alt: "Placeholder for a photograph of a young woman running her own business",
+    image: "/images/about/about-core-values-presentation.avif",
+    alt: "A participant presenting a chart to her group during a session",
   },
   {
-    image: "/placeholders/card-4.svg",
-    alt: "Placeholder for a photograph of girls at the Dada Space",
+    image: "/images/about/about-outdoor-candid.avif",
+    alt: "Participants in branded t-shirts talking outdoors after a session",
+  },
+  {
+    image: "/images/about/about-group-outdoors.avif",
+    alt: "The full group photographed outside the community centre",
+  },
+  {
+    image: "/images/about/about-facilitation.avif",
+    alt: "A participant drawing on a flipchart while the group watches",
   },
 ];
 
@@ -63,8 +74,9 @@ export function AboutPhotoCarousel({ className }: { className?: string }) {
       />
 
       <p className="mt-4 text-xs leading-relaxed text-ink-muted">
-        Placeholder images — to be replaced with consented photographs of the
-        programme. Auto-advances, and pauses on hover or keyboard focus.
+        Programmes and sessions in Kibera, photographed by Suma and published
+        with written consent. Auto-advances, and pauses on hover or keyboard
+        focus.
       </p>
     </div>
   );

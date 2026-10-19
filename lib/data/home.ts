@@ -9,6 +9,7 @@ import type {
   SiteSection,
 } from "@/lib/data/types";
 import { effectiveConsentTier } from "@/lib/data/types";
+import { resolveProgrammeImage } from "@/lib/data/programme-images";
 
 /**
  * Fallback content for local development and pre-migration builds.
@@ -261,8 +262,24 @@ export const getSection = cache(async (key: string): Promise<SiteSection> => {
   };
 });
 
+
+/**
+ * Attach the consented photograph to a programme that has none.
+ *
+ * The seed rows carry `image_path: null` because they were written before the
+ * photography existed. Without this, the seed path — which is what runs
+ * whenever Supabase is not configured — renders the brand-tinted field and the
+ * photographs never appear at all.
+ */
+function withProgrammeImages(rows: Programme[]): Programme[] {
+  return rows.map((row) => ({
+    ...row,
+    ...resolveProgrammeImage(row.slug, row.imagePath, row.imageAlt),
+  }));
+}
+
 export const getProgrammes = cache(async (): Promise<Programme[]> => {
-  if (!isSupabaseConfigured()) return SEED.programmes;
+  if (!isSupabaseConfigured()) return withProgrammeImages(SEED.programmes);
 
   const { data, error } = await createClient()
     .from("programmes")
@@ -272,9 +289,9 @@ export const getProgrammes = cache(async (): Promise<Programme[]> => {
 
   if (error) {
     console.error("[data] programmes query failed:", error.message);
-    return SEED.programmes;
+    return withProgrammeImages(SEED.programmes);
   }
-  if (!data?.length) return SEED.programmes;
+  if (!data?.length) return withProgrammeImages(SEED.programmes);
 
   return data.map((r) => ({
     slug: r.slug as string,
@@ -283,8 +300,11 @@ export const getProgrammes = cache(async (): Promise<Programme[]> => {
     icon: (r.icon as string) ?? "heart",
     stat: (r.stat as string) ?? null,
     statLabel: (r.stat_label as string | null) ?? (r.stat as string | null) ?? null,
-    imagePath: (r.image_path as string | null) ?? null,
-    imageAlt: (r.image_alt as string | null) ?? null,
+    ...resolveProgrammeImage(
+      r.slug as string,
+      r.image_path as string | null,
+      r.image_alt as string | null,
+    ),
     sortOrder: (r.sort_order as number) ?? 0,
   }));
 });

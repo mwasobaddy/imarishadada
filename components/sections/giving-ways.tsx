@@ -49,7 +49,6 @@ export function GivingWays({ tiers }: { tiers: GivingTier[] }) {
             <li key={tier.slug}>
               <Link
                 href="/donate"
-                data-hex-focus
                 className="group flex h-full flex-col rounded-card border border-brand/20 bg-card p-6 transition-colors hover:border-secondary/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
               >
                 <span className="tabular text-2xl font-semibold tracking-tight text-brand-600">
