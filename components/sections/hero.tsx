@@ -1,3 +1,4 @@
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { HexagonField } from "@/components/sections/hexagon-field";
 import {
   BLOB_VIEWBOX,
@@ -89,12 +90,12 @@ export function Hero({
             className="hero-enter hero-enter-delay mt-9 flex flex-wrap items-center gap-4"
             data-hex-focus
           >
-            <a
+            <InteractiveHoverButton
               href={primaryCta.href}
-              className="inline-flex min-h-12 items-center rounded-lg bg-gold px-7 text-base font-semibold text-gold-ink transition-colors hover:bg-gold/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
+              className="min-h-12 rounded-full bg-gold px-7 text-base font-semibold text-gold-ink"
             >
               {primaryCta.label}
-            </a>
+            </InteractiveHoverButton>
             <a
               href={secondaryCta.href}
               className="inline-flex min-h-12 items-center gap-1.5 rounded-lg px-2 text-base font-medium text-brand-600 underline decoration-brand-600/30 underline-offset-4 transition-colors hover:decoration-brand-600 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-700"

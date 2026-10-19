@@ -22,7 +22,7 @@ type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 
 export function InteractiveHoverButton({ children, className, href, ...props }: Props) {
   const classes = cn(
-    "group bg-background relative w-auto cursor-pointer overflow-hidden rounded-full border p-2 px-6 text-center font-semibold",
+    "flex group bg-background relative w-auto cursor-pointer overflow-hidden rounded-full border p-2 px-6 text-center font-semibold",
     className,
   );
 
