@@ -34,6 +34,16 @@ const nextConfig: NextConfig = {
     // bucket (e.g. Supabase Storage) becomes a source.
     remotePatterns: [],
   },
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "imarishadada.org" }],
+        destination: "https://www.imarishadada.org/:path*",
+        permanent: true,
+      },
+    ];
+  },
   turbopack: {
     rules: {
       "*.css": {

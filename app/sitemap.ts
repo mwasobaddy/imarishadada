@@ -53,7 +53,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: "/legal/cookies", priority: 0.3, changeFrequency: "yearly" as const },
   ];
 
-  const base = "https://imarishadada.org";
+  const base = "https://www.imarishadada.org";
 
   // Programme detail pages are database-driven, so their slugs come from the
   // content layer rather than a hardcoded list here. Missing them would leave

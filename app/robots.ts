@@ -11,7 +11,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/api/", "/admin/"],
       },
     ],
-    sitemap: "https://imarishadada.org/sitemap.xml",
-    host: "https://imarishadada.org",
+    sitemap: "https://www.imarishadada.org/sitemap.xml",
+    host: "https://www.imarishadada.org",
   };
 }

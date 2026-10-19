@@ -1,4 +1,4 @@
-export const SITE_URL = "https://imarishadada.org";
+export const SITE_URL = "https://www.imarishadada.org";
 export const ORG_ID = `${SITE_URL}/#organisation`;
 
 export const DEFAULT_LOCALE = "en";
