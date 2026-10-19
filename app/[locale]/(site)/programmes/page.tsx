@@ -6,6 +6,7 @@ import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button
 import { PageHero } from "@/components/site/page-hero";
 import { Container } from "@/components/site/container";
 import { ProgrammeCard } from "@/components/sections/programme-card";
+import { JourneySnake } from "@/components/sections/journey-snake";
 import { getProgrammes } from "@/lib/data/home";
 import { absoluteUrl, breadcrumbJsonLd, jsonLdScript } from "@/lib/seo";
 
@@ -171,25 +172,7 @@ export default async function ProgrammesPage({
               </p>
             ) : null}
 
-            <ol className="mt-10 space-y-4">
-              {PATHWAY.map((step, i) => (
-                <li
-                  key={step.title}
-                  className="flex gap-5 rounded-card border border-border bg-card p-5 sm:p-6"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="grid size-9 shrink-0 place-items-center rounded-full bg-brand-600 text-sm font-semibold text-brand-50 tabular"
-                  >
-                    {i + 1}
-                  </span>
-                  <div>
-                    <h3 className="text-lg font-semibold text-ink">{step.title}</h3>
-                    <p className="measure mt-1 text-ink-muted">{step.body}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
+            <JourneySnake steps={PATHWAY} />
           </Container>
         </section>
 

@@ -165,9 +165,13 @@ export function SiteHeader() {
                     href={item.link}
                     aria-current={active ? "page" : undefined}
                     className={`relative inline-flex min-h-11 items-center rounded-lg px-3 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 ${
+                      // No background on the active item — the weight, the
+                      // colour and the underline marker carry it. A filled pill
+                      // behind one word in a row of five reads as a button
+                      // rather than as "you are here".
                       active
-                        ? "bg-brand-50 font-semibold text-brand-600"
-                        : "text-ink hover:bg-brand-50 hover:text-brand-600"
+                        ? "font-semibold text-brand-600"
+                        : "text-ink hover:text-brand-600"
                     }`}
                   >
                     {t(item.labelKey)}
@@ -294,10 +298,14 @@ export function SiteHeader() {
                     <Link
                       href={item.link}
                       aria-current={active ? "page" : undefined}
-                      className={`flex min-h-14 items-center justify-between gap-3 rounded-xl px-4 text-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 ${
+                      className={`flex min-h-14 items-center justify-between gap-3 px-5 text-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 ${
+                        // Here the background is kept — a full-width row needs
+                        // a filled state to read as selected — but it is fully
+                        // rounded, so the row reads as a pill rather than a
+                        // rectangle inside a rounded sheet.
                         active
-                          ? "bg-brand-50 font-semibold text-brand-600"
-                          : "text-ink hover:bg-surface-lilac"
+                          ? "rounded-full bg-brand-50 font-semibold text-brand-600"
+                          : "rounded-full text-ink hover:bg-surface-lilac"
                       }`}
                     >
                       <span>{t(item.labelKey)}</span>
