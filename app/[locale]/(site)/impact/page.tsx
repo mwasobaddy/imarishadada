@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { PageHero } from "@/components/site/page-hero";
 import { Container } from "@/components/site/container";
+import { JourneySnake } from "@/components/sections/journey-snake";
 import { StatCounter } from "@/components/sections/stat-counter";
 import {
   METHODOLOGY,
@@ -178,16 +179,28 @@ export default async function ImpactPage({
               </p>
             </div>
 
-            <dl className="mt-12 grid gap-6 sm:grid-cols-2">
-              {METHODOLOGY.map((item) => (
-                <div
-                  key={item.term}
-                  className="rounded-card border border-border bg-card p-6"
-                >
-                  <dt className="text-lg font-semibold text-brand-600">{item.term}</dt>
-                  <dd className="measure mt-2 text-ink-muted">{item.definition}</dd>
-                </div>
-              ))}
+            {/* The four definitions are read in order, top to bottom, so they
+                get a spine — a list device. Not a snake: a snake would claim
+                these are stages of a process, and they are definitions, not
+                stages. */}
+            <dl className="mt-12">
+              <JourneySnake
+                variant="spine"
+                pinRing="surface-lilac"
+                items={METHODOLOGY.map((item) => ({
+                  title: item.term,
+                  card: (
+                    <div className="rounded-card border border-border bg-card p-6">
+                      <dt className="text-lg font-semibold text-brand-600">
+                        {item.term}
+                      </dt>
+                      <dd className="measure mt-1 text-ink-muted">
+                        {item.definition}
+                      </dd>
+                    </div>
+                  ),
+                }))}
+              />
             </dl>
 
             <p className="mt-8 text-sm text-ink-muted">

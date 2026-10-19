@@ -1,61 +1,98 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export type JourneyStep = {
+/**
+ * Pin ring colours.
+ *
+ * A static map, not an interpolated class name. Tailwind's scanner only sees
+ * complete class strings in the source, so `ring-${colour}` compiles to
+ * nothing and the pin ends up with no ring at all — which is invisible on a
+ * matching background and a visible hard disc on anything else.
+ */
+const PIN_RINGS = {
+  "surface-lilac": "ring-surface-lilac",
+  "surface": "ring-surface",
+  "surface-pink": "ring-surface-pink",
+} as const;
+
+export type JourneyItem = {
+  /** Used for the accessible label of the milestone. */
   title: string;
-  body: string;
+  /** Plain body copy. Ignored when `card` is supplied. */
+  body?: string;
+  /** Custom card content, for sections that need more than a title and a line. */
+  card?: ReactNode;
 };
 
 /**
- * Serpentine journey — the "how the programmes fit together" section.
+ * A path through a sequence of milestones.
  *
- * ## The shape
+ * ## The two shapes
  *
- * A path snakes across the section and the steps hang off it as numbered
- * milestones. On a wide screen the path runs left to right above the first
- * row of cards, turns down at the right-hand end, and comes back right to
- * left above the second row — so the eye follows one continuous line rather
- * than scanning a grid. On a narrow screen the same path straightens into a
- * spine down the left, with the cards beside it.
+ * **`snake`** — the path runs left to right along the top of the first row,
+ * swings out past the last card, and comes back along the second row. The eye
+ * follows one continuous line instead of scanning a grid. On a narrow screen
+ * the same path straightens into a spine down the left.
  *
- * The path is built from the **measured** position of each milestone rather
- * than from hard-coded geometry, so the layout survives different copy
- * lengths, a different number of steps, or a different column count. That is
- * why it is measured in an effect rather than computed in JSX.
+ * **`spine`** — one column, the path running down the left through each
+ * milestone. This is the shape for a list that is genuinely ordered: the
+ * barriers a girl hits, the steps a programme takes.
  *
- * The cards are laid out relative to their own milestone — beside it on a
- * phone, below it on a wide screen — so the line always runs in open space
- * and never crosses over the copy.
+ * ## Why not everywhere
+ *
+ * A path implies order. Drawing one through an unordered collection — the
+ * organisation's values, the partner schools — would tell a visitor those
+ * things are a sequence, and they are not. So this component is only used
+ * where the content really is ordered.
+ *
+ * ## The path is measured, not hard-coded
+ *
+ * The line is built from the **measured** position of each milestone, so it
+ * still lands exactly when the copy length, the column count or the window
+ * width changes. That is why it is measured in an effect rather than computed
+ * in JSX.
  *
  * ## Motion
  *
- * GSAP, not Motion. The path drawing itself is scroll-linked, and the
- * project's hybrid policy is explicit: if it moves in response to scroll, it
- * is GSAP.
+ * GSAP, not Motion. The draw is scroll-linked, and the project's hybrid policy
+ * is explicit: if it moves in response to scroll, it is GSAP.
  *
- * The draw is `stroke-dashoffset`, which is paint-only and causes no
- * layout. It is scrubbed, so the line fills as the reader scrolls, and it is
- * the only thing that animates.
+ * The draw is `stroke-dashoffset`, which is paint-only and causes no layout.
+ * It is scrubbed, so the line fills as the reader scrolls, and it is the only
+ * thing that animates.
  *
  * **The content never animates in.** The cards, the numbers and the text are
- * in the server-rendered HTML and stay there. If JS is slow, blocked, or
- * fails outright, the reader gets the journey with a line that has not drawn
- * yet — never a page with invisible copy. On a page whose argument is a
- * girl's path through the organisation's work, hiding that argument behind
- * an animation would be the worst possible failure.
+ * in the server-rendered HTML and stay there. If JS is slow, blocked, or fails
+ * outright, the reader gets the sequence with a line that has not drawn yet —
+ * never a page with invisible copy. On a page whose argument is a girl's path
+ * through the organisation's work, hiding that argument behind an animation
+ * would be the worst possible failure.
  */
-export function JourneySnake({ steps }: { steps: JourneyStep[] }) {
+export function JourneySnake({
+  items,
+  variant = "snake",
+  pinRing = "surface-lilac",
+  className,
+}: {
+  items: JourneyItem[];
+  variant?: "snake" | "spine";
+  /** The background the pin's ring should match, so the line appears to pass
+   *  behind the pin rather than through it. */
+  pinRing?: keyof typeof PIN_RINGS;
+  className?: string;
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const nodeRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const pathRef = useRef<SVGPathElement>(null);
   const lengthRef = useRef(0);
   const [nodes, setNodes] = useState<{ x: number; y: number }[]>([]);
+  const [size, setSize] = useState({ w: 0, h: 0 });
 
   /**
    * Measure each milestone's centre, as a percentage of the container.
@@ -71,18 +108,30 @@ export function JourneySnake({ steps }: { steps: JourneyStep[] }) {
       const box = container.getBoundingClientRect();
       if (box.width === 0 || box.height === 0) return;
 
+      // Pixel coordinates, not percentages.
+      //
+      // The SVG's viewBox is set to the container's real pixel size, so the
+      // path, the stroke width and the dash pattern are all in the same
+      // units. That matters: with a percentage viewBox and
+      // `preserveAspectRatio="none"`, the dash has to be expressed in screen
+      // pixels (because `vector-effect="non-scaling-stroke"` puts dashes in
+      // screen space), which means the dash length and the path length are
+      // measured in two different coordinate systems and the line renders as
+      // a row of disconnected fragments. Working in pixels throughout
+      // removes that whole class of bug.
       const measured = nodeRefs.current
         .map((el) => {
           if (!el) return null;
           const b = el.getBoundingClientRect();
           return {
-            x: ((b.left + b.width / 2 - box.left) / box.width) * 100,
-            y: ((b.top + b.height / 2 - box.top) / box.height) * 100,
+            x: b.left + b.width / 2 - box.left,
+            y: b.top + b.height / 2 - box.top,
           };
         })
         .filter((n): n is { x: number; y: number } => n !== null);
 
       setNodes(measured);
+      setSize({ w: box.width, h: box.height });
     };
 
     measure();
@@ -98,9 +147,9 @@ export function JourneySnake({ steps }: { steps: JourneyStep[] }) {
       observer.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [steps.length]);
+  }, [items.length]);
 
-  const path = buildPath(nodes);
+  const path = buildPath(nodes, size.w);
 
   /**
    * Own the dash pattern.
@@ -149,15 +198,13 @@ export function JourneySnake({ steps }: { steps: JourneyStep[] }) {
             reduced: boolean;
           };
 
-          if (!isDesktop || !reduced) return;
-
           const length = lengthRef.current;
           if (!length) return;
 
           if (!isDesktop || !reduced) {
             // No animation on a narrow screen, under reduced motion, or
             // without JavaScript. The line stays where the layout effect left
-            // it — fully drawn. The journey is still a journey.
+            // it — fully drawn. The sequence is still a sequence.
             el.style.strokeDashoffset = "0";
             return;
           }
@@ -189,8 +236,10 @@ export function JourneySnake({ steps }: { steps: JourneyStep[] }) {
     { scope: containerRef, dependencies: [path] },
   );
 
+  const spine = variant === "spine";
+
   return (
-    <div ref={containerRef} className="relative mt-10">
+    <div ref={containerRef} className={`relative ${className ?? ""}`}>
       {/* The spine. `aria-hidden` — it carries no information the numbered
           milestones do not already carry. `overflow-visible` so the turn is
           not clipped, and `vector-effect` keeps the stroke the same width
@@ -198,15 +247,12 @@ export function JourneySnake({ steps }: { steps: JourneyStep[] }) {
       <svg
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-0 h-full w-full overflow-visible"
-        viewBox="0 0 100 100"
-        preserveAspectRatio="none"
+        viewBox={`0 0 ${Math.max(size.w, 1)} ${Math.max(size.h, 1)}`}
         fill="none"
       >
         <path
           ref={pathRef}
           d={path}
-          pathLength={1}
-          vectorEffect="non-scaling-stroke"
           stroke="var(--color-brand-600)"
           strokeWidth="2.5"
           strokeLinecap="round"
@@ -214,40 +260,58 @@ export function JourneySnake({ steps }: { steps: JourneyStep[] }) {
         />
       </svg>
 
-      <ol className="relative z-10 grid gap-x-8 gap-y-2 lg:grid-cols-3 lg:gap-y-12">
-        {steps.map((step, i) => (
+      <ol
+        className={
+          spine
+            ? "relative z-10 space-y-8"
+            : "relative z-10 grid gap-x-8 gap-y-10 lg:grid-cols-3 lg:gap-y-12"
+        }
+      >
+        {items.map((item, i) => (
           <li
-            key={step.title}
+            key={item.title}
             className={
-              // The second row is reversed so the line flows right to left,
-              // which is what turns a grid into a snake. The DOM order is
-              // untouched, so a screen reader still hears 1, 2, 3, 4, 5, 6.
-              i === 3
-                ? "lg:col-start-3 lg:row-start-2"
-                : i === 4
-                  ? "lg:col-start-2 lg:row-start-2"
-                  : i === 5
-                    ? "lg:col-start-1 lg:row-start-2"
-                    : ""
+              spine
+                ? ""
+                : // The second row is reversed so the line flows right to left,
+                  // which is what turns a grid into a snake. The DOM order is
+                  // untouched, so a screen reader still hears 1, 2, 3, 4, 5, 6.
+                  i === 3
+                  ? "lg:col-start-3 lg:row-start-2"
+                  : i === 4
+                    ? "lg:col-start-2 lg:row-start-2"
+                    : i === 5
+                      ? "lg:col-start-1 lg:row-start-2"
+                      : ""
             }
           >
-            <div className="flex items-start gap-4 lg:flex-col lg:items-center lg:gap-3">
+            <div
+              className={
+                spine
+                  ? "flex items-start gap-5"
+                  : "flex items-start gap-4 lg:flex-col lg:items-center lg:gap-3"
+              }
+            >
               {/* The milestone pin. It sits on the line, so the number is
-                  visually attached to the journey. */}
+                  visually attached to the sequence. */}
               <span
                 ref={(el) => {
                   nodeRefs.current[i] = el;
                 }}
                 aria-hidden="true"
-                className="grid size-10 shrink-0 place-items-center rounded-full bg-brand-600 text-sm font-semibold text-brand-50 tabular ring-4 ring-surface-lilac"
+                className={`grid size-10 shrink-0 place-items-center rounded-full bg-brand-600 text-sm font-semibold text-brand-50 tabular ring-4 ${PIN_RINGS[pinRing]}`}
               >
                 {i + 1}
               </span>
 
-              <div className="rounded-card border border-border bg-card p-5 sm:p-6 lg:w-full">
-                <h3 className="text-lg font-semibold text-brand-600">{step.title}</h3>
-                <p className="measure mt-1 text-ink-muted">{step.body}</p>
-              </div>
+              {item.card ?? (
+                <div className="rounded-card border border-border bg-card p-5 sm:p-6 lg:w-full">
+                  <h3 className="text-lg font-semibold text-brand-600">{item.title}</h3>
+                  {item.body ? (
+                    <p className="measure mt-1 text-ink-muted">{item.body}</p>
+                  ) : null}
+                </div>
+              )}
             </div>
           </li>
         ))}
@@ -261,8 +325,8 @@ export function JourneySnake({ steps }: { steps: JourneyStep[] }) {
  *
  * The route is not simply "connect each pair of milestones". A milestone on
  * the last column of a row has to *turn* before it can reach the first
- * column of the next row, and a straight line between them would cut diagonally
- * across the card in between.
+ * column of the next row, and a straight line between them would cut
+ * diagonally across the card in between.
  *
  * So a turn is routed as three waypoints: out to the far edge of the
  * container, down the edge, and back in. The result is a road that runs along
@@ -272,7 +336,7 @@ export function JourneySnake({ steps }: { steps: JourneyStep[] }) {
  *
  * The corners are rounded with quadratic segments, the way a road is.
  */
-function buildPath(nodes: { x: number; y: number }[]): string {
+function buildPath(nodes: { x: number; y: number }[], containerWidth: number): string {
   if (nodes.length === 0) return "";
   if (nodes.length === 1) return `M ${nodes[0]!.x} ${nodes[0]!.y}`;
 
@@ -310,7 +374,7 @@ function buildPath(nodes: { x: number; y: number }[]): string {
       // The edge is just outside the container on purpose: the cards stop at
       // the container's edge, so a line running exactly on it would be half
       // hidden under the card it is supposed to be turning around.
-      const edge = a.x > 50 ? 101.5 : -1.5;
+      const edge = a.x > containerWidth / 2 ? containerWidth + 14 : -14;
       points.push({ x: edge, y: a.y });
       points.push({ x: edge, y: b.y });
     }
@@ -318,7 +382,7 @@ function buildPath(nodes: { x: number; y: number }[]): string {
     points.push({ x: b.x, y: b.y });
   }
 
-  return roundedPolyline(points, 3.2);
+  return roundedPolyline(points, 22);
 }
 
 /**
@@ -327,9 +391,8 @@ function buildPath(nodes: { x: number; y: number }[]): string {
  * Each corner is replaced by a line to a point a short way back along the
  * incoming edge, a quadratic curve through the corner itself, and a line on
  * from a short way along the outgoing edge. The radius is in the path's own
- * units, which are percentages — so a corner is very slightly elliptical
- * because the container is wider than it is tall. At this radius the
- * difference is not visible.
+ * units, which are pixels — the same units the path itself is built in, so
+ * the corners are true circles.
  */
 function roundedPolyline(
   points: { x: number; y: number }[],

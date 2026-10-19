@@ -172,7 +172,7 @@ export default async function ProgrammesPage({
               </p>
             ) : null}
 
-            <JourneySnake steps={PATHWAY} />
+            <JourneySnake items={PATHWAY.map((step) => ({ title: step.title, body: step.body }))} />
           </Container>
         </section>
 
@@ -235,7 +235,7 @@ export default async function ProgrammesPage({
                 </p>
                 <InteractiveHoverButton
                   href="/donate"
-                  className="mt-6 min-h-13 rounded-full bg-gold px-8 text-base font-semibold text-gold-ink"
+                  className="mt-6 min-h-13 rounded-full bg-gold px-8 text-base font-semibold text-gold-ink w-fit"
                 >
                   Give where it&rsquo;s needed
                 </InteractiveHoverButton>

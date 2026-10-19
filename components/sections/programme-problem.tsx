@@ -1,6 +1,8 @@
 "use client";
 
 import { useRef } from "react";
+
+import { JourneySnake } from "@/components/sections/journey-snake";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -123,20 +125,24 @@ export function ProgrammeProblem({ paragraphs }: { paragraphs: string[] }) {
             </p>
           </div>
 
-          <div className="space-y-6">
-            {paragraphs.map((text, i) => (
-              <p
-                key={text.slice(0, 32)}
-                data-problem-panel
-                className="rounded-2xl border border-border bg-card p-6 text-lg leading-relaxed text-ink-muted sm:p-8"
-              >
-                <span className="mr-2 font-semibold text-brand-600 tabular" aria-hidden="true">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                {text}
-              </p>
-            ))}
-          </div>
+          {/* The barriers are a genuine sequence — a girl meets them in this
+              order — so they get a path, not a list. The pin carries the
+              number, so the copy no longer has to carry it inline. */}
+          <JourneySnake
+            variant="spine"
+            pinRing="surface"
+            items={paragraphs.map((text) => ({
+              title: text.slice(0, 32),
+              card: (
+                <p
+                  data-problem-panel
+                  className="rounded-2xl border border-border bg-card p-6 text-lg leading-relaxed text-ink-muted sm:p-8"
+                >
+                  {text}
+                </p>
+              ),
+            }))}
+          />
         </div>
       </div>
     </section>
