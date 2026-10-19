@@ -58,9 +58,9 @@ export function LegalPage({
           <div className="grid gap-10 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-16">
             {/* Table of contents. Sticky on desktop, a plain list on mobile. */}
             <nav aria-label="On this page" className="lg:sticky lg:top-24 lg:self-start">
-              <h2 className="text-sm font-semibold tracking-wide text-ink uppercase">
+              <p className="text-sm font-semibold tracking-wide text-ink uppercase">
                 On this page
-              </h2>
+              </p>
               <ol className="mt-4 space-y-2">
                 {sections.map((section) => (
                   <li key={section.id}>

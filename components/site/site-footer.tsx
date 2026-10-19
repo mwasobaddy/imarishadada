@@ -88,12 +88,12 @@ export async function SiteFooter() {
           </div>
 
           <nav aria-labelledby="footer-programmes">
-            <h2
+            <h3
               id="footer-programmes"
               className="text-sm font-semibold tracking-wide text-brand-600 uppercase"
             >
               {t("programmes.heading")}
-            </h2>
+            </h3>
             <ul className="mt-4 space-y-1">
               {programmes.map((item) => (
                 <li key={item.href}>
@@ -109,12 +109,12 @@ export async function SiteFooter() {
           </nav>
 
           <nav aria-labelledby="footer-organisation">
-            <h2
+            <h3
               id="footer-organisation"
               className="text-sm font-semibold tracking-wide text-brand-600 uppercase"
             >
               {t("organisation.heading")}
-            </h2>
+            </h3>
             <ul className="mt-4 space-y-1">
               {organisation.map((item) => (
                 <li key={item.href}>
@@ -130,12 +130,12 @@ export async function SiteFooter() {
           </nav>
 
           <nav aria-labelledby="footer-support">
-            <h2
+            <h3
               id="footer-support"
               className="text-sm font-semibold tracking-wide text-brand-600 uppercase"
             >
               {t("support.heading")}
-            </h2>
+            </h3>
             <ul className="mt-4 space-y-1">
               {support.map((item) => (
                 <li key={item.href}>

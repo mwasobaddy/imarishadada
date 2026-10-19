@@ -71,9 +71,9 @@ export function ContactForm({
         aria-live="polite"
         className="rounded-2xl border border-brand-600/30 bg-brand-50 p-8"
       >
-        <h2 className="text-2xl font-semibold text-brand-600">
+        <h3 className="text-2xl font-semibold text-brand-600">
           Thank you, your message is with us.
-        </h2>
+        </h3>
         <p className="measure mt-3 text-ink-muted">
           We reply within three working days. If it is urgent, WhatsApp is faster.
         </p>
@@ -147,7 +147,7 @@ export function ContactForm({
       noValidate
       className="rounded-2xl border border-border bg-card p-6 sm:p-8"
     >
-      <h2 className="text-2xl font-semibold text-brand-600">Send us a message</h2>
+      <h3 className="text-2xl font-semibold text-brand-600">Send us a message</h3>
       <p className="mt-2 text-ink-muted">
         We reply within three working days.
       </p>
