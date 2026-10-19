@@ -20,9 +20,22 @@ import { HERO_PORTRAIT } from "@/lib/data/hero-portrait";
 import { buildLanguageAlternates, jsonLdScript, webSiteJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Imarisha Dada — Empowering Girls and Young Women in Kibera, Nairobi",
+  title: "Empowering Girls in Kibera, Nairobi",
   description:
-    "Girl-led organisation in Kibera, Nairobi supporting school re-entry, safe spaces and economic empowerment for girls and young mothers.",
+    "Imarisha Dada is a girl-led organisation in Kibera, Nairobi supporting school re-entry, safe spaces and economic empowerment for girls and young mothers.",
+  keywords: [
+    "Imarisha Dada",
+    "Kibera",
+    "Nairobi",
+    "girls education",
+    "school re-entry",
+    "young mothers",
+    "economic empowerment",
+    "safe spaces",
+    "NGO Kenya",
+    "charity Kenya",
+  ],
+  robots: { index: true, follow: true },
   alternates: {
     canonical: "/",
     languages: buildLanguageAlternates("/"),
@@ -31,16 +44,16 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_KE",
     url: "/",
-    title: "Imarisha Dada — Empowering Girls and Young Women in Kibera, Nairobi",
+    title: "Empowering Girls in Kibera, Nairobi | Imarisha Dada",
     description:
-      "Girl-led organisation in Kibera, Nairobi supporting school re-entry, safe spaces and economic empowerment for girls and young mothers.",
+      "Imarisha Dada is a girl-led organisation in Kibera, Nairobi supporting school re-entry, safe spaces and economic empowerment for girls and young mothers.",
     images: ["/opengraph-image"],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Imarisha Dada — Empowering Girls and Young Women in Kibera, Nairobi",
+    title: "Empowering Girls in Kibera, Nairobi | Imarisha Dada",
     description:
-      "Girl-led organisation in Kibera, Nairobi supporting school re-entry, safe spaces and economic empowerment for girls and young mothers.",
+      "Imarisha Dada is a girl-led organisation in Kibera, Nairobi supporting school re-entry, safe spaces and economic empowerment for girls and young mothers.",
     images: ["/opengraph-image"],
   },
 };

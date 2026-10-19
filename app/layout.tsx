@@ -13,7 +13,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Imarisha Dada — Empowering Girls and Young Women in Kibera, Nairobi",
+    default: "Empowering Girls in Kibera, Nairobi",
     template: "%s | Imarisha Dada",
   },
   description:
@@ -33,17 +33,18 @@ export const metadata: Metadata = {
     locale: "en_KE",
       images: ["/opengraph-image"],
     url: "/",
-    title: "Imarisha Dada — Empowering Girls and Young Women in Kibera, Nairobi",
+    title: "Empowering Girls in Kibera, Nairobi | Imarisha Dada",
     description:
       "Girl-led organisation in Kibera, Nairobi supporting school re-entry, safe spaces and economic empowerment for girls and young mothers.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Imarisha Dada — Empowering Girls and Young Women in Kibera, Nairobi",
+    title: "Empowering Girls in Kibera, Nairobi | Imarisha Dada",
     description:
       "Girl-led organisation in Kibera, Nairobi supporting school re-entry, safe spaces and economic empowerment for girls and young mothers.",
   },
   formatDetection: { telephone: false },
+  robots: { index: true, follow: true },
 };
 
 // themeColor and colorScheme are deprecated inside `metadata` in Next 16.
