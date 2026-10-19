@@ -1,8 +1,20 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
 
 const nextConfig: NextConfig = {
   experimental: {
     agentFeedback: true,
+    // Required for `app/global-not-found.tsx`.
+    //
+    // The root layout is now a top-level dynamic segment (`app/[locale]`), so
+    // Next cannot compose a consistent 404 from a layout plus a `not-found`
+    // file. Without this flag, an unmatched URL gets an auto-generated
+    // `<html>` with no `lang` attribute and no font or theme classes — so a
+    // screen reader does not know the language and the page renders in the
+    // wrong theme.
+    //
+    // @see node_modules/next/dist/docs/01-app/03-api-reference/03-file-conventions/not-found.md
+    globalNotFound: true,
   },
   cacheComponents: true,
   partialPrefetching: true,
@@ -32,4 +44,11 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+/**
+ * `next-intl/plugin` wires the request config into the build so message
+ * catalogues are typed and a missing key fails at compile time rather than
+ * rendering a raw key string at runtime.
+ */
+const withNextIntl = createNextIntlPlugin();
+
+export default withNextIntl(nextConfig);
