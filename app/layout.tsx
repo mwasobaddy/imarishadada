@@ -1,10 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 
-import { AnnouncementBar } from "@/components/site/announcement-bar";
-import { SiteHeader } from "@/components/site/site-header";
-import { SiteFooter } from "@/components/site/site-footer";
-import { SITE_URL, jsonLdScript, organisationJsonLd, webSiteJsonLd } from "@/lib/seo";
+import { SITE_URL } from "@/lib/seo";
 
 import "./globals.css";
 
@@ -14,18 +10,6 @@ import "./globals.css";
 // "optional" the fallback renders on a cold slow connection and Geist is used
 // on subsequent navigations once it is cached. Kenyan traffic is mostly cold
 // and metered, so zero layout shift beats a first-visit typeface.
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-  display: "optional",
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-  display: "optional",
-});
-
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -68,29 +52,17 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+/**
+ * Root layout — deliberately renders no `<html>`.
+ *
+ * `<html lang>` has to be set per locale, and a root layout sits above
+ * `[locale]`, so it cannot know which language it is wrapping. The document
+ * shell therefore lives in `app/[locale]/layout.tsx`, which can read the
+ * segment. This layout keeps only what must apply to everything: the fonts, the
+ * stylesheet, and the site-wide metadata defaults.
+ *
+ * @see i18n/routing.ts
+ */
 export default function RootLayout({ children }: LayoutProps<"/">) {
-  return (
-    <html
-      lang="en-KE"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <head>
-        {/* Site-wide structured data. Fields we do not yet have (registration
-            number, postal address, social profiles) are deliberately omitted
-            rather than filled with placeholders. */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: jsonLdScript([organisationJsonLd(), webSiteJsonLd()]),
-          }}
-        />
-      </head>
-      <body className="flex min-h-full flex-col bg-surface text-ink">
-        <AnnouncementBar />
-        <SiteHeader />
-        {children}
-        <SiteFooter />
-      </body>
-    </html>
-  );
+  return children;
 }
