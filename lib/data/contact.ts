@@ -30,6 +30,19 @@ export type ContactDetails = {
   address: string | null;
   responseTime: string;
   officeHours: string | null;
+  /**
+   * How long each channel actually takes.
+   *
+   * A single "we reply within three working days" applied to every channel is
+   * wrong twice over: it is not true of WhatsApp, and it tells a visitor who
+   * just messaged on WhatsApp to wait three days for a reply that arrives in
+   * minutes. The wait differs by channel, so it is stated per channel.
+   */
+  responseTimes?: {
+    whatsapp?: string;
+    phone?: string;
+    email?: string;
+  };
 };
 
 export type EnquiryTypeOption = {
@@ -46,6 +59,11 @@ const SEED_CONTACT: ContactDetails = {
   address: "Kibera, Nairobi, Kenya",
   responseTime: "We reply within three working days.",
   officeHours: "Monday to Friday, 9am to 5pm EAT",
+  responseTimes: {
+    whatsapp: "Replies within a few hours on weekdays.",
+    phone: "Answered on weekdays during office hours.",
+    email: "Replies within three working days.",
+  },
 };
 
 const SEED_TYPES: EnquiryTypeOption[] = [

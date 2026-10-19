@@ -15,26 +15,46 @@ import { cn } from "@/lib/utils"
  *
  * ## The colour transition
  *
- * The effect is an inversion. At rest the button is gold (`bg-gold`) with dark
- * ink text (`text-gold-ink`). On hover a dark disc expands from the dot until
- * it fills the button, and the label **transitions to gold** as it slides in
- * from the right with the arrow.
+ * The effect is an inversion. At rest the button is one colour with text in
+ * another. On hover a disc expands from a small dot until it fills the
+ * button, and the label **transitions to the button's own fill colour** as it
+ * slides in from the right with the arrow.
  *
- * That means the disc must be the *dark* colour and the incoming label the
- * *gold* one. Getting this backwards — a gold disc under gold text, or a dark
- * label on a dark disc — produces an invisible button, which is what the
- * upstream `bg-primary` / `text-primary-foreground` pair did once the brand
- * palette was applied to it.
+ * That means the disc must be the button's *foreground* colour and the
+ * incoming label the button's *background* colour. Getting this backwards — a
+ * gold disc under gold text, or a dark label on a dark disc — produces an
+ * invisible button, which is what the upstream `bg-primary` /
+ * `text-primary-foreground` pair did once the brand palette was applied.
  *
- * `text-gold` is a fixed colour rather than `text-current` on purpose: the
- * incoming label must stay gold whether the button is the gold give button or
- * a dark one, so the contrast is decided by the disc, not by the button.
+ * Which pair is correct depends on the button, so it is declared with the
+ * `tone` prop rather than hardcoded:
+ *
+ *   | Tone      | At rest          | Disc on hover | Label on hover |
+ *   |-----------|------------------|---------------|----------------|
+ *   | `gold`    | gold / dark ink  | dark ink      | gold           |
+ *   | `brand`   | purple / cream   | cream         | purple         |
+ *
+ * `tone` is a fixed set rather than two free colour props, because a free
+ * prop would put a `text-${colour}` in the source that Tailwind's scanner
+ * cannot see, and the class would silently not exist.
  */
 type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   href?: string;
+  tone?: keyof typeof TONES;
 };
 
-export function InteractiveHoverButton({ children, className, href, ...props }: Props) {
+const TONES = {
+  gold: { dot: "bg-gold-ink", label: "text-gold" },
+  brand: { dot: "bg-brand-50", label: "text-brand-600" },
+} as const;
+
+export function InteractiveHoverButton({
+  children,
+  className,
+  href,
+  tone = "gold",
+  ...props
+}: Props) {
   const classes = cn(
     "flex group bg-background relative w-auto cursor-pointer overflow-hidden rounded-full border p-2 px-6 text-center font-semibold",
     className,
@@ -42,19 +62,27 @@ export function InteractiveHoverButton({ children, className, href, ...props }: 
 
   const inner = (
     <>
-      {/* The dot that expands into the disc. `bg-gold-ink` is the dark brand
-          ink, so the expanded disc reads as a dark field the gold label can
-          sit on. */}
+      {/* The dot that expands into the disc. */}
       <div className="flex items-center justify-center gap-2">
-        <div className="bg-gold-ink h-2 w-2 rounded-full transition-all duration-300 group-hover:scale-[100.8]"></div>
+        <div
+          className={cn(
+            "h-2 w-2 rounded-full transition-all duration-300 group-hover:scale-[100.8]",
+            TONES[tone].dot,
+          )}
+        ></div>
         {/* The label at rest, in the button's own colour. It slides out and
-            fades as the gold label takes its place. */}
+            fades as the incoming label takes its place. */}
         <span className="inline-block transition-all duration-300 group-hover:translate-x-12 group-hover:opacity-0">
           {children}
         </span>
       </div>
-      {/* The label that arrives on hover, in gold, over the expanded dark disc. */}
-      <div className="text-gold absolute top-0 z-10 flex h-full w-full translate-x-12 items-center justify-center gap-2 opacity-0 transition-all duration-300 group-hover:-translate-x-5 group-hover:opacity-100">
+      {/* The label that arrives on hover, in the button's own fill colour. */}
+      <div
+        className={cn(
+          "absolute top-0 z-10 flex h-full w-full translate-x-12 items-center justify-center gap-2 opacity-0 transition-all duration-300 group-hover:-translate-x-5 group-hover:opacity-100",
+          TONES[tone].label,
+        )}
+      >
         <span>{children}</span>
         <ArrowRight />
       </div>
@@ -66,12 +94,12 @@ export function InteractiveHoverButton({ children, className, href, ...props }: 
       <Link href={href} className={classes}>
         {inner}
       </Link>
-    )
+    );
   }
 
   return (
     <button className={classes} {...props}>
       {inner}
     </button>
-  )
+  );
 }

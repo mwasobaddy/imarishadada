@@ -272,7 +272,7 @@ export function JourneySnake({
             key={item.title}
             className={
               spine
-                ? ""
+                ? "mb-0"
                 : // The second row is reversed so the line flows right to left,
                   // which is what turns a grid into a snake. The DOM order is
                   // untouched, so a screen reader still hears 1, 2, 3, 4, 5, 6.
@@ -305,7 +305,7 @@ export function JourneySnake({
               </span>
 
               {item.card ?? (
-                <div className="rounded-card border border-border bg-card p-5 sm:p-6 lg:w-full">
+                <div className="rounded-card border border-border bg-card p-5 sm:p-6 w-full">
                   <h3 className="text-lg font-semibold text-brand-600">{item.title}</h3>
                   {item.body ? (
                     <p className="measure mt-1 text-ink-muted">{item.body}</p>

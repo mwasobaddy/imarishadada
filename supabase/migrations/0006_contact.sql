@@ -112,7 +112,12 @@ insert into public.settings (key, value, description) values
      "whatsappPrefill": "Hello Imarisha Dada, I would like to find out more about your work.",
      "address": "Kibera, Nairobi, Kenya",
      "responseTime": "We reply within three working days.",
-     "officeHours": "Monday to Friday, 9am to 5pm EAT"
+     "officeHours": "Monday to Friday, 9am to 5pm EAT",
+     "responseTimes": {
+       "whatsapp": "Replies within a few hours on weekdays.",
+       "phone": "Answered on weekdays during office hours.",
+       "email": "Replies within three working days."
+     }
    }'::jsonb,
    'Contact channels. Null fields render a labelled placeholder rather than an empty or bouncing value.'),
   ('enquiry_types',
