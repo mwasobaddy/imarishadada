@@ -86,7 +86,7 @@ export function PageHero({
         blendMode="multiply"
         contrast={0.2}
         colored={false}
-        dust={0.06}
+        dust={0}
         scratches={0}
         scanlines={0}
         flicker={0}

@@ -269,26 +269,57 @@ function PlaceholderNote({ children }: { children: React.ReactNode }) {
 }
 
 /**
+ * The three questions a prospective donor asks most.
+ *
+ * Kept here rather than fetched, so the contact page does not depend on
+ * `/faq` existing, and so the answers sit next to the form they are meant to
+ * prevent a wasted enquiry about.
+ */
+const CONTACT_FAQS = [
+  {
+    q: "Do you offer monthly giving?",
+    a: "Yes — every amount on our giving ladder can be given monthly. Monthly gifts are what keep a mentor in a girl's life through the whole school year.",
+  },
+  {
+    q: "Can I give from outside Kenya?",
+    a: "Yes, by card. Receipts are issued for every gift, in your currency.",
+  },
+  {
+    q: "Do you accept in-kind donations?",
+    a: "Message us first. We cannot always accept physical goods, and an unasked-for donation is often unusable.",
+  },
+];
+
+/**
  * FAQ teaser.
  *
- * Three of the questions a prospective donor asks most, answered inline so the
- * contact page does not depend on `/faq` existing.
+ * Two shapes:
+ *
+ *   * `inline` — a compact list that sits beside the form. This is the one
+ *     that matters: the answers are read *before* the visitor writes, which is
+ *     the only time they prevent a wasted enquiry. On the old page this sat
+ *     at the very bottom, after the form, where it prevented nothing.
+ *   * `section` — a standalone band, for a page that has no form to sit
+ *     beside.
  */
-export function ContactFaqs() {
-  const faqs = [
-    {
-      q: "Do you offer monthly giving?",
-      a: "Yes — every amount on our giving ladder can be given monthly. Monthly gifts are what keep a mentor in a girl's life through the whole school year.",
-    },
-    {
-      q: "Can I give from outside Kenya?",
-      a: "Yes, by card. Receipts are issued for every gift, in your currency.",
-    },
-    {
-      q: "Do you accept in-kind donations?",
-      a: "Message us first. We cannot always accept physical goods, and an unasked-for donation is often unusable.",
-    },
-  ];
+export function ContactFaqs({ variant = "section" }: { variant?: "inline" | "section" }) {
+  if (variant === "inline") {
+    return (
+      <div className="mt-8">
+        <h3 className="text-sm font-semibold tracking-wide text-ink uppercase">
+          Before you write
+        </h3>
+        <dl className="mt-4 space-y-3">
+          {CONTACT_FAQS.map((faq) => (
+            <div key={faq.q} className="rounded-card border border-border bg-card p-4">
+              <dt className="font-semibold text-ink">{faq.q}</dt>
+              <dd className="measure mt-1 text-sm text-ink-muted">{faq.a}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    );
+  }
 
   return (
     <section aria-labelledby="contact-faq-heading" className="bg-surface-lilac py-section">
@@ -301,7 +332,7 @@ export function ContactFaqs() {
         </h2>
 
         <dl className="mt-10 space-y-4">
-          {faqs.map((faq) => (
+          {CONTACT_FAQS.map((faq) => (
             <div key={faq.q} className="rounded-card border border-border bg-card p-6">
               <dt className="text-lg font-semibold text-ink">{faq.q}</dt>
               <dd className="measure mt-2 text-ink-muted">{faq.a}</dd>
