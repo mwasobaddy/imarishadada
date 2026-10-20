@@ -95,6 +95,12 @@ export function webSiteJsonLd() {
     url: SITE_URL,
     name: "Imarisha Dada",
     publisher: { "@id": ORG_ID },
+    creator: {
+      "@type": "Person",
+      name: "Kelvin Mwangi Wanjohi",
+      jobTitle: "Software Developer",
+      nationality: "Kenyan",
+    },
     inLanguage: "en-KE",
   };
 }

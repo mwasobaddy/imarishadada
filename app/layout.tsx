@@ -19,7 +19,9 @@ export const metadata: Metadata = {
   description:
     "Girl-led organisation in Kibera, Nairobi supporting school re-entry, safe spaces and economic empowerment for girls and young mothers.",
   applicationName: "Imarisha Dada",
-  authors: [{ name: "Imarisha Dada" }],
+  authors: [{ name: "Kelvin Mwangi Wanjohi" }],
+  creator: "Kelvin Mwangi Wanjohi",
+  publisher: "Kelvin Mwangi Wanjohi",
   alternates: {
     canonical: "/",
     languages: {
