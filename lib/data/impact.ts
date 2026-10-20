@@ -48,7 +48,9 @@ export const getStories = cache(
         "slug, quote, attribution, consent_tier, consent_expires_at, image_path, reading_minutes, published_at, programmes(slug,title)",
       )
       .eq("published", true)
-      .lte("published_at", new Date().toISOString())
+      // Future-dated stories are filtered by RLS (`stories_anon_read`), not by
+      // a client-side `new Date()` — which is an unstable value under
+      // `cacheComponents` and fails the prerender.
       .order("published_at", { ascending: false });
 
     const { data, error } = programmeSlug

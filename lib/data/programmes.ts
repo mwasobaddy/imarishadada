@@ -365,7 +365,8 @@ export const getProgrammeStories = cache(
       )
       .eq("published", true)
       .eq("programmes.slug", programmeSlug)
-      .lte("published_at", new Date().toISOString())
+      // Future-dated stories are filtered by RLS (`stories_anon_read`). A
+      // client-side `new Date()` is unstable under `cacheComponents`.
       .order("published_at", { ascending: false });
 
     if (error) {

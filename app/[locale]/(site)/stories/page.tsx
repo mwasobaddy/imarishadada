@@ -19,10 +19,8 @@ import { breadcrumbJsonLd, jsonLdScript } from "@/lib/seo";
  */
 
 export async function generateMetadata({
-  params,
   searchParams,
 }: PageProps<"/[locale]/stories">): Promise<Metadata> {
-  const { locale } = await params;
   const sp = await searchParams;
   const programme = typeof sp.programme === "string" ? sp.programme : null;
 

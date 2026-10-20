@@ -373,7 +373,10 @@ export const getFeaturedStory = cache(async (): Promise<FeaturedStory | null> =>
     .select("slug, quote, attribution, consent_tier, consent_expires_at, image_path")
     .eq("published", true)
     .eq("featured", true)
-    .lte("published_at", new Date().toISOString())
+    // The "not future-dated" guard lives in RLS, not here. The
+    // `stories_anon_read` policy already filters `published_at <= now()`.
+    // Calling `new Date()` at render time is an unstable value under
+    // `cacheComponents` and fails the prerender.
     .order("published_at", { ascending: false })
     .limit(1);
 

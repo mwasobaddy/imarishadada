@@ -2,6 +2,7 @@ import { timingSafeEqual, createHmac } from "node:crypto";
 import { NextResponse } from "next/server";
 
 import { createServiceClient, isServiceRoleConfigured } from "@/lib/supabase/client";
+import type { Json } from "@/lib/supabase/types";
 
 /**
  * M-Pesa Daraja callback.
@@ -106,15 +107,43 @@ export async function POST(request: Request) {
 
   const supabase = createServiceClient();
 
+  // Resolve the donation BEFORE recording the provider event.
+  //
+  // `payment_transactions.donation_id` is NOT NULL by design: the event log
+  // exists to explain one specific gift, and an orphan row explains nothing.
+  // Recording the event first "and linking it later" is therefore impossible
+  // under this schema — an insert that tried would fail on every callback, so
+  // no legitimate M-Pesa payment could ever be reconciled.
+  const { data: donation, error: lookupError } = await supabase
+    .from("donations")
+    .select("id")
+    .eq("reference", reference)
+    .maybeSingle();
+
+  if (lookupError) {
+    console.error("[mpesa/callback] donation lookup failed:", lookupError.message);
+    return NextResponse.json({ error: "lookup failed" }, { status: 500 });
+  }
+
+  if (!donation) {
+    // A correctly-signed callback for a reference we never issued. Either a
+    // replay from another environment or a payload that guessed the secret.
+    // Either way there is no gift to reconcile, and writing an event row would
+    // be a fabricated audit record.
+    console.warn(`[mpesa/callback] no donation for reference ${reference}`);
+    return NextResponse.json({ error: "unknown reference" }, { status: 404 });
+  }
+
   // Record the provider event. A duplicate here is a provider retry, and the
-  // unique index makes the insert fail — which is the idempotency guarantee.
+  // unique index on (provider, event, provider_ref) makes the insert fail —
+  // which is the idempotency guarantee.
   const { error: eventError } = await supabase.from("payment_transactions").insert({
+    donation_id: donation.id,
     provider: "mpesa",
     provider_ref: reference,
     event: succeeded ? "stk_success" : `stk_failure_${resultCode}`,
     signature_verified: true,
-    payload: body as unknown as Record<string, unknown>,
-    donation_id: null,
+    payload: body as unknown as Json,
   });
 
   if (eventError) {

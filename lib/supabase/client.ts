@@ -1,10 +1,16 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
+import type { Database } from "./types";
+
 /**
  * Server-side Supabase client using the public (anon) key.
  *
  * The anon key ships in the browser bundle — RLS is the only thing protecting
  * this data. Never use a service-role key here: it bypasses RLS.
+ *
+ * Typed with the generated `Database` schema (`lib/supabase/types.ts`).
+ * Regenerate after a migration with:
+ *   npx supabase gen types typescript --project-id qbipjvbbpgggempnzfrp > lib/supabase/types.ts
  */
 export function createClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -16,7 +22,7 @@ export function createClient() {
     );
   }
 
-  return createSupabaseClient(url, key, {
+  return createSupabaseClient<Database>(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 }
@@ -52,7 +58,7 @@ export function createServiceClient() {
     );
   }
 
-  return createSupabaseClient(url, key, {
+  return createSupabaseClient<Database>(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 }
