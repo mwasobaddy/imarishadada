@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { toast } from "sonner";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Lock } from "lucide-react";
 
 import { createAuthBrowserClient } from "@/lib/supabase/auth-browser";
+import { AuthInput } from "@/components/auth/auth-input";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -17,17 +19,14 @@ export default function ResetPasswordPage() {
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Supabase recovery link lands here with a session in the URL hash.
-  // We need to wait for the client to pick up the session before allowing
-  // the password update.
+  // Supabase's recovery link lands here with a session in the URL hash. We
+  // wait for the client to pick it up before allowing the password update —
+  // calling updateUser() without a session silently does nothing.
   useEffect(() => {
     const supabase = createAuthBrowserClient();
     supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") {
-        setReady(true);
-      }
+      if (event === "PASSWORD_RECOVERY") setReady(true);
     });
-    // Also check if already in a recovery session
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) setReady(true);
     });
@@ -59,95 +58,89 @@ export default function ResetPasswordPage() {
 
   if (error) {
     return (
-      <div className="space-y-4 text-center">
+      <div className="space-y-5 text-center">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-50">
           <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
         </div>
-        <p className="text-sm text-ink-muted">{error}</p>
-        <a
+        <h2 className="text-xl font-semibold text-ink">Link expired</h2>
+        <p className="text-sm leading-relaxed text-ink-muted">{error}</p>
+        <Link
           href="/auth/forgot-password"
-          className="inline-block text-sm font-medium text-brand-600 underline underline-offset-2 hover:text-brand-700"
+          className="inline-block text-sm font-medium text-brand-600 hover:text-brand-700 hover:underline"
         >
           Request a new reset link
-        </a>
+        </Link>
       </div>
     );
   }
 
   if (!ready) {
     return (
-      <div className="space-y-4 text-center">
+      <div className="space-y-5 text-center">
         <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-brand-600 border-t-transparent" />
-        <p className="text-sm text-ink-muted">Verifying your reset link…</p>
+        <h2 className="text-xl font-semibold text-ink">Verifying your link</h2>
+        <p className="text-sm text-ink-muted">One moment…</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-lg font-semibold text-ink">Set a new password</h2>
-        <p className="mt-1 text-sm text-ink-muted">
-          Choose a strong password you'll remember.
-        </p>
-      </div>
+    <div>
+      <h1 className="text-center text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+        Set new password
+      </h1>
+      <p className="mt-2 text-center text-sm text-ink-muted">
+        Choose a strong password you&apos;ll remember.
+      </p>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium text-ink">
-            New password
-          </label>
-          <div className="relative mt-1.5">
-            <input
-              id="password"
-              type={showPassword ? "text" : "password"}
-              autoComplete="new-password"
-              required
-              minLength={8}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="block w-full rounded-lg border border-border bg-card px-3.5 py-2.5 pr-10 text-sm text-ink placeholder:text-ink-muted/50 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-600/20 transition-colors"
-              placeholder="At least 8 characters"
-            />
+      <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+        <AuthInput
+          id="password"
+          label="New password"
+          type={showPassword ? "text" : "password"}
+          autoComplete="new-password"
+          required
+          minLength={8}
+          value={password}
+          onChange={setPassword}
+          placeholder="At least 8 characters"
+          icon={<Lock className="h-4 w-4" />}
+          trailing={
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted hover:text-ink transition-colors"
+              className="text-ink-muted transition-colors hover:text-ink"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
-          </div>
-        </div>
+          }
+        />
 
-        <div>
-          <label htmlFor="confirm" className="block text-sm font-medium text-ink">
-            Confirm password
-          </label>
-          <div className="relative mt-1.5">
-            <input
-              id="confirm"
-              type={showConfirm ? "text" : "password"}
-              autoComplete="new-password"
-              required
-              minLength={8}
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              className="block w-full rounded-lg border border-border bg-card px-3.5 py-2.5 pr-10 text-sm text-ink placeholder:text-ink-muted/50 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-600/20 transition-colors"
-              placeholder="Repeat the password"
-            />
+        <AuthInput
+          id="confirm"
+          label="Confirm password"
+          type={showConfirm ? "text" : "password"}
+          autoComplete="new-password"
+          required
+          minLength={8}
+          value={confirm}
+          onChange={setConfirm}
+          placeholder="Repeat the password"
+          icon={<Lock className="h-4 w-4" />}
+          trailing={
             <button
               type="button"
               onClick={() => setShowConfirm((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted hover:text-ink transition-colors"
+              className="text-ink-muted transition-colors hover:text-ink"
               aria-label={showConfirm ? "Hide password" : "Show password"}
             >
               {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
-          </div>
-        </div>
+          }
+        />
 
         <button
           type="submit"
