@@ -38,6 +38,13 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# The template is meant to be committed — it holds placeholders only. Without
+# this negation `.env*` swallows it and the team has no reference for which
+# variables the app needs.
+!.env.local.example
+
+# Supabase CLI scratch state (never share between machines)
+supabase/.temp/
 
 # vercel
 .vercel
