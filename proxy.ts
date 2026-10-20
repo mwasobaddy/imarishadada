@@ -63,7 +63,15 @@ export default async function proxy(request: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
 
-    return NextResponse.next();
+    // Authenticated — fall through to next-intl rather than returning
+    // `NextResponse.next()`.
+    //
+    // This matters: the `[locale]` segment only exists because next-intl
+    // rewrites the incoming path (`/admin` → `/en/admin`). Skipping the
+    // middleware leaves `params.locale` undefined, and the locale layout
+    // responds with `notFound()`. So the rewrite is not optional here — the
+    // auth check has to sit in front of it, not replace it.
+    return intlMiddleware(request);
   }
 
   // Everything else: next-intl locale handling.

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Toaster } from "sonner";
 
@@ -6,6 +7,11 @@ import { getMyPermissions, getCurrentStaff } from "@/lib/admin/permissions";
 
 import { AdminShell } from "@/components/admin/admin-shell";
 import { PwaInstallPrompt } from "@/components/admin/pwa-install-prompt";
+
+export const metadata: Metadata = {
+  title: "Admin",
+  robots: { index: false, follow: false },
+};
 
 /**
  * Admin shell. Everything under `/[locale]/admin` is protected: an
