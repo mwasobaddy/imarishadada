@@ -83,7 +83,7 @@ export default function AuthLayout({
 
         {/* Bottom: footer note */}
         <div className="relative z-10 text-xs text-brand-100/60">
-          <p>© {new Date().getFullYear()} Imarisha Dada. All rights reserved.</p>
+          <p>© 2026 Imarisha Dada. All rights reserved.</p>
         </div>
       </div>
 
