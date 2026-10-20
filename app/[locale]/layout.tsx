@@ -96,6 +96,11 @@ export default async function LocaleLayout({
         />
       </head>
       <body className="flex min-h-full flex-col bg-surface text-ink">
+        {/* One boundary, here rather than per-route.
+            Next will not prerender a route whose ancestors might suspend, so
+            the boundary has to sit above the whole tree. That does mean every
+            public page reports as partial (◐) — see doc/page-editor.md §8 for
+            what that does and does not cost. */}
         <Suspense fallback={null}>
           <NextIntlClientProvider messages={messages}>
             {children}

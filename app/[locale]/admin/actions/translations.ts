@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/client";
 import type { Insert } from "@/lib/supabase/row-types";
 import { hasPermission } from "@/lib/admin/permissions";
@@ -22,6 +22,7 @@ export async function createTranslation(data: Insert<"translations">) {
   const supabase = createServiceClient();
   const { data: row, error } = await supabase.from("translations").insert(data).select().single();
   if (error) throw new Error(error.message);
+  revalidateTag("translations", "max");
   revalidatePath("/admin/translations");
   return row;
 }
@@ -31,6 +32,7 @@ export async function updateTranslation(id: string, data: Insert<"translations">
   const supabase = createServiceClient();
   const { data: row, error } = await supabase.from("translations").update(data).eq("id", id).select().single();
   if (error) throw new Error(error.message);
+  revalidateTag("translations", "max");
   revalidatePath("/admin/translations");
   return row;
 }
@@ -40,6 +42,7 @@ export async function deleteTranslation(id: string) {
   const supabase = createServiceClient();
   const { error } = await supabase.from("translations").delete().eq("id", id);
   if (error) throw new Error(error.message);
+  revalidateTag("translations", "max");
   revalidatePath("/admin/translations");
 }
 
@@ -53,6 +56,7 @@ export async function reviewTranslation(id: string) {
     .select()
     .single();
   if (error) throw new Error(error.message);
+  revalidateTag("translations", "max");
   revalidatePath("/admin/translations");
   return row;
 }

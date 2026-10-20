@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
-import { Suspense } from "react";
 
 import { ClosingCta } from "@/components/sections/closing-cta";
 import { FeaturedStory } from "@/components/sections/featured-story";
@@ -58,31 +57,24 @@ export const metadata: Metadata = {
   },
 };
 
-// Anything uncached is streamed through a Suspense boundary because
-// cacheComponents is enabled (next.config.ts).
+/**
+ * Home.
+ *
+ * Every reader below is `'use cache'`, so this page prerenders in full. The
+ * Suspense boundary that used to wrap the content is gone: it existed because
+ * the data was uncached and had to stream, and a boundary around fully cached
+ * content only turns a static route into a partial one.
+ *
+ * `setRequestLocale` still runs in the page, not the layout — a layout body
+ * executes after the page it wraps, so pinning the locale there would be too
+ * late.
+ */
 export default async function HomePage({
   params,
 }: PageProps<"/[locale]">) {
   const { locale } = await params;
-
-  // Pin the locale for static rendering. Without this, `next-intl` resolves it
-  // from the request, which is uncached data and fails the `cacheComponents`
-  // build. It must run in the page, not the layout: layouts execute after the
-  // page they wrap.
   setRequestLocale(locale);
 
-  return (
-    <>
-      <main id="main" className="flex-1">
-        <Suspense fallback={<div className="min-h-[70vh] bg-surface" />}>
-          <HomeContent />
-        </Suspense>
-      </main>
-    </>
-  );
-}
-
-async function HomeContent() {
   const [programmes, stats, tiers, story, programmesSection, hero] = await Promise.all([
     getProgrammes(),
     getImpactStats(),
@@ -93,7 +85,7 @@ async function HomeContent() {
   ]);
 
   return (
-    <>
+    <main id="main" className="flex-1">
       {/* Copy comes from `site_sections`, so an editor can change the headline
           and the CTA labels without a deploy. The component's own defaults are
           the fallback, so a database blip renders the last-known-good page
@@ -130,6 +122,6 @@ async function HomeContent() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdScript(webSiteJsonLd()) }}
       />
-    </>
+    </main>
   );
 }

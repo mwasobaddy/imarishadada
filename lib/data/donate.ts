@@ -1,4 +1,4 @@
-import { cache } from "react";
+import { cacheLife, cacheTag } from "next/cache";
 
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { getGivingTiers } from "@/lib/data/home";
@@ -94,7 +94,11 @@ function parseJson<T>(value: unknown, fallback: T): T {
  * not selectable, so a donor who came here for M-Pesa sees it is coming rather
  * than wondering where it went.
  */
-export const getPaymentRails = cache(async (): Promise<PaymentRails> => {
+export async function getPaymentRails(): Promise<PaymentRails> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("settings");
+
   if (!isSupabaseConfigured()) return SEED_RAILS;
 
   const { data, error } = await createClient()
@@ -111,7 +115,7 @@ export const getPaymentRails = cache(async (): Promise<PaymentRails> => {
     card: { ...SEED_RAILS.card, ...(parsed.card ?? {}) },
     bank: { ...SEED_RAILS.bank, ...(parsed.bank ?? {}) },
   };
-});
+}
 
 /**
  * Bank details for donors who chose that rail.
@@ -120,7 +124,11 @@ export const getPaymentRails = cache(async (): Promise<PaymentRails> => {
  * RLS policy, so an account number is never in a client payload until the
  * donor has actually selected the bank rail.
  */
-export const getBankDetails = cache(async (): Promise<BankDetails> => {
+export async function getBankDetails(): Promise<BankDetails> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("settings");
+
   if (!isSupabaseConfigured()) return SEED_BANK;
 
   const { data, error } = await createClient()
@@ -132,9 +140,13 @@ export const getBankDetails = cache(async (): Promise<BankDetails> => {
   if (error || !data) return SEED_BANK;
 
   return parseJson<Partial<BankDetails>>(data.value, {}) as BankDetails;
-});
+}
 
-export const getTaxReceipt = cache(async (): Promise<TaxReceipt> => {
+export async function getTaxReceipt(): Promise<TaxReceipt> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("settings");
+
   if (!isSupabaseConfigured()) return SEED_TAX;
 
   const { data, error } = await createClient()
@@ -146,7 +158,7 @@ export const getTaxReceipt = cache(async (): Promise<TaxReceipt> => {
   if (error || !data) return SEED_TAX;
 
   return parseJson<Partial<TaxReceipt>>(data.value, {}) as TaxReceipt;
-});
+}
 
 /**
  * The bank rail is only offered when it can actually be completed. A rail

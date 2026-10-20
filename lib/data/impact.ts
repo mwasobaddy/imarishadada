@@ -1,4 +1,4 @@
-import { cache } from "react";
+import { cacheLife, cacheTag } from "next/cache";
 
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { effectiveConsentTier, type ConsentTier } from "@/lib/data/types";
@@ -36,8 +36,11 @@ const SEED_COUNTS: ConsentTierCounts = {
   anonymised: 0,
 };
 
-export const getStories = cache(
-  async (programmeSlug?: string): Promise<StoryCard[]> => {
+export async function getStories(programmeSlug?: string): Promise<StoryCard[]> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("stories");
+
     if (!isSupabaseConfigured()) {
       return programmeSlug ? [] : SEED_STORIES;
     }
@@ -89,8 +92,7 @@ export const getStories = cache(
         },
       ];
     });
-  },
-);
+  }
 
 /**
  * How many stories sit at each consent tier.
@@ -98,19 +100,27 @@ export const getStories = cache(
  * Published on the stories page as a transparency measure: it is more credible
  * to say "six stories, two anonymised" than to imply every participant is named.
  */
-export const getConsentCounts = cache(async (): Promise<ConsentTierCounts> => {
+export async function getConsentCounts(): Promise<ConsentTierCounts> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("stories");
+
   const stories = await getStories();
   if (!isSupabaseConfigured()) return SEED_COUNTS;
 
   const counts: ConsentTierCounts = { ...SEED_COUNTS };
   for (const story of stories) counts[story.consentTier] += 1;
   return counts;
-});
+}
 
 /**
  * Impact statistics across every programme, newest reporting period last.
  */
-export const getAllImpactStats = cache(async () => {
+export async function getAllImpactStats() {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("impact-stats");
+
   if (!isSupabaseConfigured()) {
     return [
       { slug: "young-mothers-back-in-school", value: 19, label: "young mothers returned to school", period: "2025–26", programmeSlug: "school-reentry", sortOrder: 1 },
@@ -144,7 +154,7 @@ export const getAllImpactStats = cache(async () => {
       sortOrder: (r.sort_order as number) ?? 0,
     };
   });
-});
+}
 
 /**
  * Methodology definitions.

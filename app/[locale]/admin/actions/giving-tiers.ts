@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/client";
 import type { AuditSnapshot, Update, WithOptionalSlug } from "@/lib/supabase/row-types";
 import { hasPermission } from "@/lib/admin/permissions";
@@ -49,6 +49,7 @@ export async function createGivingTier(data: WithOptionalSlug<"giving_tiers">) {
     row_id: tier.id,
     after: tier as unknown as AuditSnapshot,
   });
+  revalidateTag("giving-tiers", "max");
   revalidatePath("/admin/giving-tiers");
   return tier;
 }
@@ -71,6 +72,7 @@ export async function updateGivingTier(id: string, data: Update<"giving_tiers">)
     before: before as unknown as AuditSnapshot,
     after: tier as unknown as AuditSnapshot,
   });
+  revalidateTag("giving-tiers", "max");
   revalidatePath("/admin/giving-tiers");
   return tier;
 }
@@ -87,6 +89,7 @@ export async function deleteGivingTier(id: string) {
     row_id: id,
     before: before as unknown as AuditSnapshot,
   });
+  revalidateTag("giving-tiers", "max");
   revalidatePath("/admin/giving-tiers");
 }
 
@@ -100,6 +103,7 @@ export async function toggleGivingTier(id: string, active: boolean) {
     .select()
     .single();
   if (error) throw new Error(error.message);
+  revalidateTag("giving-tiers", "max");
   revalidatePath("/admin/giving-tiers");
   return tier;
 }

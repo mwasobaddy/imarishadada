@@ -1,6 +1,6 @@
+import { cacheLife, cacheTag } from "next/cache";
 import { createHash } from "node:crypto";
 
-import { cache } from "react";
 
 import { createServiceClient, isServiceRoleConfigured } from "@/lib/supabase/client";
 import {
@@ -99,11 +99,19 @@ async function readSetting<T extends object>(key: string, fallback: T): Promise<
   return mergeJson(data.value, fallback);
 }
 
-export const getContactDetails = cache(async (): Promise<ContactDetails> => {
-  return readSetting<ContactDetails>("contact_details", SEED_CONTACT);
-});
+export async function getContactDetails(): Promise<ContactDetails> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("settings");
 
-export const getEnquiryTypes = cache(async (): Promise<EnquiryTypeOption[]> => {
+  return readSetting<ContactDetails>("contact_details", SEED_CONTACT);
+}
+
+export async function getEnquiryTypes(): Promise<EnquiryTypeOption[]> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("settings");
+
   if (!isServiceRoleConfigured()) return SEED_TYPES;
 
   const { data, error } = await createServiceClient()
@@ -114,7 +122,7 @@ export const getEnquiryTypes = cache(async (): Promise<EnquiryTypeOption[]> => {
 
   if (error || !Array.isArray(data?.value)) return SEED_TYPES;
   return data.value as EnquiryTypeOption[];
-});
+}
 
 /**
  * Stable, non-reversible client identifier for rate limiting.

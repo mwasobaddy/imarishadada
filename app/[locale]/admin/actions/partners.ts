@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/client";
 import type { AuditSnapshot, Insert } from "@/lib/supabase/row-types";
 import { hasPermission } from "@/lib/admin/permissions";
@@ -23,6 +23,7 @@ export async function createPartner(data: Insert<"partners">) {
   const { data: row, error } = await supabase.from("partners").insert(data).select().single();
   if (error) throw new Error(error.message);
   await supabase.from("audit_log").insert({ action: "create", table_name: "partners", row_id: row.id, after: row as unknown as AuditSnapshot });
+  revalidateTag("partners", "max");
   revalidatePath("/admin/content/partners");
   return row;
 }
@@ -32,6 +33,7 @@ export async function updatePartner(id: string, data: Insert<"partners">) {
   const supabase = createServiceClient();
   const { data: row, error } = await supabase.from("partners").update(data).eq("id", id).select().single();
   if (error) throw new Error(error.message);
+  revalidateTag("partners", "max");
   revalidatePath("/admin/content/partners");
   return row;
 }
@@ -41,5 +43,6 @@ export async function deletePartner(id: string) {
   const supabase = createServiceClient();
   const { error } = await supabase.from("partners").delete().eq("id", id);
   if (error) throw new Error(error.message);
+  revalidateTag("partners", "max");
   revalidatePath("/admin/content/partners");
 }

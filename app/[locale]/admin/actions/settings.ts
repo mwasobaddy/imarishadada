@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/client";
 import type { AuditSnapshot } from "@/lib/supabase/row-types";
 import { hasPermission } from "@/lib/admin/permissions";
@@ -80,6 +80,7 @@ export async function updateSetting(key: string, value: unknown, changeNote?: st
     after: setting as unknown as AuditSnapshot,
   });
 
+  revalidateTag("settings", "max");
   revalidatePath("/admin/settings");
   return { status: "applied", setting };
 }
@@ -118,6 +119,7 @@ export async function approveSettingChange(versionId: string) {
     } as unknown as AuditSnapshot,
   });
 
+  revalidateTag("settings", "max");
   revalidatePath("/admin/settings");
   return setting;
 }

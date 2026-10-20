@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/client";
 import type { AuditSnapshot, Insert } from "@/lib/supabase/row-types";
 import { hasPermission } from "@/lib/admin/permissions";
@@ -34,6 +34,8 @@ export async function createProgramme(data: Insert<"programmes">) {
   const { data: row, error } = await supabase.from("programmes").insert(data).select().single();
   if (error) throw new Error(error.message);
   await supabase.from("audit_log").insert({ action: "create", table_name: "programmes", row_id: row.id, after: row as unknown as AuditSnapshot });
+  revalidateTag("programmes", "max");
+  revalidateTag("sections", "max");
   revalidatePath("/admin/content/programmes");
   return row;
 }
@@ -45,7 +47,11 @@ export async function updateProgramme(id: string, data: Insert<"programmes">) {
   const { data: row, error } = await supabase.from("programmes").update(data).eq("id", id).select().single();
   if (error) throw new Error(error.message);
   await supabase.from("audit_log").insert({ action: "update", table_name: "programmes", row_id: id, before: before as unknown as AuditSnapshot, after: row as unknown as AuditSnapshot });
+  revalidateTag("programmes", "max");
+  revalidateTag("sections", "max");
   revalidatePath("/admin/content/programmes");
+  revalidateTag("programmes", "max");
+  revalidateTag("sections", "max");
   revalidatePath(`/programmes/${row.slug}`);
   return row;
 }
@@ -57,6 +63,8 @@ export async function deleteProgramme(id: string) {
   const { error } = await supabase.from("programmes").delete().eq("id", id);
   if (error) throw new Error(error.message);
   await supabase.from("audit_log").insert({ action: "delete", table_name: "programmes", row_id: id, before: before as unknown as AuditSnapshot });
+  revalidateTag("programmes", "max");
+  revalidateTag("sections", "max");
   revalidatePath("/admin/content/programmes");
 }
 
@@ -65,6 +73,8 @@ export async function toggleProgramme(id: string, active: boolean) {
   const supabase = createServiceClient();
   const { data: row, error } = await supabase.from("programmes").update({ active }).eq("id", id).select().single();
   if (error) throw new Error(error.message);
+  revalidateTag("programmes", "max");
+  revalidateTag("sections", "max");
   revalidatePath("/admin/content/programmes");
   return row;
 }

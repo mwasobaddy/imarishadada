@@ -1,4 +1,4 @@
-import { cache } from "react";
+import { cacheLife, cacheTag } from "next/cache";
 
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { getProgrammes } from "@/lib/data/home";
@@ -57,7 +57,11 @@ const SEED_VALUES: CoreValue[] = [
  */
 const SEED_TEAM: TeamMember[] = [];
 
-export const getCoreValues = cache(async (): Promise<CoreValue[]> => {
+export async function getCoreValues(): Promise<CoreValue[]> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("core-values");
+
   if (!isSupabaseConfigured()) return SEED_VALUES;
 
   const { data, error } = await createClient()
@@ -78,9 +82,13 @@ export const getCoreValues = cache(async (): Promise<CoreValue[]> => {
     description: r.description as string,
     sortOrder: (r.sort_order as number) ?? 0,
   }));
-});
+}
 
-export const getTeamMembers = cache(async (): Promise<TeamMember[]> => {
+export async function getTeamMembers(): Promise<TeamMember[]> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("team-members");
+
   if (!isSupabaseConfigured()) return SEED_TEAM;
 
   const { data, error } = await createClient()
@@ -104,9 +112,13 @@ export const getTeamMembers = cache(async (): Promise<TeamMember[]> => {
     safeguardingOfficer: (r.safeguarding_officer as boolean) ?? false,
     sortOrder: (r.sort_order as number) ?? 0,
   }));
-});
+}
 
-export const getAboutSections = cache(async (): Promise<Record<string, SiteSection>> => {
+export async function getAboutSections(): Promise<Record<string, SiteSection>> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("sections");
+
   const keys = [
     "about-hero",
     "about-story",
@@ -122,6 +134,6 @@ export const getAboutSections = cache(async (): Promise<Record<string, SiteSecti
       keys.map(async (key) => [key, await getSection(key)] as const),
     ),
   );
-});
+}
 
 export const getAboutProgrammes = getProgrammes;

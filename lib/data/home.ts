@@ -1,4 +1,4 @@
-import { cache } from "react";
+import { cacheLife, cacheTag } from "next/cache";
 
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import type {
@@ -178,7 +178,11 @@ function withProgrammeImages(rows: Programme[]): Programme[] {
   }));
 }
 
-export const getProgrammes = cache(async (): Promise<Programme[]> => {
+export async function getProgrammes(): Promise<Programme[]> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("programmes");
+
   if (!isSupabaseConfigured()) return withProgrammeImages(SEED.programmes);
 
   const { data, error } = await createClient()
@@ -207,9 +211,13 @@ export const getProgrammes = cache(async (): Promise<Programme[]> => {
     ),
     sortOrder: (r.sort_order as number) ?? 0,
   }));
-});
+}
 
-export const getImpactStats = cache(async (): Promise<ImpactStat[]> => {
+export async function getImpactStats(): Promise<ImpactStat[]> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("impact-stats");
+
   if (!isSupabaseConfigured()) return SEED.impactStats;
 
   const { data, error } = await createClient()
@@ -232,9 +240,13 @@ export const getImpactStats = cache(async (): Promise<ImpactStat[]> => {
     programmeSlug: programmeSlugOf(r.programmes),
     sortOrder: (r.sort_order as number) ?? 0,
   }));
-});
+}
 
-export const getGivingTiers = cache(async (): Promise<GivingTier[]> => {
+export async function getGivingTiers(): Promise<GivingTier[]> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("giving-tiers");
+
   if (!isSupabaseConfigured()) return SEED.givingTiers;
 
   const { data, error } = await createClient()
@@ -259,13 +271,17 @@ export const getGivingTiers = cache(async (): Promise<GivingTier[]> => {
     programmeSlug: programmeSlugOf(r.programmes),
     sortOrder: (r.sort_order as number) ?? 0,
   }));
-});
+}
 
 /**
  * Featured story. Returns null when no eligible story exists — the home page
  * omits the section rather than rendering a placeholder.
  */
-export const getFeaturedStory = cache(async (): Promise<FeaturedStory | null> => {
+export async function getFeaturedStory(): Promise<FeaturedStory | null> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("stories");
+
   if (!isSupabaseConfigured()) return null;
 
   const { data, error } = await createClient()
@@ -296,4 +312,4 @@ export const getFeaturedStory = cache(async (): Promise<FeaturedStory | null> =>
     // Never resolve an image for a tier that cannot display one.
     imagePath: tier === "named_full" ? ((row.image_path as string | null) ?? null) : null,
   };
-});
+}

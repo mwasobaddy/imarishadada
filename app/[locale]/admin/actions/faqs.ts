@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/client";
 import type { AuditSnapshot, Insert } from "@/lib/supabase/row-types";
 import { hasPermission } from "@/lib/admin/permissions";
@@ -23,6 +23,7 @@ export async function createFaq(data: Insert<"faqs">) {
   const { data: faq, error } = await supabase.from("faqs").insert(data).select().single();
   if (error) throw new Error(error.message);
   await supabase.from("audit_log").insert({ action: "create", table_name: "faqs", row_id: faq.id, after: faq as unknown as AuditSnapshot });
+  revalidateTag("faqs", "max");
   revalidatePath("/admin/content/faqs");
   return faq;
 }
@@ -34,6 +35,7 @@ export async function updateFaq(id: string, data: Insert<"faqs">) {
   const { data: faq, error } = await supabase.from("faqs").update(data).eq("id", id).select().single();
   if (error) throw new Error(error.message);
   await supabase.from("audit_log").insert({ action: "update", table_name: "faqs", row_id: id, before: before as unknown as AuditSnapshot, after: faq as unknown as AuditSnapshot });
+  revalidateTag("faqs", "max");
   revalidatePath("/admin/content/faqs");
   return faq;
 }
@@ -45,6 +47,7 @@ export async function deleteFaq(id: string) {
   const { error } = await supabase.from("faqs").delete().eq("id", id);
   if (error) throw new Error(error.message);
   await supabase.from("audit_log").insert({ action: "delete", table_name: "faqs", row_id: id, before: before as unknown as AuditSnapshot });
+  revalidateTag("faqs", "max");
   revalidatePath("/admin/content/faqs");
 }
 
@@ -53,6 +56,7 @@ export async function toggleFaq(id: string, published: boolean) {
   const supabase = createServiceClient();
   const { data: faq, error } = await supabase.from("faqs").update({ published }).eq("id", id).select().single();
   if (error) throw new Error(error.message);
+  revalidateTag("faqs", "max");
   revalidatePath("/admin/content/faqs");
   return faq;
 }

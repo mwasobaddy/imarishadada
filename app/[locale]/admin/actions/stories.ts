@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { hasPermission } from "@/lib/admin/permissions";
 import { createServiceClient } from "@/lib/supabase/client";
 import type { AuditSnapshot, Insert, Update, WithOptionalSlug } from "@/lib/supabase/row-types";
@@ -41,6 +41,7 @@ export async function createStory(data: WithOptionalSlug<"stories">) {
     after: story as unknown as AuditSnapshot,
   });
 
+  revalidateTag("stories", "max");
   revalidatePath("/admin/content/stories");
   return story;
 }
@@ -73,7 +74,9 @@ export async function updateStory(id: string, data: Update<"stories">) {
     after: story as unknown as AuditSnapshot,
   });
 
+  revalidateTag("stories", "max");
   revalidatePath("/admin/content/stories");
+  revalidateTag("stories", "max");
   revalidatePath(`/admin/content/stories/${story.slug}`);
   return story;
 }
@@ -99,6 +102,7 @@ export async function deleteStory(id: string) {
     before: before as unknown as AuditSnapshot,
   });
 
+  revalidateTag("stories", "max");
   revalidatePath("/admin/content/stories");
 }
 
@@ -125,6 +129,7 @@ export async function publishStory(id: string) {
     after: story as unknown as AuditSnapshot,
   });
 
+  revalidateTag("stories", "max");
   revalidatePath("/admin/content/stories");
   return story;
 }
@@ -142,6 +147,7 @@ export async function unpublishStory(id: string) {
 
   if (error) throw new Error(error.message);
 
+  revalidateTag("stories", "max");
   revalidatePath("/admin/content/stories");
   return story;
 }
@@ -159,6 +165,7 @@ export async function scheduleStory(id: string, scheduledAt: string) {
 
   if (error) throw new Error(error.message);
 
+  revalidateTag("stories", "max");
   revalidatePath("/admin/content/stories");
   return story;
 }

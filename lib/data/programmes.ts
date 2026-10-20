@@ -1,4 +1,4 @@
-import { cache } from "react";
+import { cacheLife, cacheTag } from "next/cache";
 
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import {
@@ -158,8 +158,11 @@ function parseOutcomes(value: unknown): ProgrammeOutcome[] {
 }
 
 /** A single programme, or null when the slug does not exist or is inactive. */
-export const getProgramme = cache(
-  async (slug: string): Promise<ProgrammePage | null> => {
+export async function getProgramme(slug: string): Promise<ProgrammePage | null> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("programmes");
+
     const fallback = OUTCOMES_BY_SLUG[slug]
       ? {
           id: null,
@@ -212,8 +215,7 @@ export const getProgramme = cache(
       outcomes: parseOutcomes(row.outcomes),
       sortOrder: row.sort_order,
     };
-  },
-);
+  }
 
 /**
  * Every active programme slug, for `generateStaticParams`.
@@ -225,7 +227,11 @@ export const getProgramme = cache(
  */
 const FALLBACK_SLUGS = ["school-reentry", "economic-empowerment", "dada-space"];
 
-export const getProgrammeSlugs = cache(async (): Promise<string[]> => {
+export async function getProgrammeSlugs(): Promise<string[]> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("programmes");
+
   if (!isSupabaseConfigured()) return FALLBACK_SLUGS;
 
   const { data, error } = await createClient()
@@ -236,7 +242,7 @@ export const getProgrammeSlugs = cache(async (): Promise<string[]> => {
 
   if (error || !data?.length) return FALLBACK_SLUGS;
   return data.map((r) => r.slug as string);
-});
+}
 
 /**
  * Impact figures attributed to this programme.
@@ -245,8 +251,11 @@ export const getProgrammeSlugs = cache(async (): Promise<string[]> => {
  * before publishing" were never seeded, so they simply do not appear — the page
  * cannot accidentally publish an unsourced number.
  */
-export const getProgrammeStats = cache(
-  async (programmeSlug: string): Promise<ImpactStat[]> => {
+export async function getProgrammeStats(programmeSlug: string): Promise<ImpactStat[]> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("impact-stats");
+
     if (!isSupabaseConfigured()) {
       return programmeSlug === "school-reentry"
         ? [
@@ -289,12 +298,14 @@ export const getProgrammeStats = cache(
         sortOrder: (r.sort_order as number) ?? 0,
       };
     });
-  },
-);
+  }
 
 /** Giving tiers attached to this programme, cheapest first. */
-export const getProgrammeTiers = cache(
-  async (programmeSlug: string): Promise<GivingTier[]> => {
+export async function getProgrammeTiers(programmeSlug: string): Promise<GivingTier[]> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("giving-tiers");
+
     const fallback = (FALLBACK_TIERS[programmeSlug] ?? []).map<GivingTier>((t, i) => ({
       id: null,
       slug: t.slug,
@@ -340,8 +351,7 @@ export const getProgrammeTiers = cache(
         sortOrder: (r.sort_order as number) ?? 0,
       };
     });
-  },
-);
+  }
 
 /**
  * Stories attached to this programme, with consent enforced.
@@ -354,8 +364,11 @@ export const getProgrammeTiers = cache(
  * The tier is NEVER taken from the client and is not admin-editable
  * (programme-school-reentry.md §4.5).
  */
-export const getProgrammeStories = cache(
-  async (programmeSlug: string): Promise<FeaturedStory[]> => {
+export async function getProgrammeStories(programmeSlug: string): Promise<FeaturedStory[]> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("stories");
+
     if (!isSupabaseConfigured()) return [];
 
     const { data, error } = await createClient()
@@ -394,12 +407,14 @@ export const getProgrammeStories = cache(
         } satisfies FeaturedStory,
       ];
     });
-  },
-);
+  }
 
 /** Other programmes, for the "see what else we run" footer. */
-export const getOtherProgrammes = cache(
-  async (currentSlug: string): Promise<Programme[]> => {
+export async function getOtherProgrammes(currentSlug: string): Promise<Programme[]> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("programmes");
+
     if (!isSupabaseConfigured()) return [];
 
     const { data, error } = await createClient()
@@ -423,8 +438,7 @@ export const getOtherProgrammes = cache(
       imageAlt: (r.image_alt as string | null) ?? null,
       sortOrder: (r.sort_order as number) ?? 0,
     }));
-  },
-);
+  }
 
 /**
  * Partner schools with recorded written agreement.
@@ -432,15 +446,22 @@ export const getOtherProgrammes = cache(
  * `agreement_on` is a required column: a name cannot be stored at all without a
  * date, so an unconfirmed school cannot accidentally reach the page.
  */
-export const getPartnerSchools = cache(
-  async (programmeSlug?: string): Promise<
+export async function getPartnerSchools(programmeSlug?: string): Promise<
     { name: string; area: string | null; note: string | null }[]
-  > => {
+  > {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("partner-schools");
+
     if (!isSupabaseConfigured()) return [];
 
     const query = createClient()
       .from("partner_schools")
-      .select("name, area, note")
+      // `programmes(slug)` is in the select because the filter below uses it.
+      // PostgREST rejects a filter on an embedded resource that is not also
+      // selected — "programmes is not an embedded resource in this request".
+      // The embed is otherwise unused; it exists to make the filter legal.
+      .select("name, area, note, programmes(slug)")
       .eq("active", true)
       .not("agreement_on", "is", null)
       .order("sort_order");
@@ -459,5 +480,4 @@ export const getPartnerSchools = cache(
       area: (r.area as string | null) ?? null,
       note: (r.note as string | null) ?? null,
     }));
-  },
-);
+  }
