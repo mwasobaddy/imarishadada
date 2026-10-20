@@ -172,7 +172,7 @@ export async function SiteFooter() {
             <a
               href={WHATSAPP_LINK}
               target="_blank"
-              rel="noopener noreferrer"
+              rel="nofollow noopener noreferrer"
               className="underline decoration-ink-muted/40 underline-offset-4 hover:text-brand-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
             >
               WhatsApp {PHONE_DISPLAY}

@@ -85,6 +85,8 @@ async function DonationOutcome({
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <a
             href={WHATSAPP_LINK}
+            target="_blank"
+            rel="nofollow noopener noreferrer"
             className="inline-flex min-h-13 items-center justify-center rounded-lg bg-gold px-8 text-base font-semibold text-gold-ink"
           >
             WhatsApp us

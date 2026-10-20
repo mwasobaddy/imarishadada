@@ -87,7 +87,7 @@ export default async function DonateFailurePage({
               <a
                 href={WHATSAPP_LINK}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="nofollow noopener noreferrer"
                 className="inline-flex min-h-13 items-center justify-center rounded-lg border border-border bg-card px-8 text-base font-medium text-brand-600 transition-colors hover:border-brand-600/40 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-700"
               >
                 WhatsApp us

@@ -90,8 +90,17 @@ export function InteractiveHoverButton({
   );
 
   if (href) {
+    // External links get `rel="nofollow noopener noreferrer"` so crawlers do
+    // not follow them (avoids false-positive "broken link" flags on
+    // rate-limited endpoints like wa.me) and so the browser does not leak
+    // the referring origin to the destination.
+    const external = /^https?:\/\//.test(href);
     return (
-      <Link href={href} className={classes}>
+      <Link
+        href={href}
+        className={classes}
+        {...(external ? { rel: "nofollow noopener noreferrer", target: "_blank" } : {})}
+      >
         {inner}
       </Link>
     );
