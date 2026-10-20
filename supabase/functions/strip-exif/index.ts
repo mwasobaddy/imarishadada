@@ -220,7 +220,9 @@ Deno.serve(async (req: Request) => {
         "Content-Type": file.type,
         "x-upsert": "false",
       },
-      body: stripped,
+      // Deno's `fetch` accepts a `Uint8Array` body; the DOM lib's `BodyInit`
+      // type does not, so the cast is needed to satisfy both runtimes.
+      body: stripped as unknown as BodyInit,
     });
 
     if (!uploadRes.ok) {
