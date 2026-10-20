@@ -62,12 +62,14 @@ export function AdminShell({
 
   return (
     <div className="flex min-h-screen bg-surface">
-      {/* Mobile sidebar toggle */}
+      {/* Mobile sidebar toggle. 44×44 so it clears the minimum tap target —
+          the whole team works from phones. */}
       <button
         type="button"
         onClick={() => setSidebarOpen((v) => !v)}
-        className="fixed left-4 top-4 z-50 rounded-lg bg-card p-2 shadow-md lg:hidden"
+        aria-expanded={sidebarOpen}
         aria-label="Toggle sidebar"
+        className="fixed left-4 top-4 z-50 flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-card shadow-md lg:hidden"
       >
         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
@@ -122,9 +124,11 @@ export function AdminShell({
         />
       )}
 
-      {/* Main content */}
+      {/* Main content. Extra top padding on mobile clears the floating
+          sidebar toggle, which would otherwise sit on top of the page
+          heading. */}
       <main className="flex-1 lg:ml-64">
-        <div className="p-6 lg:p-8">{children}</div>
+        <div className="px-6 pb-6 pt-20 lg:p-8">{children}</div>
       </main>
     </div>
   );
