@@ -1,28 +1,36 @@
 import type { Metadata } from "next";
 
 /**
- * Auth shell.
+ * Auth shell — split-screen layout.
  *
- * ## Why this exists
+ * ## Why split-screen
  *
- * The auth pages sit under `app/[locale]/` so they inherit the document shell
- * (fonts, `<html lang>`, theme tokens). But the locale layout renders a bare
- * `<body>` — it is built for pages that compose their own full-width layout.
- * Without this wrapper the sign-in form stretches edge to edge with no
- * container, no card and no brand mark, which is what it looked like before
- * this file existed.
+ * A centred card on a blank canvas is the default every auth page ships with.
+ * It works, but it wastes the left half of a wide screen and gives the eye
+ * nothing to rest on. A split layout puts the brand and a short value
+ * proposition on the left and the form on the right, which is the pattern
+ * Linear, Vercel and Stripe all use for their own sign-in surfaces.
  *
- * ## Why it is not a shared component
+ * ## Left panel
  *
- * `app/[locale]/layout.tsx` owns `<html>` and `<body>`, and the body is a flex
- * column. This layout slots in between them, so it can centre its own card
- * without touching the public site's chrome.
+ * Warm brand wash (purple → deeper purple) with the brand mark, the
+ * organisation name, and a one-line value statement. No photography — the
+ * consented images are for the public site, not the admin chrome.
+ *
+ * ## Right panel
+ *
+ * The form, vertically centred, on the page surface. On mobile the left
+ * panel collapses to a compact brand header so the form stays above the fold.
+ *
+ * ## Why the brand mark, not a heart
+ *
+ * The previous icon was a generic lucide heart. The brand mark
+ * (`/brand/mark.svg`) is the actual Imarisha Dada identity and is what
+ * appears on the public site header. Using a different icon here made the
+ * auth page feel like a different product.
  */
 
 export const metadata: Metadata = {
-  // A plain string, not a `{ template }` object. The root layout already
-  // applies the "| Imarisha Dada" suffix; setting a template here too would
-  // stack them and produce "Sign in | Imarisha Dada | Imarisha Dada".
   title: "Sign in",
   robots: { index: false, follow: false },
 };
@@ -33,41 +41,78 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-full flex-1 items-center justify-center bg-surface px-4 py-12">
-      <div className="w-full max-w-sm">
-        {/* Brand */}
-        <div className="mb-8 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-600 text-brand-50 shadow-sm">
-            <svg
-              className="h-6 w-6"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-            </svg>
+    <div className="flex min-h-screen bg-surface">
+      {/* ── Left panel — brand ── */}
+      <div className="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-brand-600 px-10 py-12 text-brand-50 lg:flex xl:px-16">
+        {/* Subtle pattern overlay */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.07]"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)",
+            backgroundSize: "24px 24px",
+          }}
+        />
+
+        {/* Top: brand mark + name */}
+        <div className="relative z-10">
+          <div className="flex items-center gap-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/brand/mark.svg"
+              alt="Imarisha Dada"
+              className="h-10 w-10"
+            />
+            <span className="text-xl font-semibold tracking-tight">
+              Imarisha Dada
+            </span>
           </div>
-          <p className="mt-4 text-lg font-semibold tracking-tight text-brand-600">
-            Imarisha Dada
+        </div>
+
+        {/* Middle: value proposition */}
+        <div className="relative z-10 max-w-md">
+          <h1 className="text-3xl font-semibold leading-tight tracking-tight xl:text-4xl">
+            Empowering girls and young women in Kibera
+          </h1>
+          <p className="mt-4 text-base leading-relaxed text-brand-100/80">
+            Staff access only. Every action is audited, every consent is
+            recorded, and every change to financial settings requires two
+            people to approve.
           </p>
-          <p className="mt-0.5 text-sm text-ink-muted">Admin access</p>
         </div>
 
-        {/* Card */}
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-7">
-          {children}
+        {/* Bottom: footer note */}
+        <div className="relative z-10 text-xs text-brand-100/60">
+          <p>© {new Date().getFullYear()} Imarisha Dada. All rights reserved.</p>
+        </div>
+      </div>
+
+      {/* ── Right panel — form ── */}
+      <div className="flex flex-1 flex-col items-center justify-center bg-surface px-6 py-12 sm:px-8 lg:px-12">
+        {/* Mobile brand header (hidden on lg) */}
+        <div className="mb-8 flex items-center gap-3 lg:hidden">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/brand/mark.svg"
+            alt="Imarisha Dada"
+            className="h-9 w-9"
+          />
+          <span className="text-lg font-semibold tracking-tight text-brand-600">
+            Imarisha Dada
+          </span>
         </div>
 
-        {/* Footer note */}
-        <p className="mt-6 text-center text-xs leading-relaxed text-ink-muted">
-          Access is limited to invited staff.
-          <br />
-          If you need an account, contact the organisation.
-        </p>
+        <div className="w-full max-w-sm">
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-7">
+            {children}
+          </div>
+
+          <p className="mt-6 text-center text-xs leading-relaxed text-ink-muted">
+            Access is limited to invited staff.
+            <br />
+            If you need an account, contact the organisation.
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -112,6 +112,21 @@ export function AdminShell({
           <div className="border-t border-border px-4 py-3">
             <p className="text-xs text-ink-muted truncate">{staff.display_name}</p>
             <p className="text-xs text-ink-muted truncate">{staff.email}</p>
+            <button
+              type="button"
+              onClick={async () => {
+                const { createAuthBrowserClient } = await import("@/lib/supabase/auth-browser");
+                const supabase = createAuthBrowserClient();
+                await supabase.auth.signOut();
+                window.location.href = "/auth/login";
+              }}
+              className="mt-3 flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-medium text-ink-muted transition-colors hover:bg-surface-lilac hover:text-ink"
+            >
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Sign out
+            </button>
           </div>
         </div>
       </aside>
