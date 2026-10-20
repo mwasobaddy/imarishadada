@@ -5,6 +5,7 @@ import { createAuthServerClient } from "@/lib/supabase/auth-server";
 import { getMyPermissions, getCurrentStaff } from "@/lib/admin/permissions";
 
 import { AdminShell } from "@/components/admin/admin-shell";
+import { PwaInstallPrompt } from "@/components/admin/pwa-install-prompt";
 
 /**
  * Admin shell. Everything under `/[locale]/admin` is protected: an
@@ -43,6 +44,7 @@ export default async function AdminLayout({
       <AdminShell permissions={permissions} staff={staff}>
         {children}
       </AdminShell>
+      <PwaInstallPrompt />
       <Toaster position="top-right" richColors closeButton />
     </>
   );

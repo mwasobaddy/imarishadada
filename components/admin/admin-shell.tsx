@@ -39,6 +39,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/admin/users", label: "Users", icon: "user-cog", permission: { resource: "users", action: "read" } },
   { href: "/admin/roles", label: "Roles", icon: "shield", permission: { resource: "roles", action: "read" } },
   { href: "/admin/audit-log", label: "Audit log", icon: "file-text", permission: { resource: "audit_log", action: "read" } },
+  { href: "/admin/chat", label: "Team chat", icon: "message-circle", permission: { resource: "notifications", action: "read" } },
   { href: "/admin/translations", label: "Translations", icon: "languages", permission: { resource: "translations", action: "read" } },
 ];
 
