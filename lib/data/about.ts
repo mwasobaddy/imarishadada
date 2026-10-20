@@ -93,7 +93,7 @@ export async function getTeamMembers(): Promise<TeamMember[]> {
 
   const { data, error } = await createClient()
     .from("team_members")
-    .select("slug, name, role, bio, photo_path, safeguarding_officer, sort_order")
+    .select("slug, name, role, title, department, bio, photo_path, safeguarding_officer, social_links, sort_order")
     .eq("active", true)
     .eq("consent_recorded", true)
     .order("sort_order");
@@ -107,7 +107,10 @@ export async function getTeamMembers(): Promise<TeamMember[]> {
     slug: r.slug as string,
     name: r.name as string,
     role: r.role as string,
+    title: (r.title as string | null) ?? null,
+    department: (r.department as string | null) ?? null,
     bio: (r.bio as string | null) ?? null,
+    socialLinks: (r.social_links as Record<string, string> | null) ?? null,
     photoPath: (r.photo_path as string | null) ?? null,
     safeguardingOfficer: (r.safeguarding_officer as boolean) ?? false,
     sortOrder: (r.sort_order as number) ?? 0,

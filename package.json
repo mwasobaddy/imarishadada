@@ -13,7 +13,8 @@
     "test:e2e": "playwright test",
     "verify": "npm run lint && npm run build && npm run test",
     "check:i18n": "node i18n/check-translations.mjs",
-    "prebuild": "npm run check:i18n"
+    "prebuild": "npm run check:i18n && node scripts/generate-image-manifest.mjs",
+    "images:manifest": "node scripts/generate-image-manifest.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

@@ -2,6 +2,8 @@
 
 import { useState, useTransition } from "react";
 
+import { MediaPicker } from "@/components/admin/media-picker";
+
 import { PageHeader } from "@/components/admin/page-header";
 import { toast } from "sonner";
 
@@ -125,7 +127,12 @@ export function PartnersEditor({ partners: initial }: { partners: Partner[] }) {
             </div>
             <div>
               <label className="block text-sm font-medium text-ink">Logo path</label>
-              <input value={form.logo_path ?? ""} onChange={(e) => setForm((f) => ({ ...f, logo_path: e.target.value }))} placeholder="partners/logo.png" className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-ink focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600" />
+              <MediaPicker
+                id="partners-editor-image"
+                label="Logo path"
+                value={form.logo_path ?? ""}
+                onChange={(path) => setForm((f) => ({ ...f, logo_path: path }))}
+              />
             </div>
             <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-ink">Description</label>

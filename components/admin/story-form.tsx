@@ -1,5 +1,6 @@
 "use client";
 
+import { MediaPicker } from "@/components/admin/media-picker";
 import { PageHeader } from "@/components/admin/page-header";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
@@ -294,16 +295,13 @@ export function StoryForm({
               className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-ink focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600"
             />
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-ink">Image path</label>
-            <input
-              value={form.image_path}
-              onChange={(e) => set("image_path", e.target.value)}
-              placeholder="stories/filename.jpg"
-              className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-ink focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600"
-            />
-          </div>
+          <MediaPicker
+            id="story-image"
+            label="Image"
+            hint="Only shown when consent allows a face"
+            value={form.image_path}
+            onChange={(path) => set("image_path", path)}
+          />
 
           <div>
             <label className="block text-sm font-medium text-ink">Reading minutes</label>

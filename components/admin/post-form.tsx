@@ -2,6 +2,8 @@
 
 import { PageHeader } from "@/components/admin/page-header";
 import { useState, useTransition } from "react";
+
+import { MediaPicker } from "@/components/admin/media-picker";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -148,7 +150,12 @@ export function PostForm({ initial }: { initial?: Post & { id: string; published
           </div>
           <div>
             <label className="block text-sm font-medium text-ink">Cover image path</label>
-            <input value={form.cover_path} onChange={(e) => set("cover_path", e.target.value)} placeholder="posts/filename.jpg" className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-ink focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600" />
+            <MediaPicker
+                id="post-form-image"
+                label="Cover image path"
+                value={form.cover_path ?? ""}
+                onChange={(path) => setForm((f) => ({ ...f, cover_path: path }))}
+              />
           </div>
           <div>
             <label className="block text-sm font-medium text-ink">Reading minutes</label>

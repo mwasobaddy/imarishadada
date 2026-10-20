@@ -2,6 +2,8 @@
 
 import { PageHeader } from "@/components/admin/page-header";
 import { useState, useTransition } from "react";
+
+import { MediaPicker } from "@/components/admin/media-picker";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -160,7 +162,12 @@ export function EventForm({ initial }: { initial?: Event & { id: string; publish
           </div>
           <div>
             <label className="block text-sm font-medium text-ink">Image path</label>
-            <input value={form.image_path} onChange={(e) => set("image_path", e.target.value)} placeholder="events/filename.jpg" className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-ink focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600" />
+            <MediaPicker
+                id="event-form-image"
+                label="Image path"
+                value={form.image_path ?? ""}
+                onChange={(path) => setForm((f) => ({ ...f, image_path: path }))}
+              />
           </div>
           <div>
             <label className="block text-sm font-medium text-ink">Max attendees</label>

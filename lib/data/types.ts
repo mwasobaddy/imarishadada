@@ -110,9 +110,18 @@ export type TeamMember = {
   slug: string;
   name: string;
   role: string;
+  /** Optional honorific or qualification, e.g. "MSc". */
+  title: string | null;
+  department: string | null;
   bio: string | null;
   photoPath: string | null;
   safeguardingOfficer: boolean;
+  /**
+   * Social profiles. Keys are the fixed set in
+   * `components/about/social-icon.tsx`, mirrored by a CHECK constraint on
+   * `team_members.social_links`.
+   */
+  socialLinks: Record<string, string> | null;
   sortOrder: number;
 };
 

@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Eye, EyeOff, ExternalLink } from "lucide-react";
 
 import { updateSection, toggleSection, type SectionPatch } from "@/app/[locale]/admin/actions/pages";
+import { MediaPicker, type MediaOption } from "@/components/admin/media-picker";
 
 type Section = {
   section_key: string;
@@ -33,9 +34,11 @@ const TITLE_MAX = 60;
 export function SectionEditor({
   section,
   route,
+  media = [],
 }: {
   section: Section;
   route: string;
+  media?: MediaOption[];
 }) {
   const router = useRouter();
   const [form, setForm] = useState(section);
@@ -221,14 +224,14 @@ export function SectionEditor({
 
           {/* Image */}
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Image path" hint="From the media library">
-              <input
-                value={form.image_path ?? ""}
-                onChange={(e) => set("image_path", e.target.value)}
-                placeholder="images/programmes/…"
-                className={inputClass}
-              />
-            </Field>
+            <MediaPicker
+              id="section-image"
+              label="Image"
+              hint="48 photographs available"
+              value={form.image_path ?? ""}
+              onChange={(path) => set("image_path", path)}
+              uploaded={media}
+            />
             <Field
               label="Alt text"
               hint="Required when an image is set"
