@@ -9,6 +9,23 @@ async function requirePermission(resource: string, action: string) {
   if (!(await hasPermission(resource, action))) throw new Error(`Permission denied: ${resource}:${action}`);
 }
 
+/**
+ * An image without alt text is an accessibility defect.
+ *
+ * The database enforces this too (`programmes_alt_required_with_image`), but a
+ * raw constraint violation is a poor error to hand an editor. This runs first
+ * so they get a sentence they can act on.
+ */
+function assertAltWithImage(data: Record<string, unknown>) {
+  const path = typeof data.image_path === "string" ? data.image_path.trim() : "";
+  const alt = typeof data.image_alt === "string" ? data.image_alt.trim() : "";
+  if (path && !alt) {
+    throw new Error(
+      "An image needs alt text. Describe what the photograph shows, for someone who cannot see it.",
+    );
+  }
+}
+
 export async function getProgrammes() {
   await requirePermission("programmes", "read");
   const supabase = createServiceClient();
@@ -27,6 +44,7 @@ export async function getProgramme(id: string) {
 
 export async function createProgramme(data: Insert<"programmes">) {
   await requirePermission("programmes", "create");
+  assertAltWithImage(data as Record<string, unknown>);
   const supabase = createServiceClient();
   if (!data.slug && data.title) {
     data.slug = (data.title as string).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");

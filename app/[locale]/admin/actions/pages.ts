@@ -46,7 +46,7 @@ function revalidateSection(sectionKey: string, pageKey: string | null) {
 }
 
 const SELECT =
-  "section_key, page_key, eyebrow, heading, body, body_secondary, steps, cta_label, cta_href, cta_secondary_label, cta_secondary_href, stat_line, image_path, image_alt, seo_title, seo_description, sort_order, active";
+  "section_key, page_key, eyebrow, heading, body, body_secondary, steps, images, cta_label, cta_href, cta_secondary_label, cta_secondary_href, stat_line, image_path, image_alt, seo_title, seo_description, sort_order, active";
 
 // ---------------------------------------------------------------------------
 // Reads — uncached, service client, for the editor
@@ -126,6 +126,7 @@ export type SectionPatch = {
   stat_line?: string | null;
   body_secondary?: string | null;
   steps?: { title: string; description: string }[] | null;
+  images?: { path: string; alt: string }[] | null;
   image_path?: string | null;
   image_alt?: string | null;
   seo_title?: string | null;
@@ -148,6 +149,16 @@ export async function updateSection(sectionKey: string, patch: SectionPatch) {
   // alt is a defect, not a warning.
   if (patch.image_path && !patch.image_alt?.trim()) {
     throw new Error("Alt text is required when a section has an image.");
+  }
+
+  // Same rule for a list of photographs. Checked here rather than in the form
+  // because a form can be bypassed; an action cannot.
+  if (
+    patch.images?.some((image) => !image.path?.trim() || !image.alt?.trim())
+  ) {
+    throw new Error(
+      "Every photograph needs an image and alt text. Remove the empty row or fill it in.",
+    );
   }
 
   // Metadata is a separate permission — a careless title costs rankings.

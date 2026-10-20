@@ -19,6 +19,13 @@ export type StaticImage = {
   width: number;
   height: number;
   sizeBytes: number;
+  /**
+   * Hand-written alt text, or null when nobody has written one yet.
+   *
+   * The media picker offers this when an editor selects the image. Null is a
+   * real state: it means "write one", not "decorative".
+   */
+  alt: string | null;
 };
 
 export const STATIC_IMAGES: StaticImage[] = [
@@ -28,7 +35,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "about",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 106933
+    "sizeBytes": 106933,
+    "alt": null
   },
   {
     "path": "/images/about/about-core-values-presentation.avif",
@@ -36,7 +44,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "about",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 114382
+    "sizeBytes": 114382,
+    "alt": "A participant presenting a chart to her group during a session"
   },
   {
     "path": "/images/about/about-facilitation.avif",
@@ -44,7 +53,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "about",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 64083
+    "sizeBytes": 64083,
+    "alt": "A participant drawing on a flipchart while the group watches"
   },
   {
     "path": "/images/about/about-facilitator-front-of-room.avif",
@@ -52,7 +62,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "about",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 123816
+    "sizeBytes": 123816,
+    "alt": null
   },
   {
     "path": "/images/about/about-group-outdoors.avif",
@@ -60,7 +71,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "about",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 127226
+    "sizeBytes": 127226,
+    "alt": "The full group photographed outside the community centre"
   },
   {
     "path": "/images/about/about-mentor-and-participant.avif",
@@ -68,7 +80,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "about",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 92555
+    "sizeBytes": 92555,
+    "alt": "A participant and a younger girl seated together during a session"
   },
   {
     "path": "/images/about/about-outdoor-candid.avif",
@@ -76,7 +89,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "about",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 119189
+    "sizeBytes": 119189,
+    "alt": "Participants in branded t-shirts talking outdoors after a session"
   },
   {
     "path": "/images/about/about-session-facilitator-alt.avif",
@@ -84,7 +98,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "about",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 78234
+    "sizeBytes": 78234,
+    "alt": null
   },
   {
     "path": "/images/about/about-session-facilitator.avif",
@@ -92,7 +107,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "about",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 122280
+    "sizeBytes": 122280,
+    "alt": null
   },
   {
     "path": "/images/about/about-the-team.avif",
@@ -100,7 +116,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "about",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 133726
+    "sizeBytes": 133726,
+    "alt": null
   },
   {
     "path": "/images/about/about-two-women-classroom-alt.avif",
@@ -108,7 +125,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "about",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 95874
+    "sizeBytes": 95874,
+    "alt": null
   },
   {
     "path": "/images/about/about-two-women-classroom.avif",
@@ -116,7 +134,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "about",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 77861
+    "sizeBytes": 77861,
+    "alt": "Two young women smiling together in a classroom in Kibera"
   },
   {
     "path": "/images/about/about-two-women-in-session.avif",
@@ -124,7 +143,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "about",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 83128
+    "sizeBytes": 83128,
+    "alt": null
   },
   {
     "path": "/images/hero/hero-alt-close-up.avif",
@@ -132,7 +152,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "hero",
     "width": 1200,
     "height": 1200,
-    "sizeBytes": 64916
+    "sizeBytes": 64916,
+    "alt": null
   },
   {
     "path": "/images/hero/hero-alt-close-up.webp",
@@ -140,7 +161,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "hero",
     "width": 1200,
     "height": 1200,
-    "sizeBytes": 38944
+    "sizeBytes": 38944,
+    "alt": null
   },
   {
     "path": "/images/hero/hero-alt-hands-clasped.avif",
@@ -148,7 +170,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "hero",
     "width": 1200,
     "height": 1200,
-    "sizeBytes": 66901
+    "sizeBytes": 66901,
+    "alt": null
   },
   {
     "path": "/images/hero/hero-alt-hands-clasped.webp",
@@ -156,7 +179,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "hero",
     "width": 1200,
     "height": 1200,
-    "sizeBytes": 47576
+    "sizeBytes": 47576,
+    "alt": null
   },
   {
     "path": "/images/hero/hero-alt-profile.avif",
@@ -164,7 +188,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "hero",
     "width": 1200,
     "height": 1200,
-    "sizeBytes": 71664
+    "sizeBytes": 71664,
+    "alt": null
   },
   {
     "path": "/images/hero/hero-alt-profile.webp",
@@ -172,7 +197,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "hero",
     "width": 1200,
     "height": 1200,
-    "sizeBytes": 52730
+    "sizeBytes": 52730,
+    "alt": null
   },
   {
     "path": "/images/hero/hero-alt-speaking.avif",
@@ -180,7 +206,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "hero",
     "width": 1200,
     "height": 1200,
-    "sizeBytes": 99300
+    "sizeBytes": 99300,
+    "alt": null
   },
   {
     "path": "/images/hero/hero-alt-speaking.webp",
@@ -188,7 +215,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "hero",
     "width": 1200,
     "height": 1200,
-    "sizeBytes": 76364
+    "sizeBytes": 76364,
+    "alt": null
   },
   {
     "path": "/images/hero/hero-speaker-pink-wall.avif",
@@ -196,7 +224,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "hero",
     "width": 1200,
     "height": 1200,
-    "sizeBytes": 64926
+    "sizeBytes": 64926,
+    "alt": null
   },
   {
     "path": "/images/hero/hero-speaker-pink-wall.webp",
@@ -204,7 +233,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "hero",
     "width": 1200,
     "height": 1200,
-    "sizeBytes": 45800
+    "sizeBytes": 45800,
+    "alt": "A young woman speaking during a Dada Space session"
   },
   {
     "path": "/images/impact/impact-community-meal-alt.avif",
@@ -212,7 +242,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "impact",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 127988
+    "sizeBytes": 127988,
+    "alt": null
   },
   {
     "path": "/images/impact/impact-community-meal.avif",
@@ -220,7 +251,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "impact",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 133718
+    "sizeBytes": 133718,
+    "alt": null
   },
   {
     "path": "/images/impact/impact-group-full.avif",
@@ -228,7 +260,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "impact",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 144915
+    "sizeBytes": 144915,
+    "alt": null
   },
   {
     "path": "/images/impact/impact-group-outdoors.avif",
@@ -236,7 +269,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "impact",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 138544
+    "sizeBytes": 138544,
+    "alt": null
   },
   {
     "path": "/images/impact/impact-group-wider.avif",
@@ -244,7 +278,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "impact",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 136055
+    "sizeBytes": 136055,
+    "alt": null
   },
   {
     "path": "/images/impact/impact-group-with-banner.avif",
@@ -252,7 +287,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "impact",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 151372
+    "sizeBytes": 151372,
+    "alt": null
   },
   {
     "path": "/images/impact/impact-outdoor-group-alt.avif",
@@ -260,7 +296,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "impact",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 118257
+    "sizeBytes": 118257,
+    "alt": null
   },
   {
     "path": "/images/impact/impact-outdoor-group-wide.avif",
@@ -268,7 +305,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "impact",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 136371
+    "sizeBytes": 136371,
+    "alt": null
   },
   {
     "path": "/images/impact/impact-outdoor-group.avif",
@@ -276,7 +314,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "impact",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 100900
+    "sizeBytes": 100900,
+    "alt": null
   },
   {
     "path": "/images/impact/impact-serving-food-alt.avif",
@@ -284,7 +323,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "impact",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 127813
+    "sizeBytes": 127813,
+    "alt": null
   },
   {
     "path": "/images/impact/impact-serving-food.avif",
@@ -292,7 +332,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "impact",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 144594
+    "sizeBytes": 144594,
+    "alt": null
   },
   {
     "path": "/images/impact/impact-supplies-distributed-alt.avif",
@@ -300,7 +341,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "impact",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 123127
+    "sizeBytes": 123127,
+    "alt": null
   },
   {
     "path": "/images/impact/impact-supplies-distributed.avif",
@@ -308,7 +350,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "impact",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 99067
+    "sizeBytes": 99067,
+    "alt": null
   },
   {
     "path": "/images/programmes/dada-space/dada-space-group-listening.avif",
@@ -316,7 +359,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "programmes",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 99089
+    "sizeBytes": 99089,
+    "alt": null
   },
   {
     "path": "/images/programmes/dada-space/dada-space-hand-raised.avif",
@@ -324,7 +368,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "programmes",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 52702
+    "sizeBytes": 52702,
+    "alt": "A girl raises her hand during a Dada Space session"
   },
   {
     "path": "/images/programmes/dada-space/dada-space-outdoor-group.avif",
@@ -332,7 +377,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "programmes",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 121113
+    "sizeBytes": 121113,
+    "alt": null
   },
   {
     "path": "/images/programmes/dada-space/dada-space-session-wide.avif",
@@ -340,7 +386,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "programmes",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 97676
+    "sizeBytes": 97676,
+    "alt": null
   },
   {
     "path": "/images/programmes/dada-space/dada-space-supplies-in-session.avif",
@@ -348,7 +395,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "programmes",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 137696
+    "sizeBytes": 137696,
+    "alt": null
   },
   {
     "path": "/images/programmes/economic-empowerment/economic-empowerment-conversation.avif",
@@ -356,7 +404,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "programmes",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 127586
+    "sizeBytes": 127586,
+    "alt": "Two participants talking together outdoors, one explaining something to the other"
   },
   {
     "path": "/images/programmes/re-entry/re-entry-mother-with-baby-alt.avif",
@@ -364,7 +413,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "programmes",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 84040
+    "sizeBytes": 84040,
+    "alt": null
   },
   {
     "path": "/images/programmes/re-entry/re-entry-mother-with-baby.avif",
@@ -372,7 +422,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "programmes",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 81536
+    "sizeBytes": 81536,
+    "alt": null
   },
   {
     "path": "/images/programmes/re-entry/re-entry-mother-writing-alt.avif",
@@ -380,7 +431,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "programmes",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 78715
+    "sizeBytes": 78715,
+    "alt": null
   },
   {
     "path": "/images/programmes/re-entry/re-entry-mother-writing.avif",
@@ -388,7 +440,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "programmes",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 80547
+    "sizeBytes": 80547,
+    "alt": "A young mother holding her baby writes with a pen during a school re-entry session"
   },
   {
     "path": "/images/programmes/re-entry/re-entry-mothers-in-session-alt.avif",
@@ -396,7 +449,8 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "programmes",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 89516
+    "sizeBytes": 89516,
+    "alt": null
   },
   {
     "path": "/images/programmes/re-entry/re-entry-mothers-in-session.avif",
@@ -404,6 +458,7 @@ export const STATIC_IMAGES: StaticImage[] = [
     "group": "programmes",
     "width": 1400,
     "height": 933,
-    "sizeBytes": 84028
+    "sizeBytes": 84028,
+    "alt": null
   }
 ];

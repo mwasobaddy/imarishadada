@@ -131,6 +131,7 @@ export async function getAboutSections(): Promise<Record<string, SiteSection>> {
     "about-team",
     "about-work",
     "about-approach",
+    "about-carousel",
   ];
   return Object.fromEntries(
     await Promise.all(

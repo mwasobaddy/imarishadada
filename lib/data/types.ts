@@ -32,6 +32,8 @@ export type SiteSection = {
   bodySecondary?: string | null;
   /** Ordered steps inside a section. Same shape as `ProgrammeOutcome[]`. */
   steps?: ProgrammeOutcome[] | null;
+  /** Ordered photographs for a carousel or gallery. */
+  images?: { path: string; alt: string }[] | null;
   imagePath?: string | null;
   imageAlt?: string | null;
 };

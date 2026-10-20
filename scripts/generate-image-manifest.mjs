@@ -30,13 +30,14 @@
  * Run via `npm run images:manifest` (also wired into `prebuild`).
  */
 
-import { readdir, writeFile } from "node:fs/promises";
+import { readFile, readdir, writeFile } from "node:fs/promises";
 import { join, relative, sep } from "node:path";
 import sharp from "sharp";
 
 const ROOT = process.cwd();
 const IMAGES_DIR = join(ROOT, "public", "images");
 const OUT = join(ROOT, "lib", "data", "image-manifest.ts");
+const ALTS = join(ROOT, "scripts", "image-alts.json");
 
 const EXT = /\.(avif|webp|jpe?g|png)$/i;
 
@@ -66,6 +67,24 @@ async function walk(dir) {
   return out;
 }
 
+/**
+ * Alt text, hand-maintained in `scripts/image-alts.json`.
+ *
+ * Not derived from the filename. An alt describing a photograph of a real
+ * participant has to be written by someone who has seen it — "about two women
+ * classroom" is a filename, not a description, and shipping it as alt text is
+ * worse than shipping none.
+ */
+let alts = {};
+try {
+  const parsed = JSON.parse(await readFile(ALTS, "utf8"));
+  alts = Object.fromEntries(
+    Object.entries(parsed).filter(([k]) => !k.startsWith("_")),
+  );
+} catch {
+  console.warn("image-alts.json not found — alt text will be empty");
+}
+
 const files = (await walk(IMAGES_DIR)).sort();
 
 const images = [];
@@ -85,6 +104,7 @@ for (const file of files) {
     width: meta.width ?? 0,
     height: meta.height ?? 0,
     sizeBytes: stat.size,
+    alt: alts[`/${rel}`] ?? null,
   });
 }
 
@@ -109,6 +129,13 @@ export type StaticImage = {
   width: number;
   height: number;
   sizeBytes: number;
+  /**
+   * Hand-written alt text, or null when nobody has written one yet.
+   *
+   * The media picker offers this when an editor selects the image. Null is a
+   * real state: it means "write one", not "decorative".
+   */
+  alt: string | null;
 };
 
 export const STATIC_IMAGES: StaticImage[] = ${JSON.stringify(images, null, 2)};

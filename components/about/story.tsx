@@ -5,7 +5,13 @@ import { AboutPhotoCarousel } from "@/components/about/photo-carousel";
 import { Programmes } from "@/components/sections/programmes";
 import type { Programme, SiteSection } from "@/lib/data/types";
 
-export function AboutStory({ section }: { section: SiteSection }) {
+export function AboutStory({
+  section,
+  carousel,
+}: {
+  section: SiteSection;
+  carousel: SiteSection;
+}) {
   return (
     <section aria-labelledby="about-story-heading" className="py-section bg-surface">
       <Container>
@@ -15,7 +21,11 @@ export function AboutStory({ section }: { section: SiteSection }) {
           stay visually balanced once the image has real height.
         */}
         <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16">
-          <AboutPhotoCarousel className="lg:order-1" />
+          <AboutPhotoCarousel
+            images={carousel.images ?? []}
+            caption={carousel.body}
+            className="lg:order-1"
+          />
 
           <div className="lg:order-2">
             {section.eyebrow ? (
@@ -90,9 +100,11 @@ export function AboutVisionMission({
 export function AboutValues({
   section,
   values,
+  carousel,
 }: {
   section: SiteSection;
   values: import("@/lib/data/types").CoreValue[];
+  carousel: SiteSection;
 }) {
   if (values.length === 0) return null;
 
@@ -128,7 +140,15 @@ export function AboutValues({
             </dl>
           </div>
 
-          <AboutPhotoCarousel className="lg:order-last" />
+          {/*
+            The same set as the story carousel. The caption is deliberately
+            omitted here — it is already stated at the top of the page, and
+            repeating it verbatim reads as a copy-paste rather than a design.
+          */}
+          <AboutPhotoCarousel
+            images={carousel.images ?? []}
+            className="lg:order-last"
+          />
         </div>
       </Container>
     </section>

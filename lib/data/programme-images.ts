@@ -1,66 +1,49 @@
 /**
- * Consented photography per programme.
+ * Programme photography.
  *
- * The `programmes.image_path` column is the source of truth, but the database
- * is not provisioned yet, so the cards would render a brand-tinted field with
- * no photograph — which is exactly the "generated, not designed" signal the
- * project rules call out.
+ * ## What used to be here
  *
- * This map is the fallback, keyed by programme slug. An editor overwrites it
- * with a real `image_path` later; the two agree.
+ * A hardcoded `PROGRAMME_IMAGE_FALLBACK` map, keyed by slug, with three
+ * photographs and their alt text. It existed because `programmes.image_path`
+ * was null on every row while the database was being provisioned, and a card
+ * with no photograph renders a brand-tinted field — which reads as "generated,
+ * not designed".
  *
- * It lives in its own module because **two** data layers resolve programmes —
- * `lib/data/home.ts` (the index page) and `lib/data/programmes.ts` (the detail
- * page) — and a fallback defined in only one of them means the index shows a
- * gradient while the detail page shows a photograph. That inconsistency was
- * visible on screen before this was extracted.
+ * ## Why it is gone
+ *
+ * Migration `0016` copied those three values into the rows. Keeping the map
+ * afterwards would have turned a stopgap into a hidden override, with a
+ * consequence that was actively confusing:
+ *
+ *   Clearing the image in the admin did not clear the image. It revealed a
+ *   different one, from code, that the editor could neither see nor change.
+ *
+ * So the database is now the only source. An empty `image_path` means the card
+ * renders its brand-tinted field, which is the honest result and the one an
+ * editor expects.
+ *
+ * A CHECK constraint (`programmes_alt_required_with_image`) now rejects an
+ * image with no alt text, so the pairing cannot drift.
  *
  * @see doc/image-review.md §Programmes
  */
-export const PROGRAMME_IMAGE_FALLBACK: Record<
-  string,
-  { path: string; alt: string }
-> = {
-  "school-reentry": {
-    path: "/images/programmes/re-entry/re-entry-mother-writing.avif",
-    alt: "A young mother holding her baby writes with a pen during a school re-entry session",
-  },
-  "economic-empowerment": {
-    // A proxy, and labelled as one.
-    //
-    // The gallery contains no photograph of a business, a market stall, or
-    // start-up capital being put to work. This frame shows two participants in
-    // conversation outdoors — the closest honest representation of a programme
-    // about young women building their own income, and far better than
-    // reusing a classroom photograph to illustrate money.
-    //
-    // It is still a proxy. The alt text describes what is actually in the
-    // picture rather than claiming to show a business, and the programme still
-    // needs its own shoot.
-    path: "/images/programmes/economic-empowerment/economic-empowerment-conversation.avif",
-    alt: "Two participants talking together outdoors, one explaining something to the other",
-  },
-  "dada-space": {
-    path: "/images/programmes/dada-space/dada-space-hand-raised.avif",
-    alt: "A girl raises her hand during a Dada Space session",
-  },
-};
 
 /**
  * Resolve a programme's photograph.
  *
- * The database column wins; the fallback covers rows created before the
- * photography was selected. An empty path means "no consented photograph
- * exists" and the card renders its brand-tinted field rather than a stock
- * image of unrelated children.
+ * Kept as a named function rather than inlined at the two call sites
+ * (`lib/data/home.ts` and `lib/data/programmes.ts`) so the pairing of path and
+ * alt stays in one place — the two layers previously disagreed, and the index
+ * showed a gradient while the detail page showed a photograph.
  */
 export function resolveProgrammeImage(
-  slug: string,
+  _slug: string,
   dbPath: string | null | undefined,
   dbAlt: string | null | undefined,
 ): { imagePath: string | null; imageAlt: string | null } {
-  const fallback = PROGRAMME_IMAGE_FALLBACK[slug];
-  const path = dbPath || fallback?.path || "";
-  const alt = dbAlt || fallback?.alt || "";
+  const path = dbPath?.trim() ?? "";
+  const alt = dbAlt?.trim() ?? "";
+  // An image without alt text is rejected at the database, so this can only be
+  // reached by a row written before the constraint existed.
   return { imagePath: path || null, imageAlt: alt || null };
 }

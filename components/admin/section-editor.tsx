@@ -21,6 +21,7 @@ type Section = {
   stat_line: string | null;
   body_secondary: string | null;
   steps: { title: string; description: string }[] | null;
+  images: { path: string; alt: string }[] | null;
   image_path: string | null;
   image_alt: string | null;
   seo_title: string | null;
@@ -69,6 +70,7 @@ export function SectionEditor({
           stat_line: form.stat_line || null,
           body_secondary: form.body_secondary || null,
           steps: form.steps && form.steps.length > 0 ? form.steps : null,
+          images: form.images && form.images.length > 0 ? form.images : null,
           image_path: form.image_path || null,
           image_alt: form.image_alt || null,
           seo_title: form.seo_title || null,
@@ -343,6 +345,131 @@ export function SectionEditor({
             </div>
           )}
 
+          {/* Carousel / gallery images */}
+          {form.images !== null && (
+            <div className="rounded-lg border border-border bg-surface p-4">
+              <div className="flex items-baseline justify-between gap-2">
+                <p className="text-sm font-medium text-ink">
+                  Photographs ({form.images?.length ?? 0})
+                </p>
+                <span className="text-[11px] text-ink-muted/70">
+                  Shown in this order
+                </span>
+              </div>
+              <p className="mt-1 text-[11px] leading-relaxed text-ink-muted">
+                Alt text is required for each one. Describe what the photograph
+                shows, for someone who cannot see it — not the filename.
+              </p>
+
+              <ul className="mt-3 space-y-3">
+                {(form.images ?? []).map((image, i) => (
+                  <li key={i} className="rounded-lg border border-border bg-card p-3">
+                    <div className="flex items-center gap-2">
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-surface-lilac font-mono text-[10px] text-ink-muted">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-ink-muted">
+                        {image.path || "No image selected"}
+                      </span>
+                      <button
+                        type="button"
+                        disabled={i === 0}
+                        onClick={() => {
+                          const next = [...(form.images ?? [])];
+                          [next[i - 1], next[i]] = [next[i]!, next[i - 1]!];
+                          set("images", next);
+                        }}
+                        aria-label={`Move photograph ${i + 1} earlier`}
+                        className="rounded-md p-1.5 text-ink-muted transition-colors hover:bg-surface-lilac hover:text-ink disabled:opacity-30"
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        disabled={i === (form.images?.length ?? 0) - 1}
+                        onClick={() => {
+                          const next = [...(form.images ?? [])];
+                          [next[i], next[i + 1]] = [next[i + 1]!, next[i]!];
+                          set("images", next);
+                        }}
+                        aria-label={`Move photograph ${i + 1} later`}
+                        className="rounded-md p-1.5 text-ink-muted transition-colors hover:bg-surface-lilac hover:text-ink disabled:opacity-30"
+                      >
+                        ↓
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          set(
+                            "images",
+                            (form.images ?? []).filter((_, j) => j !== i),
+                          )
+                        }
+                        aria-label={`Remove photograph ${i + 1}`}
+                        className="rounded-md p-1.5 text-red-600 transition-colors hover:bg-red-50"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+
+                    <div className="mt-2 grid gap-3 sm:grid-cols-2">
+                      <MediaPicker
+                        compact
+                        id={`section-image-${i}`}
+                        label={`Photograph ${i + 1}`}
+                        value={image.path}
+                        onChange={(path) => {
+                          const next = [...(form.images ?? [])];
+                          next[i] = { ...next[i]!, path };
+                          set("images", next);
+                        }}
+                        onUseAlt={(alt) => {
+                          const next = [...(form.images ?? [])];
+                          next[i] = { ...next[i]!, alt };
+                          set("images", next);
+                        }}
+                        uploaded={media}
+                      />
+                      <div>
+                        <label
+                          htmlFor={`section-image-alt-${i}`}
+                          className="text-[11px] font-medium text-ink-muted"
+                        >
+                          Alt text
+                        </label>
+                        <textarea
+                          id={`section-image-alt-${i}`}
+                          value={image.alt}
+                          onChange={(e) => {
+                            const next = [...(form.images ?? [])];
+                            next[i] = { ...next[i]!, alt: e.target.value };
+                            set("images", next);
+                          }}
+                          placeholder="What the photograph shows"
+                          rows={2}
+                          className={`${inputClass} resize-y ${
+                            !image.alt.trim() ? "border-amber-400" : ""
+                          }`}
+                        />
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+
+              <button
+                type="button"
+                onClick={() =>
+                  set("images", [...(form.images ?? []), { path: "", alt: "" }])
+                }
+                className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-ink-muted transition-colors hover:border-brand-600 hover:text-brand-600"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Add photograph
+              </button>
+            </div>
+          )}
+
           {/* Image */}
           <div className="grid gap-4 sm:grid-cols-2">
             <MediaPicker
@@ -351,6 +478,7 @@ export function SectionEditor({
               hint="48 photographs available"
               value={form.image_path ?? ""}
               onChange={(path) => set("image_path", path)}
+              onUseAlt={(alt) => set("image_alt", alt)}
               uploaded={media}
             />
             <Field

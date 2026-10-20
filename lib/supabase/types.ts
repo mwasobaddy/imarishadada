@@ -1224,6 +1224,7 @@ export type Database = {
           id: string
           image_alt: string | null
           image_path: string | null
+          images: Json | null
           page_key: string | null
           section_key: string
           seo_description: string | null
@@ -1247,6 +1248,7 @@ export type Database = {
           id?: string
           image_alt?: string | null
           image_path?: string | null
+          images?: Json | null
           page_key?: string | null
           section_key: string
           seo_description?: string | null
@@ -1270,6 +1272,7 @@ export type Database = {
           id?: string
           image_alt?: string | null
           image_path?: string | null
+          images?: Json | null
           page_key?: string | null
           section_key?: string
           seo_description?: string | null

@@ -50,6 +50,7 @@ type SectionRow = {
   stat_line: string | null;
   body_secondary: string | null;
   steps: { title: string; description: string }[] | null;
+  images: { path: string; alt: string }[] | null;
   image_path: string | null;
   image_alt: string | null;
 };
@@ -154,6 +155,30 @@ const FALLBACKS: Record<string, SiteSection> = {
     ctaLabel: null,
     ctaHref: null,
   },
+  /**
+   * The About page carousel, rendered twice from one set.
+   *
+   * Mirrors migration `0017`. Without it a database blip empties the carousel,
+   * and `AboutPhotoCarousel` returns null for an empty set — so the two columns
+   * it anchors collapse and the story section loses its image entirely. Stale
+   * photographs beat a missing layout.
+   */
+  "about-carousel": {
+    key: "about-carousel",
+    eyebrow: null,
+    heading: "Programmes and sessions in Kibera",
+    body: "Programmes and sessions in Kibera, photographed by Suma and published with written consent. Auto-advances, and pauses on hover or keyboard focus.",
+    ctaLabel: null,
+    ctaHref: null,
+    images: [
+      { path: "/images/about/about-two-women-classroom.avif", alt: "Two young women smiling together in a classroom in Kibera" },
+      { path: "/images/about/about-mentor-and-participant.avif", alt: "A participant and a younger girl seated together during a session" },
+      { path: "/images/about/about-core-values-presentation.avif", alt: "A participant presenting a chart to her group during a session" },
+      { path: "/images/about/about-outdoor-candid.avif", alt: "Participants in branded t-shirts talking outdoors after a session" },
+      { path: "/images/about/about-group-outdoors.avif", alt: "The full group photographed outside the community centre" },
+      { path: "/images/about/about-facilitation.avif", alt: "A participant drawing on a flipchart while the group watches" },
+    ],
+  },
 };
 
 function toSection(row: SectionRow): SiteSection {
@@ -170,13 +195,14 @@ function toSection(row: SectionRow): SiteSection {
     statLine: row.stat_line ?? fallback?.statLine ?? null,
     bodySecondary: row.body_secondary ?? fallback?.bodySecondary ?? null,
     steps: row.steps ?? fallback?.steps ?? null,
+    images: row.images ?? fallback?.images ?? null,
     imagePath: row.image_path ?? fallback?.imagePath ?? null,
     imageAlt: row.image_alt ?? fallback?.imageAlt ?? null,
   };
 }
 
 const SELECT =
-  "section_key, eyebrow, heading, body, cta_label, cta_href, cta_secondary_label, cta_secondary_href, stat_line, body_secondary, steps, image_path, image_alt";
+  "section_key, eyebrow, heading, body, cta_label, cta_href, cta_secondary_label, cta_secondary_href, stat_line, body_secondary, steps, images, image_path, image_alt";
 
 /**
  * One section, by key. Cached until the matching `revalidateTag` fires.

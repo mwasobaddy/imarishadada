@@ -54,6 +54,8 @@ export function MediaPicker({
   hint,
   uploaded = [],
   id,
+  onUseAlt,
+  compact = false,
 }: {
   value: string;
   onChange: (path: string) => void;
@@ -62,6 +64,21 @@ export function MediaPicker({
   /** Rows from the `media` table, passed down from the server. */
   uploaded?: MediaOption[];
   id?: string;
+  /**
+   * Called when the editor accepts the selected image's alt text.
+   *
+   * Offered rather than applied: the alt for a team portrait and the alt for
+   * the same portrait inside a story are not the same sentence, and silently
+   * overwriting what someone has already written is how that gets lost.
+   */
+  onUseAlt?: (alt: string) => void;
+  /**
+   * Drop the label row and tighten the trigger.
+   *
+   * Used inside a repeating list, where the row is already labelled by its
+   * position and eight "Image" labels stacked down the page is noise.
+   */
+  compact?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -79,6 +96,7 @@ export function MediaPicker({
           group: i.group,
           width: i.width,
           height: i.height,
+          alt: i.alt ?? undefined,
           source: "static",
         }),
       ),
@@ -135,12 +153,14 @@ export function MediaPicker({
 
   return (
     <div ref={wrapRef} className="relative">
-      <div className="flex items-baseline justify-between gap-2">
-        <label htmlFor={id} className="text-sm font-medium text-ink">
-          {label}
-        </label>
-        {hint && <span className="text-[11px] text-ink-muted/70">{hint}</span>}
-      </div>
+      {!compact && (
+        <div className="flex items-baseline justify-between gap-2">
+          <label htmlFor={id} className="text-sm font-medium text-ink">
+            {label}
+          </label>
+          {hint && <span className="text-[11px] text-ink-muted/70">{hint}</span>}
+        </div>
+      )}
 
       {/* Trigger — shows the current selection, or the empty state. */}
       <button
@@ -149,9 +169,16 @@ export function MediaPicker({
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-haspopup="dialog"
-        className="mt-1.5 flex w-full items-center gap-3 rounded-lg border border-border bg-card p-2 text-left transition-colors hover:border-brand-600/40"
+        aria-label={compact ? `${label}: ${selected?.label ?? "choose an image"}` : undefined}
+        className={`flex w-full items-center gap-3 rounded-lg border border-border bg-card p-2 text-left transition-colors hover:border-brand-600/40 ${
+          compact ? "" : "mt-1.5"
+        }`}
       >
-        <span className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-md bg-surface-lilac">
+        <span
+          className={`relative flex shrink-0 items-center justify-center overflow-hidden rounded-md bg-surface-lilac ${
+            compact ? "h-10 w-10" : "h-12 w-12"
+          }`}
+        >
           {value ? (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img src={value} alt="" className="h-full w-full object-cover" />
@@ -188,6 +215,30 @@ export function MediaPicker({
           </span>
         )}
       </button>
+
+      {/* Alt text the image already carries, offered rather than applied. */}
+      {value && selected?.alt && onUseAlt && (
+        <div className="mt-2 flex items-start gap-2 rounded-lg border border-border bg-surface px-3 py-2">
+          <p className="min-w-0 flex-1 text-[11px] leading-relaxed text-ink-muted">
+            <span className="font-medium text-ink">Alt on file:</span>{" "}
+            {selected.alt}
+          </p>
+          <button
+            type="button"
+            onClick={() => onUseAlt(selected.alt!)}
+            className="shrink-0 rounded-full border border-border bg-card px-2.5 py-1 text-[11px] font-medium text-brand-600 transition-colors hover:border-brand-600"
+          >
+            Use this
+          </button>
+        </div>
+      )}
+
+      {value && selected && !selected.alt && (
+        <p className="mt-2 text-[11px] leading-relaxed text-amber-700">
+          No alt text on file for this image. Write one — describe what the
+          photograph shows, for someone who cannot see it.
+        </p>
+      )}
 
       {/* Popover */}
       {open && (

@@ -80,12 +80,19 @@ export default async function AboutPage({
           body={sections["about-hero"]?.body}
         />
 
-        <AboutStory section={sections["about-story"]!} />
+        <AboutStory
+          section={sections["about-story"]!}
+          carousel={sections["about-carousel"]!}
+        />
         <AboutVisionMission
           vision={sections["about-vision"]!}
           mission={sections["about-mission"]!}
         />
-        <AboutValues section={sections["about-values"]!} values={values} />
+        <AboutValues
+          section={sections["about-values"]!}
+          values={values}
+          carousel={sections["about-carousel"]!}
+        />
         <AboutWork section={sections["about-work"]!} programmes={programmes} />
         <AboutTeam section={sections["about-team"]!} members={members} />
         <AboutField />
