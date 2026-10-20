@@ -1,7 +1,8 @@
 import { cache } from "react";
 
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
-import { getProgrammes, getSection } from "@/lib/data/home";
+import { getProgrammes } from "@/lib/data/home";
+import { getSection } from "@/lib/data/sections";
 import type { CoreValue, SiteSection, TeamMember } from "@/lib/data/types";
 
 /**

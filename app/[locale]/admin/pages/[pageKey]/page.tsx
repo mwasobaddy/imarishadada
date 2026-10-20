@@ -1,0 +1,66 @@
+import { notFound } from "next/navigation";
+import { ExternalLink } from "lucide-react";
+
+import { getPageWithSections } from "@/app/[locale]/admin/actions/pages";
+import { EmptyState, PageHeader } from "@/components/admin/page-header";
+import { SectionEditor } from "@/components/admin/section-editor";
+
+export default async function PageSectionsPage({
+  params,
+}: {
+  params: Promise<{ pageKey: string }>;
+}) {
+  const { pageKey } = await params;
+  const { page, sections } = await getPageWithSections(pageKey);
+
+  if (!page) notFound();
+
+  return (
+    <div className="mx-auto max-w-4xl">
+      <PageHeader
+        eyebrow="Pages"
+        title={page.label}
+        description={page.description ?? undefined}
+        count={`${sections.length} ${sections.length === 1 ? "section" : "sections"}`}
+        action={
+          <a
+            href={page.route}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-10 items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-ink-muted transition-colors hover:border-brand-600 hover:text-brand-600"
+          >
+            <span className="font-mono text-xs">{page.route}</span>
+            <ExternalLink className="h-3.5 w-3.5" />
+          </a>
+        }
+      />
+
+      {sections.length === 0 ? (
+        <EmptyState
+          title="No editable sections yet"
+          description="This page's copy is still in code. It moves here when its sections are seeded — see doc/page-editor.md §8."
+        />
+      ) : (
+        <>
+          <div className="mb-5 rounded-xl border border-border bg-surface-lilac/40 px-5 py-4">
+            <p className="text-sm leading-relaxed text-ink-muted">
+              You can change the words, the picture and the button labels. The
+              layout, the heading level and the page structure stay in code, so a
+              change here cannot break the page outline or its SEO.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            {sections.map((section) => (
+              <SectionEditor
+                key={section.section_key}
+                section={section}
+                route={page.route}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}

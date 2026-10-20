@@ -14,8 +14,8 @@ import {
   getGivingTiers,
   getImpactStats,
   getProgrammes,
-  getSection,
 } from "@/lib/data/home";
+import { getSection } from "@/lib/data/sections";
 import { HERO_PORTRAIT } from "@/lib/data/hero-portrait";
 import { buildLanguageAlternates, jsonLdScript, webSiteJsonLd } from "@/lib/seo";
 
@@ -83,23 +83,34 @@ export default async function HomePage({
 }
 
 async function HomeContent() {
-  const [programmes, stats, tiers, story, programmesSection] = await Promise.all([
+  const [programmes, stats, tiers, story, programmesSection, hero] = await Promise.all([
     getProgrammes(),
     getImpactStats(),
     getGivingTiers(),
     getFeaturedStory(),
     getSection("home-programmes"),
+    getSection("home-hero"),
   ]);
 
   return (
     <>
+      {/* Copy comes from `site_sections`, so an editor can change the headline
+          and the CTA labels without a deploy. The component's own defaults are
+          the fallback, so a database blip renders the last-known-good page
+          rather than an empty <h1>. */}
       <Hero
-        title="Every girl in Kibera deserves to go back to school."
-        subtitle="Imarisha Dada is a girl-led organisation in Kibera, Nairobi. We support young mothers returning to education, girls finding safe spaces to grow, and young women building their own income."
-        primaryCta={{ label: "Donate", href: "/donate" }}
-        secondaryCta={{ label: "See our impact", href: "#impact" }}
+        title={hero.heading}
+        subtitle={hero.body ?? ""}
+        primaryCta={{
+          label: hero.ctaLabel ?? "Donate",
+          href: hero.ctaHref ?? "/donate",
+        }}
+        secondaryCta={{
+          label: hero.ctaSecondaryLabel ?? "See our impact",
+          href: hero.ctaSecondaryHref ?? "#impact",
+        }}
         portrait={HERO_PORTRAIT}
-        impactLine="19 young mothers back in school. 23 young women funded. All in 2025–26."
+        impactLine={hero.statLine ?? ""}
       />
 
       {/* Registration number is not published until issued — TrustStrip

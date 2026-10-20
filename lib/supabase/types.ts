@@ -1173,6 +1173,42 @@ export type Database = {
           },
         ]
       }
+      site_pages: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          id: string
+          label: string
+          page_key: string
+          route: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          label: string
+          page_key: string
+          route: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          label?: string
+          page_key?: string
+          route?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       site_sections: {
         Row: {
           active: boolean
@@ -1180,11 +1216,19 @@ export type Database = {
           created_at: string
           cta_href: string | null
           cta_label: string | null
+          cta_secondary_href: string | null
+          cta_secondary_label: string | null
           eyebrow: string | null
           heading: string
           id: string
+          image_alt: string | null
+          image_path: string | null
+          page_key: string | null
           section_key: string
+          seo_description: string | null
+          seo_title: string | null
           sort_order: number
+          stat_line: string | null
           updated_at: string
         }
         Insert: {
@@ -1193,11 +1237,19 @@ export type Database = {
           created_at?: string
           cta_href?: string | null
           cta_label?: string | null
+          cta_secondary_href?: string | null
+          cta_secondary_label?: string | null
           eyebrow?: string | null
           heading: string
           id?: string
+          image_alt?: string | null
+          image_path?: string | null
+          page_key?: string | null
           section_key: string
+          seo_description?: string | null
+          seo_title?: string | null
           sort_order?: number
+          stat_line?: string | null
           updated_at?: string
         }
         Update: {
@@ -1206,11 +1258,19 @@ export type Database = {
           created_at?: string
           cta_href?: string | null
           cta_label?: string | null
+          cta_secondary_href?: string | null
+          cta_secondary_label?: string | null
           eyebrow?: string | null
           heading?: string
           id?: string
+          image_alt?: string | null
+          image_path?: string | null
+          page_key?: string | null
           section_key?: string
+          seo_description?: string | null
+          seo_title?: string | null
           sort_order?: number
+          stat_line?: string | null
           updated_at?: string
         }
         Relationships: []

@@ -6,7 +6,6 @@ import type {
   GivingTier,
   ImpactStat,
   Programme,
-  SiteSection,
 } from "@/lib/data/types";
 import { effectiveConsentTier } from "@/lib/data/types";
 import { resolveProgrammeImage } from "@/lib/data/programme-images";
@@ -155,112 +154,13 @@ function programmeSlugOf(value: unknown): string | null {
   return null;
 }
 
-const SECTIONS: SiteSection[] = [
-  {
-    key: "home-programmes",
-    eyebrow: "Our work",
-    heading: "Three programmes, one aim: a girl in Kibera decides her own future",
-    body: "School re-entry, economic empowerment, and safe spaces designed with girls and community leaders, not delivered to them.",
-    ctaLabel: "All programmes",
-    ctaHref: "/programmes",
-  },
-  {
-    key: "about-hero",
-    eyebrow: null,
-    heading: "Imarisha Dada",
-    body: "Empower a Sister",
-    ctaLabel: null,
-    ctaHref: null,
-  },
-  {
-    key: "about-story",
-    eyebrow: "Our story",
-    heading: "We started with nineteen of them.",
-    body: "Imarisha Dada began in Kibera with a simple observation: the girls who fell out of school here were not girls who had stopped learning. They were girls who had been pushed out \u2014 by pregnancy, by cost, by stigma, and by the assumption that a young mother had already chosen her path.",
-    ctaLabel: null,
-    ctaHref: null,
-  },
-  {
-    key: "about-vision",
-    eyebrow: "Vision",
-    heading: "A safe, equal, and inclusive community where every girl thrives.",
-    body: null,
-    ctaLabel: null,
-    ctaHref: null,
-  },
-  {
-    key: "about-mission",
-    eyebrow: "Mission",
-    heading: "To amplify the voices of girls and young women and empower them to lead positive change in their communities.",
-    body: null,
-    ctaLabel: null,
-    ctaHref: null,
-  },
-  {
-    key: "about-values",
-    eyebrow: "What guides us",
-    heading: "Six commitments we are held to.",
-    body: null,
-    ctaLabel: null,
-    ctaHref: null,
-  },
-  {
-    key: "about-work",
-    eyebrow: "What we do",
-    heading: "Three programmes, one aim: a girl in Kibera decides her own future.",
-    body: null,
-    ctaLabel: "Support our work",
-    ctaHref: "/donate",
-  },
-  {
-    key: "about-team",
-    eyebrow: "Our team",
-    heading: "The people behind the work",
-    body: null,
-    ctaLabel: null,
-    ctaHref: null,
-  },
-  {
-    key: "about-approach",
-    eyebrow: "How we work",
-    heading: "Community-owned, girl-led, evidence-informed.",
-    body: null,
-    ctaLabel: null,
-    ctaHref: null,
-  },
-  {
-    key: "home-giving",
-    eyebrow: "Ways to give",
-    heading: "What your gift actually does",
-    body: "Every amount below is tied to a specific outcome. Give monthly and a mentor's continuity matters as much as a single emergency.",
-    ctaLabel: null,
-    ctaHref: null,
-  },
-];
+// The section fallbacks moved to `lib/data/sections.ts` along with
+// `getSection`. Keeping a second copy here is how the two drift.
 
 /** Section copy from `site_sections`. Falls back to the mirrored seed copy. */
-export const getSection = cache(async (key: string): Promise<SiteSection> => {
-  const fallback = SECTIONS.find((s) => s.key === key);
-  if (!isSupabaseConfigured() || !fallback) return fallback!;
-
-  const { data, error } = await createClient()
-    .from("site_sections")
-    .select("section_key, eyebrow, heading, body, cta_label, cta_href")
-    .eq("section_key", key)
-    .eq("active", true)
-    .maybeSingle();
-
-  if (error || !data) return fallback;
-
-  return {
-    key,
-    eyebrow: (data.eyebrow as string | null) ?? fallback.eyebrow,
-    heading: (data.heading as string) ?? fallback.heading,
-    body: (data.body as string | null) ?? fallback.body,
-    ctaLabel: (data.cta_label as string | null) ?? null,
-    ctaHref: (data.cta_href as string | null) ?? null,
-  };
-});
+// `getSection` moved to `lib/data/sections.ts`, where it is wrapped in
+// `'use cache'` rather than React's per-request `cache()`. That is what
+// keeps the page prerendered now that an editor can change the copy.
 
 
 /**

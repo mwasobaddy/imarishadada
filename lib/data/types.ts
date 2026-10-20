@@ -23,6 +23,13 @@ export type SiteSection = {
   body: string | null;
   ctaLabel: string | null;
   ctaHref: string | null;
+  /** Second CTA — the hero has "Donate" and "See our impact". */
+  ctaSecondaryLabel?: string | null;
+  ctaSecondaryHref?: string | null;
+  /** Optional single line of figures shown with the section. */
+  statLine?: string | null;
+  imagePath?: string | null;
+  imageAlt?: string | null;
 };
 
 export type ImpactStat = {

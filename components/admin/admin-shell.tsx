@@ -125,10 +125,13 @@ export function AdminShell({
   children,
   permissions,
   staff,
+  pages,
 }: {
   children: React.ReactNode;
   permissions: Permission[];
   staff: Staff;
+  /** Null when the caller cannot read pages. */
+  pages: { page_key: string; label: string; route: string }[] | null;
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -157,6 +160,14 @@ export function AdminShell({
     items: g.items.filter((i) => hasPerm(i.permission)),
   })).filter((g) => g.items.length > 0);
 
+  // ── Workspace switch ──
+  //
+  // Derived from the pathname, not from state. Two navs that can disagree with
+  // the URL is how a user ends up looking at the wrong list. A deep link into
+  // /admin/pages/... renders the pages nav without any client-side setup.
+  const pagesMode = Boolean(pathname?.startsWith("/admin/pages"));
+  const showPagesLink = pages !== null;
+
   // The most specific match wins. A plain "starts with" would let the
   // `/admin` Dashboard item match every path beneath it, so the breadcrumb
   // read "Dashboard" on every page.
@@ -164,6 +175,15 @@ export function AdminShell({
     .flatMap((g) => g.items)
     .filter((i) => pathname === i.href || pathname?.startsWith(i.href + "/"))
     .sort((a, b) => b.href.length - a.href.length)[0];
+
+  // In the pages workspace the breadcrumb names the page being edited, which
+  // is not in NAV_GROUPS.
+  const pagesCrumb = pagesMode
+    ? pages?.find((p) => pathname === `/admin/pages/${p.page_key}`)?.label ??
+      (pathname === "/admin/pages" ? "Page copy" : null)
+    : null;
+
+  const crumb = pagesCrumb ?? activeItem?.label ?? "Admin";
 
   const initials = staff.display_name
     .split(" ")
@@ -214,27 +234,77 @@ export function AdminShell({
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-4 pb-6">
-          {groups.map((group) => (
-            <div key={group.label} className="mb-5 last:mb-0">
+          {/* ── Workspace switcher ── */}
+          {!collapsed && (
+            <p className="mb-1.5 px-2 text-[10px] font-semibold uppercase tracking-widest text-ink-muted/50">
+              Workspace
+            </p>
+          )}
+          <ul className="mb-5 space-y-0.5">
+            <li>
+              <Link
+                href="/admin"
+                title={collapsed ? "Manage" : undefined}
+                aria-current={!pagesMode && pathname === "/admin" ? "page" : undefined}
+                className={`relative flex items-center gap-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  collapsed ? "h-9 w-9 justify-center" : "px-2.5 py-2"
+                } ${
+                  !pagesMode
+                    ? "bg-brand-50 text-brand-600"
+                    : "text-ink-muted hover:bg-surface-lilac hover:text-ink"
+                }`}
+              >
+                {!pagesMode && (
+                  <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-brand-600" />
+                )}
+                <LayoutGrid className="h-4 w-4 shrink-0" />
+                {!collapsed && <span className="truncate">Manage</span>}
+              </Link>
+            </li>
+            {showPagesLink && (
+              <li>
+                <Link
+                  href="/admin/pages"
+                  title={collapsed ? "Pages" : undefined}
+                  aria-current={pagesMode ? "page" : undefined}
+                  className={`relative flex items-center gap-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    collapsed ? "h-9 w-9 justify-center" : "px-2.5 py-2"
+                  } ${
+                    pagesMode
+                      ? "bg-brand-50 text-brand-600"
+                      : "text-ink-muted hover:bg-surface-lilac hover:text-ink"
+                  }`}
+                >
+                  {pagesMode && (
+                    <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-brand-600" />
+                  )}
+                  <FileText className="h-4 w-4 shrink-0" />
+                  {!collapsed && <span className="truncate">Pages</span>}
+                </Link>
+              </li>
+            )}
+          </ul>
+
+          {/* ── Pages workspace: one item per page ── */}
+          {pagesMode && pages ? (
+            <>
               {!collapsed && (
                 <p className="mb-1.5 px-2 text-[10px] font-semibold uppercase tracking-widest text-ink-muted/50">
-                  {group.label}
+                  Page copy
                 </p>
               )}
-              {collapsed && <div className="mx-2 mb-2 border-t border-border" />}
               <ul className="space-y-0.5">
-                {group.items.map((item) => {
+                {pages.map((page) => {
                   const active =
-                    pathname === item.href ||
-                    (item.href !== "/admin" && pathname?.startsWith(item.href + "/"));
-                  const Icon = item.icon;
+                    pathname === `/admin/pages/${page.page_key}` ||
+                    pathname?.startsWith(`/admin/pages/${page.page_key}/`);
                   return (
-                    <li key={item.href}>
+                    <li key={page.page_key}>
                       <Link
-                        href={item.href}
-                        title={collapsed ? item.label : undefined}
+                        href={`/admin/pages/${page.page_key}`}
+                        title={collapsed ? page.label : undefined}
                         aria-current={active ? "page" : undefined}
-                        className={`group relative flex items-center gap-2.5 rounded-lg text-sm font-medium transition-colors ${
+                        className={`relative flex items-center gap-2.5 rounded-lg text-sm font-medium transition-colors ${
                           collapsed ? "h-9 w-9 justify-center" : "px-2.5 py-2"
                         } ${
                           active
@@ -242,19 +312,65 @@ export function AdminShell({
                             : "text-ink-muted hover:bg-surface-lilac hover:text-ink"
                         }`}
                       >
-                        {/* Active accent bar */}
                         {active && (
                           <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-brand-600" />
                         )}
-                        <Icon className="h-4 w-4 shrink-0" />
-                        {!collapsed && <span className="truncate">{item.label}</span>}
+                        <span
+                          className={`h-1.5 w-1.5 shrink-0 rounded-full ${
+                            active ? "bg-brand-600" : "bg-border"
+                          }`}
+                        />
+                        {!collapsed && <span className="truncate">{page.label}</span>}
                       </Link>
                     </li>
                   );
                 })}
               </ul>
-            </div>
-          ))}
+            </>
+          ) : (
+            /* ── Manage workspace: the record nav ── */
+            groups.map((group) => (
+              <div key={group.label} className="mb-5 last:mb-0">
+                {!collapsed && (
+                  <p className="mb-1.5 px-2 text-[10px] font-semibold uppercase tracking-widest text-ink-muted/50">
+                    {group.label}
+                  </p>
+                )}
+                {collapsed && <div className="mx-2 mb-2 border-t border-border" />}
+                <ul className="space-y-0.5">
+                  {group.items.map((item) => {
+                    const active =
+                      pathname === item.href ||
+                      (item.href !== "/admin" && pathname?.startsWith(item.href + "/"));
+                    const Icon = item.icon;
+                    return (
+                      <li key={item.href}>
+                        <Link
+                          href={item.href}
+                          title={collapsed ? item.label : undefined}
+                          aria-current={active ? "page" : undefined}
+                          className={`group relative flex items-center gap-2.5 rounded-lg text-sm font-medium transition-colors ${
+                            collapsed ? "h-9 w-9 justify-center" : "px-2.5 py-2"
+                          } ${
+                            active
+                              ? "bg-brand-50 text-brand-600"
+                              : "text-ink-muted hover:bg-surface-lilac hover:text-ink"
+                          }`}
+                        >
+                          {/* Active accent bar */}
+                          {active && (
+                            <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-brand-600" />
+                          )}
+                          <Icon className="h-4 w-4 shrink-0" />
+                          {!collapsed && <span className="truncate">{item.label}</span>}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ))
+          )}
         </nav>
 
         {/* Footer — user */}
@@ -358,7 +474,76 @@ export function AdminShell({
         <div className="fixed inset-0 top-14 z-30 flex flex-col bg-surface lg:hidden">
           <div className="flex-1 overflow-y-auto px-4 py-5">
             <div className="mx-auto max-w-md space-y-6">
-              {groups.map((group) => (
+              {/* Workspace switcher */}
+              <div>
+                <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-ink-muted/50">
+                  Workspace
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  <Link
+                    href="/admin"
+                    onClick={() => setMenuOpen(false)}
+                    className={`flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors ${
+                      !pagesMode
+                        ? "border-brand-600 bg-brand-50 text-brand-600"
+                        : "border-border bg-card text-ink hover:border-brand-600/40"
+                    }`}
+                  >
+                    <LayoutGrid className="h-4 w-4" />
+                    Manage
+                  </Link>
+                  {showPagesLink && (
+                    <Link
+                      href="/admin/pages"
+                      onClick={() => setMenuOpen(false)}
+                      className={`flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors ${
+                        pagesMode
+                          ? "border-brand-600 bg-brand-50 text-brand-600"
+                          : "border-border bg-card text-ink hover:border-brand-600/40"
+                      }`}
+                    >
+                      <FileText className="h-4 w-4" />
+                      Pages
+                    </Link>
+                  )}
+                </div>
+              </div>
+
+              {pagesMode && pages
+                ? (
+                    <div>
+                      <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-ink-muted/50">
+                        Page copy
+                      </p>
+                      <ul className="space-y-1">
+                        {pages.map((page) => {
+                          const active =
+                            pathname === `/admin/pages/${page.page_key}`;
+                          return (
+                            <li key={page.page_key}>
+                              <Link
+                                href={`/admin/pages/${page.page_key}`}
+                                onClick={() => setMenuOpen(false)}
+                                className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-sm font-medium transition-colors ${
+                                  active
+                                    ? "border-brand-600 bg-brand-50 text-brand-600"
+                                    : "border-border bg-card text-ink hover:border-brand-600/40"
+                                }`}
+                              >
+                                <span
+                                  className={`h-1.5 w-1.5 shrink-0 rounded-full ${
+                                    active ? "bg-brand-600" : "bg-border"
+                                  }`}
+                                />
+                                {page.label}
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  )
+                : groups.map((group) => (
                 <div key={group.label}>
                   <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-ink-muted/50">
                     {group.label}
@@ -366,7 +551,8 @@ export function AdminShell({
                   <ul className="space-y-1">
                     {group.items.map((item) => {
                       const active =
-                        pathname === item.href || pathname?.startsWith(item.href + "/");
+                        pathname === item.href ||
+                        (item.href !== "/admin" && pathname?.startsWith(item.href + "/"));
                       const Icon = item.icon;
                       return (
                         <li key={item.href}>
@@ -435,7 +621,7 @@ export function AdminShell({
             )}
           </button>
           <span className="truncate text-sm font-medium text-ink">
-            {activeItem?.label ?? "Admin"}
+            {crumb}
           </span>
           <span className="hidden text-ink-muted/40 sm:inline">/</span>
           <span className="hidden truncate text-sm text-ink-muted sm:inline">
