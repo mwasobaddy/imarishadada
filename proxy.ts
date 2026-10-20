@@ -1,38 +1,71 @@
 import createMiddleware from "next-intl/middleware";
+import { createServerClient } from "@supabase/ssr";
+import { NextResponse, type NextRequest } from "next/server";
 
 import { routing } from "@/i18n/routing";
 
 /**
- * Locale detection and redirect.
+ * Locale detection and redirect + admin route protection.
  *
- * ## `proxy.ts`, not `middleware.ts`
+ * ## Admin protection
  *
- * Next 16 renamed this. `middleware.ts` is deprecated; `proxy.ts` is the
- * current name and the only one that runs. Node.js runtime only.
+ * `/admin/*` and `/auth/*` are not locale-prefixed. Admin routes require a
+ * valid session; an unauthenticated request is bounced to `/auth/login` with
+ * a `next` param so the user lands back where they were trying to go.
  *
- * ## What it does
+ * ## Locale detection
  *
- * For a visitor with no locale in the URL, it decides which locale to serve
- * from (in order: an explicit locale prefix, then the `NEXT_LOCALE` cookie,
- * then the `Accept-Language` header, then the default). For a visitor who has
- * picked a language, it redirects them to the same page in that language.
+ * For everything else, next-intl handles locale detection and redirects.
  *
- * ## What it deliberately does not do
- *
- * It never redirects a crawler. A bot asking for `/donate` is served `/donate`,
- * not bounced through `/en/donate`, because a redirect chain on every asset
- * request is both slow and a well-known way to lose a crawl budget. `next-intl`
- * handles this internally by only auto-redirecting navigations.
- *
- * ## The matcher
- *
- * Excludes `api`, `_next`, `_vercel`, and anything with a file extension. That
- * last clause is what keeps `/brand/logo.webp` and `/favicon.ico` from being
- * treated as unprefixed routes — without it every image request runs locale
- * detection, and any image path beginning with a segment named like a locale
- * (`/sw/...`) would 404.
+ * @see .opencode/rules/backend.md — "Anything under /admin, /dashboard,
+ *      /api/private — enforce in proxy.ts AND in the data layer."
  */
-export default createMiddleware(routing);
+const intlMiddleware = createMiddleware(routing);
+
+export default async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Detect admin/auth segments regardless of locale prefix.
+  // Admin pages live at /[locale]/admin/... but the proxy sees the raw path.
+  const segments = pathname.split("/").filter(Boolean);
+  const isAdmin = segments.includes("admin");
+  const isAuth = segments.includes("auth");
+
+  // Auth routes: let through (next-intl handles locale).
+  if (isAuth) {
+    return intlMiddleware(request);
+  }
+
+  // Admin routes: require a session.
+  if (isAdmin) {
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll: () => request.cookies.getAll(),
+          setAll: () => {},
+        },
+      },
+    );
+
+    const { data } = await supabase.auth.getClaims();
+    if (!data?.claims?.sub) {
+      // Redirect to the login page, preserving the locale if present.
+      const locale = segments[0] && routing.locales.includes(segments[0] as any)
+        ? segments[0]
+        : "en";
+      const loginUrl = new URL(`/${locale}/auth/login`, request.url);
+      loginUrl.searchParams.set("next", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    return NextResponse.next();
+  }
+
+  // Everything else: next-intl locale handling.
+  return intlMiddleware(request);
+}
 
 export const config = {
   matcher: "/((?!api|trpc|_next|_vercel|.*\\..*).*)",
