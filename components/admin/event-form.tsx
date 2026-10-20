@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { createEvent, updateEvent, publishEvent, unpublishEvent, deleteEvent } from "@/app/[locale]/admin/actions/events";
+import type { WithOptionalSlug } from "@/lib/supabase/row-types";
 
 type Event = {
   id?: string;
@@ -35,25 +36,31 @@ export function EventForm({ initial }: { initial?: Event & { id: string; publish
   }
 
   async function save() {
+    // `starts_at` is NOT NULL in the database, so the form has to catch a
+    // missing date before it reaches the insert.
+    if (!form.starts_at) {
+      toast.error("A start date is required");
+      return;
+    }
     startTransition(async () => {
       try {
-        const payload = {
+        const payload: WithOptionalSlug<"events"> = {
           slug: form.slug || undefined,
           title: form.title,
           description: form.description,
           body: form.body || null,
           location: form.location || null,
-          starts_at: form.starts_at ? new Date(form.starts_at).toISOString() : null,
+          starts_at: new Date(form.starts_at).toISOString(),
           ends_at: form.ends_at ? new Date(form.ends_at).toISOString() : null,
           rsvp_enabled: form.rsvp_enabled,
           max_attendees: form.max_attendees ? parseInt(form.max_attendees) : null,
           image_path: form.image_path || null,
         };
         if (initial?.id) {
-          await updateEvent(initial.id, payload as any);
+          await updateEvent(initial.id, payload);
           toast.success("Event updated");
         } else {
-          const created = await createEvent(payload as any);
+          const created = await createEvent(payload);
           toast.success("Event created");
           router.push(`/admin/content/events/${created.id}`);
         }

@@ -3,7 +3,8 @@
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
-import { createTranslation, updateTranslation, deleteTranslation, reviewTranslation } from "@/app/[locale]/admin/actions/translations";
+import { createTranslation, deleteTranslation, reviewTranslation } from "@/app/[locale]/admin/actions/translations";
+import type { Insert } from "@/lib/supabase/row-types";
 
 type Translation = {
   id: string;
@@ -39,7 +40,15 @@ export function TranslationsEditor({ translations: initial }: { translations: Tr
     }
     startTransition(async () => {
       try {
-        const created = await createTranslation(form as any);
+        const payload: Insert<"translations"> = {
+          table_name: form.table_name ?? "",
+          row_id: form.row_id ?? "",
+          locale: form.locale ?? "sw",
+          field_name: form.field_name ?? "",
+          value: form.value ?? "",
+          is_reviewed: form.is_reviewed ?? false,
+        };
+        const created = await createTranslation(payload);
         setTranslations((prev) => [...prev, created as Translation]);
         toast.success("Translation created");
         cancel();

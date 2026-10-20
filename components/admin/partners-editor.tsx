@@ -44,7 +44,16 @@ export function PartnersEditor({ partners: initial }: { partners: Partner[] }) {
     if (!form.name) { toast.error("Name is required"); return; }
     startTransition(async () => {
       try {
-        const payload = { name: form.name, description: form.description ?? "", logo_path: form.logo_path || null, website_url: form.website_url || null, tier: form.tier, is_test: form.is_test, sort_order: form.sort_order, active: form.active };
+        const payload = {
+          name: form.name ?? "",
+          description: form.description ?? "",
+          logo_path: form.logo_path || null,
+          website_url: form.website_url || null,
+          tier: form.tier ?? "community",
+          is_test: form.is_test ?? false,
+          sort_order: form.sort_order ?? 0,
+          active: form.active ?? true,
+        };
         if (creating) {
           const created = await createPartner(payload);
           setPartners((prev) => [...prev, created as Partner]);

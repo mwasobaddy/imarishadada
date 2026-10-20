@@ -4,6 +4,16 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 /**
+ * The `beforeinstallprompt` event is not in the DOM lib yet. Chrome fires it
+ * with `prompt()` and `userChoice`; everything else about it is a standard
+ * `Event`.
+ */
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+}
+
+/**
  * Force-install prompt for the admin panel.
  *
  * Shown when an admin visits /admin on a mobile device that supports PWA
@@ -11,7 +21,8 @@ import { toast } from "sonner";
  * install or after the user clicks "Not now" (stored in localStorage).
  */
 export function PwaInstallPrompt() {
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [deferredPrompt, setDeferredPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null);
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -20,7 +31,7 @@ export function PwaInstallPrompt() {
 
     const handler = (e: Event) => {
       e.preventDefault();
-      setDeferredPrompt(e);
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
       setShow(true);
     };
     window.addEventListener("beforeinstallprompt", handler);

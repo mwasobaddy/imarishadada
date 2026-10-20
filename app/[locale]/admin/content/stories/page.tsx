@@ -47,7 +47,7 @@ export default async function StoriesListPage() {
                 <tr key={story.id} className="hover:bg-surface-lilac/50">
                   <td className="px-4 py-3 font-medium text-ink">{story.title}</td>
                   <td className="px-4 py-3 text-ink-muted">
-                    {(story as any).programmes?.title ?? "—"}
+                    {story.programmes?.title ?? "—"}
                   </td>
                   <td className="px-4 py-3">
                     <span className="rounded-full bg-surface-lilac px-2 py-0.5 text-xs font-medium text-ink-muted">

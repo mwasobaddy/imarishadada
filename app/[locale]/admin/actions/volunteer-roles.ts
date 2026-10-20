@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/client";
+import type { AuditSnapshot, Insert } from "@/lib/supabase/row-types";
 import { hasPermission } from "@/lib/admin/permissions";
 
 async function requirePermission(resource: string, action: string) {
@@ -16,20 +17,20 @@ export async function getVolunteerRoles() {
   return data ?? [];
 }
 
-export async function createVolunteerRole(data: Record<string, unknown>) {
+export async function createVolunteerRole(data: Insert<"volunteer_roles">) {
   await requirePermission("volunteer_roles", "create");
   const supabase = createServiceClient();
-  const { data: row, error } = await supabase.from("volunteer_roles").insert(data as any).select().single();
+  const { data: row, error } = await supabase.from("volunteer_roles").insert(data).select().single();
   if (error) throw new Error(error.message);
-  await supabase.from("audit_log").insert({ action: "create", table_name: "volunteer_roles", row_id: row.id, after: row as any });
+  await supabase.from("audit_log").insert({ action: "create", table_name: "volunteer_roles", row_id: row.id, after: row as unknown as AuditSnapshot });
   revalidatePath("/admin/volunteer-roles");
   return row;
 }
 
-export async function updateVolunteerRole(id: string, data: Record<string, unknown>) {
+export async function updateVolunteerRole(id: string, data: Insert<"volunteer_roles">) {
   await requirePermission("volunteer_roles", "update");
   const supabase = createServiceClient();
-  const { data: row, error } = await supabase.from("volunteer_roles").update(data as any).eq("id", id).select().single();
+  const { data: row, error } = await supabase.from("volunteer_roles").update(data).eq("id", id).select().single();
   if (error) throw new Error(error.message);
   revalidatePath("/admin/volunteer-roles");
   return row;

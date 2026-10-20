@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import type { Insert } from "@/lib/supabase/row-types";
 import { toast } from "sonner";
 
 import {
   createFinancialBreakdown,
-  updateFinancialBreakdown,
   deleteFinancialBreakdown,
 } from "@/app/[locale]/admin/actions/financial";
 
@@ -40,7 +40,16 @@ export function FinancialBreakdownEditor({ breakdown: initial, programmes }: { b
     if (!form.fiscal_year || !form.category) { toast.error("Fiscal year and category are required"); return; }
     startTransition(async () => {
       try {
-        const created = await createFinancialBreakdown(form as any);
+        const payload: Insert<"financial_breakdown"> = {
+          fiscal_year: form.fiscal_year ?? "",
+          programme_id: form.programme_id || null,
+          category: form.category ?? "",
+          amount: form.amount ?? 0,
+          currency: form.currency ?? "KES",
+          share_pct: form.share_pct ?? null,
+          sort_order: form.sort_order ?? 0,
+        };
+        const created = await createFinancialBreakdown(payload);
         setRows((prev) => [...prev, created as Row]);
         toast.success("Entry created");
         cancel();

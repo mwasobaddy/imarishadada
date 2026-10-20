@@ -1,4 +1,3 @@
-import { createAuthServerClient } from "@/lib/supabase/auth-server";
 import { getCurrentStaff } from "@/lib/admin/permissions";
 import { RealtimeChat } from "@/components/admin/realtime-chat";
 

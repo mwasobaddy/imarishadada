@@ -85,10 +85,10 @@ export function StoryForm({
           programme_id: form.programme_id || null,
         };
         if (initial?.id) {
-          await updateStory(initial.id, payload as any);
+          await updateStory(initial.id, payload);
           toast.success("Story updated");
         } else {
-          const created = await createStory(payload as any);
+          const created = await createStory(payload);
           toast.success("Story created");
           router.push(`/admin/content/stories/${created.id}`);
         }

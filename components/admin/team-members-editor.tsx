@@ -46,7 +46,19 @@ export function TeamMembersEditor({ members: initial }: { members: Member[] }) {
     if (!form.name || !form.slug || !form.role) { toast.error("Name, slug, and role are required"); return; }
     startTransition(async () => {
       try {
-        const payload = { slug: form.slug, name: form.name, role: form.role, bio: form.bio || null, photo_path: form.photo_path || null, safeguarding_officer: form.safeguarding_officer, consent_recorded: form.consent_recorded, title: form.title || null, department: form.department || null, sort_order: form.sort_order, active: form.active };
+        const payload = {
+          slug: form.slug ?? "",
+          name: form.name ?? "",
+          role: form.role ?? "",
+          bio: form.bio || null,
+          photo_path: form.photo_path || null,
+          safeguarding_officer: form.safeguarding_officer ?? false,
+          consent_recorded: form.consent_recorded ?? false,
+          title: form.title || null,
+          department: form.department || null,
+          sort_order: form.sort_order ?? 0,
+          active: form.active ?? true,
+        };
         if (creating) {
           const created = await createTeamMember(payload);
           setMembers((prev) => [...prev, created as Member]);

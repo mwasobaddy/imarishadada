@@ -47,10 +47,10 @@ export function PostForm({ initial }: { initial?: Post & { id: string; published
           reading_minutes: form.reading_minutes ? parseInt(form.reading_minutes) : null,
         };
         if (initial?.id) {
-          await updatePost(initial.id, payload as any);
+          await updatePost(initial.id, payload);
           toast.success("Post updated");
         } else {
-          const created = await createPost(payload as any);
+          const created = await createPost(payload);
           toast.success("Post created");
           router.push(`/admin/content/posts/${created.id}`);
         }

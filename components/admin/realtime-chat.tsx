@@ -20,11 +20,13 @@ export function RealtimeChat({ channel = "general", userName }: { channel?: stri
   const [sending, setSending] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const supabase = createAuthBrowserClient();
-  const userIdRef = useRef<string | null>(null);
+  // State, not a ref: the id is read during render (to mark your own
+  // messages) and React forbids reading a ref during render.
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getClaims().then(({ data }) => {
-      userIdRef.current = data?.claims?.sub ?? null;
+      setUserId(data?.claims?.sub ?? null);
     });
 
     supabase
@@ -60,7 +62,6 @@ export function RealtimeChat({ channel = "general", userName }: { channel?: stri
   async function send() {
     if (!input.trim() || sending) return;
     setSending(true);
-    const userId = userIdRef.current;
     if (!userId) { toast.error("Not authenticated"); setSending(false); return; }
 
     const { error } = await supabase.from("chat_messages").insert({
@@ -140,7 +141,7 @@ export function RealtimeChat({ channel = "general", userName }: { channel?: stri
                 </div>
                 <div className="space-y-4">
                   {g.messages.map((m, i) => {
-                    const isOwn = m.sender_id === userIdRef.current;
+                    const isOwn = m.sender_id === userId;
                     const prevMsg = i > 0 ? g.messages[i - 1] : null;
                     const showAvatar = !prevMsg || prevMsg.sender_id !== m.sender_id;
                     return (

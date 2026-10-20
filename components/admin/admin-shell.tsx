@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 type Permission = { resource: string; action: string };
@@ -60,6 +60,7 @@ export function AdminShell({
   staff: Staff;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const hasPerm = (p: NavItem["permission"]) =>
@@ -78,7 +79,8 @@ export function AdminShell({
     const { createAuthBrowserClient } = await import("@/lib/supabase/auth-browser");
     const supabase = createAuthBrowserClient();
     await supabase.auth.signOut();
-    window.location.href = "/auth/login";
+    router.push("/auth/login");
+    router.refresh();
   }
 
   return (

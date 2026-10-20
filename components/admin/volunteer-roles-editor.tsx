@@ -45,7 +45,9 @@ export function VolunteerRolesEditor({ roles: initial }: { roles: Role[] }) {
     if (!form.title || !form.description) { toast.error("Title and description are required"); return; }
     startTransition(async () => {
       try {
-        const payload = { title: form.title, description: form.description, commitment: form.commitment || null, requirements: form.requirements || null, location: form.location || null, time_commitment: form.time_commitment || null, skills_needed: form.skills_needed ?? [], positions_available: form.positions_available ?? 1, positions_filled: form.positions_filled ?? 0, active: form.active ?? true, sort_order: form.sort_order ?? 0 };
+        const payload = {
+          title: form.title ?? "",
+          description: form.description ?? "", commitment: form.commitment || null, requirements: form.requirements || null, location: form.location || null, time_commitment: form.time_commitment || null, skills_needed: form.skills_needed ?? [], positions_available: form.positions_available ?? 1, positions_filled: form.positions_filled ?? 0, active: form.active ?? true, sort_order: form.sort_order ?? 0 };
         if (creating) {
           const created = await createVolunteerRole(payload);
           setRoles((prev) => [...prev, created as Role]);

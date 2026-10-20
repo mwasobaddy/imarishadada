@@ -21,7 +21,7 @@ export async function getAuditLog(limit = 100) {
   return data ?? [];
 }
 
-export async function exportAuditLog(format: "csv" | "json") {
+export async function exportAuditLog() {
   await requirePermission("audit_log", "export");
   const supabase = createServiceClient();
   const { data, error } = await supabase

@@ -60,11 +60,11 @@ export function ImpactStatsEditor({ stats: initial, programmes }: { stats: Stat[
     startTransition(async () => {
       try {
         const payload = {
-          slug: form.slug,
+          slug: form.slug ?? "",
           value: form.value ?? 0,
           unit: form.unit || null,
-          label: form.label,
-          period: form.period,
+          label: form.label ?? "",
+          period: form.period ?? "",
           display_value: form.display_value || null,
           sort_order: form.sort_order ?? 0,
           active: form.active ?? true,

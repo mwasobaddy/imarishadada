@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/client";
+import type { AuditSnapshot, Insert } from "@/lib/supabase/row-types";
 import { hasPermission } from "@/lib/admin/permissions";
 
 async function requirePermission(resource: string, action: string) {
@@ -16,20 +17,20 @@ export async function getTeamMembers() {
   return data ?? [];
 }
 
-export async function createTeamMember(data: Record<string, unknown>) {
+export async function createTeamMember(data: Insert<"team_members">) {
   await requirePermission("team_members", "create");
   const supabase = createServiceClient();
-  const { data: row, error } = await supabase.from("team_members").insert(data as any).select().single();
+  const { data: row, error } = await supabase.from("team_members").insert(data).select().single();
   if (error) throw new Error(error.message);
-  await supabase.from("audit_log").insert({ action: "create", table_name: "team_members", row_id: row.id, after: row as any });
+  await supabase.from("audit_log").insert({ action: "create", table_name: "team_members", row_id: row.id, after: row as unknown as AuditSnapshot });
   revalidatePath("/admin/content/team");
   return row;
 }
 
-export async function updateTeamMember(id: string, data: Record<string, unknown>) {
+export async function updateTeamMember(id: string, data: Insert<"team_members">) {
   await requirePermission("team_members", "update");
   const supabase = createServiceClient();
-  const { data: row, error } = await supabase.from("team_members").update(data as any).eq("id", id).select().single();
+  const { data: row, error } = await supabase.from("team_members").update(data).eq("id", id).select().single();
   if (error) throw new Error(error.message);
   revalidatePath("/admin/content/team");
   return row;

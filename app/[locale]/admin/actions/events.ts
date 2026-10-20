@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/client";
+import type { AuditSnapshot, Insert, Update, WithOptionalSlug } from "@/lib/supabase/row-types";
 import { hasPermission } from "@/lib/admin/permissions";
 
 async function requirePermission(resource: string, action: string) {
@@ -16,23 +17,29 @@ export async function getEvents() {
   return data ?? [];
 }
 
-export async function createEvent(data: Record<string, unknown>) {
+export async function createEvent(data: WithOptionalSlug<"events">) {
   await requirePermission("events", "create");
   const supabase = createServiceClient();
-  if (!data.slug && data.title) {
-    data.slug = (data.title as string).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-  }
-  const { data: event, error } = await supabase.from("events").insert(data as any).select().single();
+  // The slug is NOT NULL in the database, but the editor may leave it blank
+  // and expect one to be derived from the title.
+  const slug =
+    data.slug ||
+    (data.title
+      ? data.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+      : "");
+
+  const payload: Insert<"events"> = { ...data, slug };
+  const { data: event, error } = await supabase.from("events").insert(payload).select().single();
   if (error) throw new Error(error.message);
-  await supabase.from("audit_log").insert({ action: "create", table_name: "events", row_id: event.id, after: event as any });
+  await supabase.from("audit_log").insert({ action: "create", table_name: "events", row_id: event.id, after: event as unknown as AuditSnapshot });
   revalidatePath("/admin/content/events");
   return event;
 }
 
-export async function updateEvent(id: string, data: Record<string, unknown>) {
+export async function updateEvent(id: string, data: Update<"events">) {
   await requirePermission("events", "update");
   const supabase = createServiceClient();
-  const { data: event, error } = await supabase.from("events").update(data as any).eq("id", id).select().single();
+  const { data: event, error } = await supabase.from("events").update(data).eq("id", id).select().single();
   if (error) throw new Error(error.message);
   revalidatePath("/admin/content/events");
   return event;

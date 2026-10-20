@@ -38,7 +38,7 @@ export default async function UsersPage() {
                   <td className="px-4 py-3 text-ink-muted">{user.email}</td>
                   <td className="px-4 py-3">
                     <div className="flex flex-wrap gap-1">
-                      {(user.roles ?? []).map((r: any) => (
+                      {(user.roles ?? []).map((r) => (
                         <span
                           key={r.id}
                           className="rounded-full bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-600"

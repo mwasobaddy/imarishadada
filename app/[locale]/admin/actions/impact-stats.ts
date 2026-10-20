@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/client";
+import type { AuditSnapshot, Insert } from "@/lib/supabase/row-types";
 import { hasPermission } from "@/lib/admin/permissions";
 
 async function requirePermission(resource: string, action: string) {
@@ -19,23 +20,23 @@ export async function getImpactStats() {
   return data ?? [];
 }
 
-export async function createImpactStat(data: Record<string, unknown>) {
+export async function createImpactStat(data: Insert<"impact_stats">) {
   await requirePermission("impact_stats", "create");
   const supabase = createServiceClient();
-  const { data: stat, error } = await supabase.from("impact_stats").insert(data as any).select().single();
+  const { data: stat, error } = await supabase.from("impact_stats").insert(data).select().single();
   if (error) throw new Error(error.message);
-  await supabase.from("audit_log").insert({ action: "create", table_name: "impact_stats", row_id: stat.id, after: stat as any });
+  await supabase.from("audit_log").insert({ action: "create", table_name: "impact_stats", row_id: stat.id, after: stat as unknown as AuditSnapshot });
   revalidatePath("/admin/impact");
   return stat;
 }
 
-export async function updateImpactStat(id: string, data: Record<string, unknown>) {
+export async function updateImpactStat(id: string, data: Insert<"impact_stats">) {
   await requirePermission("impact_stats", "update");
   const supabase = createServiceClient();
   const { data: before } = await supabase.from("impact_stats").select("*").eq("id", id).single();
-  const { data: stat, error } = await supabase.from("impact_stats").update(data as any).eq("id", id).select().single();
+  const { data: stat, error } = await supabase.from("impact_stats").update(data).eq("id", id).select().single();
   if (error) throw new Error(error.message);
-  await supabase.from("audit_log").insert({ action: "update", table_name: "impact_stats", row_id: id, before: before as any, after: stat as any });
+  await supabase.from("audit_log").insert({ action: "update", table_name: "impact_stats", row_id: id, before: before as unknown as AuditSnapshot, after: stat as unknown as AuditSnapshot });
   revalidatePath("/admin/impact");
   return stat;
 }
@@ -46,6 +47,6 @@ export async function deleteImpactStat(id: string) {
   const { data: before } = await supabase.from("impact_stats").select("*").eq("id", id).single();
   const { error } = await supabase.from("impact_stats").delete().eq("id", id);
   if (error) throw new Error(error.message);
-  await supabase.from("audit_log").insert({ action: "delete", table_name: "impact_stats", row_id: id, before: before as any });
+  await supabase.from("audit_log").insert({ action: "delete", table_name: "impact_stats", row_id: id, before: before as unknown as AuditSnapshot });
   revalidatePath("/admin/impact");
 }

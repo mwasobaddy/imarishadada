@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/client";
+import type { Insert } from "@/lib/supabase/row-types";
 import { hasPermission } from "@/lib/admin/permissions";
 
 async function requirePermission(resource: string, action: string) {
@@ -16,19 +17,19 @@ export async function getTranslations() {
   return data ?? [];
 }
 
-export async function createTranslation(data: Record<string, unknown>) {
+export async function createTranslation(data: Insert<"translations">) {
   await requirePermission("translations", "create");
   const supabase = createServiceClient();
-  const { data: row, error } = await supabase.from("translations").insert(data as any).select().single();
+  const { data: row, error } = await supabase.from("translations").insert(data).select().single();
   if (error) throw new Error(error.message);
   revalidatePath("/admin/translations");
   return row;
 }
 
-export async function updateTranslation(id: string, data: Record<string, unknown>) {
+export async function updateTranslation(id: string, data: Insert<"translations">) {
   await requirePermission("translations", "update");
   const supabase = createServiceClient();
-  const { data: row, error } = await supabase.from("translations").update(data as any).eq("id", id).select().single();
+  const { data: row, error } = await supabase.from("translations").update(data).eq("id", id).select().single();
   if (error) throw new Error(error.message);
   revalidatePath("/admin/translations");
   return row;

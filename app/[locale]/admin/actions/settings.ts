@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/client";
+import type { AuditSnapshot } from "@/lib/supabase/row-types";
 import { hasPermission } from "@/lib/admin/permissions";
 
 async function requirePermission(resource: string, action: string) {
@@ -41,7 +42,7 @@ export async function updateSetting(key: string, value: unknown, changeNote?: st
       .from("settings_versions")
       .insert({
         key,
-        value: value as any,
+        value: value as unknown as AuditSnapshot,
         changed_by: null, // filled by RLS context
         change_note: changeNote ?? "Pending approval",
       })
@@ -53,8 +54,8 @@ export async function updateSetting(key: string, value: unknown, changeNote?: st
       action: "update",
       table_name: "settings",
       row_id: null,
-      before: before as any,
-      after: { key, value, status: "pending_approval" } as any,
+      before: before as unknown as AuditSnapshot,
+      after: { key, value, status: "pending_approval" } as unknown as AuditSnapshot,
     });
 
     revalidatePath("/admin/settings");
@@ -64,7 +65,7 @@ export async function updateSetting(key: string, value: unknown, changeNote?: st
   // Non-financial: apply immediately
   const { data: setting, error } = await supabase
     .from("settings")
-    .update({ value: value as any })
+    .update({ value: value as unknown as AuditSnapshot })
     .eq("key", key)
     .select()
     .single();
@@ -75,8 +76,8 @@ export async function updateSetting(key: string, value: unknown, changeNote?: st
     action: "update",
     table_name: "settings",
     row_id: null,
-    before: before as any,
-    after: setting as any,
+    before: before as unknown as AuditSnapshot,
+    after: setting as unknown as AuditSnapshot,
   });
 
   revalidatePath("/admin/settings");
@@ -110,7 +111,11 @@ export async function approveSettingChange(versionId: string) {
     table_name: "settings",
     row_id: null,
     before: null,
-    after: { key: version.key, value: version.value, approved_version: versionId } as any,
+    after: {
+      key: version.key,
+      value: version.value,
+      approved_version: versionId,
+    } as unknown as AuditSnapshot,
   });
 
   revalidatePath("/admin/settings");

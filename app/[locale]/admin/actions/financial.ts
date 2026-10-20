@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/client";
+import type { AuditSnapshot, Insert } from "@/lib/supabase/row-types";
 import { hasPermission } from "@/lib/admin/permissions";
 
 async function requirePermission(resource: string, action: string) {
@@ -17,20 +18,20 @@ export async function getFinancialBreakdown() {
   return data ?? [];
 }
 
-export async function createFinancialBreakdown(data: Record<string, unknown>) {
+export async function createFinancialBreakdown(data: Insert<"financial_breakdown">) {
   await requirePermission("financial_breakdown", "create");
   const supabase = createServiceClient();
-  const { data: row, error } = await supabase.from("financial_breakdown").insert(data as any).select().single();
+  const { data: row, error } = await supabase.from("financial_breakdown").insert(data).select().single();
   if (error) throw new Error(error.message);
-  await supabase.from("audit_log").insert({ action: "create", table_name: "financial_breakdown", row_id: row.id, after: row as any });
+  await supabase.from("audit_log").insert({ action: "create", table_name: "financial_breakdown", row_id: row.id, after: row as unknown as AuditSnapshot });
   revalidatePath("/admin/financials");
   return row;
 }
 
-export async function updateFinancialBreakdown(id: string, data: Record<string, unknown>) {
+export async function updateFinancialBreakdown(id: string, data: Insert<"financial_breakdown">) {
   await requirePermission("financial_breakdown", "update");
   const supabase = createServiceClient();
-  const { data: row, error } = await supabase.from("financial_breakdown").update(data as any).eq("id", id).select().single();
+  const { data: row, error } = await supabase.from("financial_breakdown").update(data).eq("id", id).select().single();
   if (error) throw new Error(error.message);
   revalidatePath("/admin/financials");
   return row;
@@ -53,20 +54,20 @@ export async function getTransparencyGaps() {
   return data ?? [];
 }
 
-export async function createTransparencyGap(data: Record<string, unknown>) {
+export async function createTransparencyGap(data: Insert<"transparency_gaps">) {
   await requirePermission("transparency_gaps", "create");
   const supabase = createServiceClient();
-  const { data: row, error } = await supabase.from("transparency_gaps").insert(data as any).select().single();
+  const { data: row, error } = await supabase.from("transparency_gaps").insert(data).select().single();
   if (error) throw new Error(error.message);
-  await supabase.from("audit_log").insert({ action: "create", table_name: "transparency_gaps", row_id: row.id, after: row as any });
+  await supabase.from("audit_log").insert({ action: "create", table_name: "transparency_gaps", row_id: row.id, after: row as unknown as AuditSnapshot });
   revalidatePath("/admin/transparency");
   return row;
 }
 
-export async function updateTransparencyGap(id: string, data: Record<string, unknown>) {
+export async function updateTransparencyGap(id: string, data: Insert<"transparency_gaps">) {
   await requirePermission("transparency_gaps", "update");
   const supabase = createServiceClient();
-  const { data: row, error } = await supabase.from("transparency_gaps").update(data as any).eq("id", id).select().single();
+  const { data: row, error } = await supabase.from("transparency_gaps").update(data).eq("id", id).select().single();
   if (error) throw new Error(error.message);
   revalidatePath("/admin/transparency");
   return row;

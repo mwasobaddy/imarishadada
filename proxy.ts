@@ -55,9 +55,9 @@ export default async function proxy(request: NextRequest) {
       // Redirect to the login page. `localePath` omits the prefix for the
       // default locale (English is served unprefixed), so this is a single
       // hop rather than /en/auth/login → /auth/login.
-      const locale = segments[0] && routing.locales.includes(segments[0] as any)
-        ? (segments[0] as "en")
-        : "en";
+      const first = segments[0];
+      const locale: "en" =
+        first && (routing.locales as readonly string[]).includes(first) ? "en" : "en";
       const loginUrl = new URL(localePath(locale, "/auth/login"), request.url);
       loginUrl.searchParams.set("next", pathname);
       return NextResponse.redirect(loginUrl);

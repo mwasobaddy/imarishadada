@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import type { Update, WithOptionalSlug } from "@/lib/supabase/row-types";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -53,7 +54,6 @@ export function GivingTiersEditor({
     setCreating(true);
     setForm({
       slug: "",
-      title: "",
       tier_type: "one_time",
       cadence: "one_time",
       amount: 0,
@@ -62,7 +62,7 @@ export function GivingTiersEditor({
       sort_order: tiers.length + 1,
       active: true,
       programme_id: null,
-    } as any);
+    });
   }
 
   function cancel() {
@@ -75,11 +75,33 @@ export function GivingTiersEditor({
     startTransition(async () => {
       try {
         if (creating) {
-          const created = await createGivingTier(form as any);
+          const payload: WithOptionalSlug<"giving_tiers"> = {
+            slug: form.slug || undefined,
+            tier_type: form.tier_type ?? "one_time",
+            cadence: form.cadence ?? "one_time",
+            amount: form.amount ?? 0,
+            currency: form.currency ?? "KES",
+            outcome_label: form.outcome_label ?? "",
+            sort_order: form.sort_order ?? 0,
+            active: form.active ?? true,
+            programme_id: form.programme_id || null,
+          };
+          const created = await createGivingTier(payload);
           setTiers((prev) => [...prev, created as Tier]);
           toast.success("Tier created");
         } else if (editing) {
-          const updated = await updateGivingTier(editing, form as any);
+          const payload: Update<"giving_tiers"> = {
+            slug: form.slug || undefined,
+            tier_type: form.tier_type ?? "one_time",
+            cadence: form.cadence ?? "one_time",
+            amount: form.amount ?? 0,
+            currency: form.currency ?? "KES",
+            outcome_label: form.outcome_label ?? "",
+            sort_order: form.sort_order ?? 0,
+            active: form.active ?? true,
+            programme_id: form.programme_id || null,
+          };
+          const updated = await updateGivingTier(editing, payload);
           setTiers((prev) => prev.map((t) => (t.id === editing ? (updated as Tier) : t)));
           toast.success("Tier updated");
         }

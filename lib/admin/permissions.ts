@@ -1,6 +1,5 @@
 import { createAuthServerClient } from "@/lib/supabase/auth-server";
 import { createAuthBrowserClient } from "@/lib/supabase/auth-browser";
-import type { Database } from "@/lib/supabase/types";
 
 type Permission = { resource: string; action: string };
 
@@ -59,7 +58,7 @@ export async function getMyRoles(): Promise<{ id: string; name: string }[]> {
     .eq("user_id", claims.claims.sub);
 
   if (error || !data) return [];
-  return data.flatMap((r: any) => (r.roles ? [r.roles] : []));
+  return data.flatMap((r) => (r.roles ? [r.roles] : []));
 }
 
 /**

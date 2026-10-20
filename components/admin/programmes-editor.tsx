@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
 import { createProgramme, updateProgramme, deleteProgramme, toggleProgramme } from "@/app/[locale]/admin/actions/programmes";
+import type { Insert } from "@/lib/supabase/row-types";
 
 type Programme = {
   id: string;
@@ -46,9 +47,9 @@ export function ProgrammesEditor({ programmes: initial }: { programmes: Programm
     if (!form.title || !form.slug) { toast.error("Title and slug are required"); return; }
     startTransition(async () => {
       try {
-        const payload: Record<string, unknown> = {
-          slug: form.slug,
-          title: form.title,
+        const payload: Insert<"programmes"> = {
+          slug: form.slug ?? "",
+          title: form.title ?? "",
           summary: form.summary ?? "",
           body: form.body ?? "",
           icon: form.icon ?? "heart",
@@ -60,7 +61,9 @@ export function ProgrammesEditor({ programmes: initial }: { programmes: Programm
           active: form.active ?? true,
         };
         if (form.outcomes && typeof form.outcomes === "string" && form.outcomes.trim()) {
-          try { payload.outcomes = JSON.parse(form.outcomes); } catch { toast.error("Outcomes must be valid JSON"); return; }
+          try {
+            payload.outcomes = JSON.parse(form.outcomes) as Insert<"programmes">["outcomes"];
+          } catch { toast.error("Outcomes must be valid JSON"); return; }
         }
         if (creating) {
           const created = await createProgramme(payload);

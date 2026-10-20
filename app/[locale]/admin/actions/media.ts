@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/client";
+import type { AuditSnapshot, Insert } from "@/lib/supabase/row-types";
 import { hasPermission } from "@/lib/admin/permissions";
 
 async function requirePermission(resource: string, action: string) {
@@ -16,20 +17,20 @@ export async function getMedia() {
   return data ?? [];
 }
 
-export async function createMediaRecord(data: Record<string, unknown>) {
+export async function createMediaRecord(data: Insert<"media">) {
   await requirePermission("media", "create");
   const supabase = createServiceClient();
-  const { data: media, error } = await supabase.from("media").insert(data as any).select().single();
+  const { data: media, error } = await supabase.from("media").insert(data).select().single();
   if (error) throw new Error(error.message);
-  await supabase.from("audit_log").insert({ action: "create", table_name: "media", row_id: media.id, after: media as any });
+  await supabase.from("audit_log").insert({ action: "create", table_name: "media", row_id: media.id, after: media as unknown as AuditSnapshot });
   revalidatePath("/admin/media");
   return media;
 }
 
-export async function updateMedia(id: string, data: Record<string, unknown>) {
+export async function updateMedia(id: string, data: Insert<"media">) {
   await requirePermission("media", "update");
   const supabase = createServiceClient();
-  const { data: media, error } = await supabase.from("media").update(data as any).eq("id", id).select().single();
+  const { data: media, error } = await supabase.from("media").update(data).eq("id", id).select().single();
   if (error) throw new Error(error.message);
   revalidatePath("/admin/media");
   return media;

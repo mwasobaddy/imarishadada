@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/client";
+import type { AuditSnapshot, Row } from "@/lib/supabase/row-types";
 import { hasPermission } from "@/lib/admin/permissions";
 
 async function requirePermission(resource: string, action: string) {
@@ -54,7 +55,7 @@ export async function createRole(name: string, description: string, permissionId
     action: "create",
     table_name: "roles",
     row_id: role.id,
-    after: { name, description, permission_count: permissionIds.length } as any,
+    after: { name, description, permission_count: permissionIds.length } as unknown as AuditSnapshot,
   });
 
   revalidatePath("/admin/roles");
@@ -87,8 +88,10 @@ export async function updateRolePermissions(roleId: string, permissionIds: strin
     action: "update",
     table_name: "roles",
     row_id: roleId,
-    before: { permission_ids: (before ?? []).map((r: any) => r.permission_id) } as any,
-    after: { permission_ids: permissionIds } as any,
+    before: {
+      permission_ids: (before ?? []).map((r) => r.permission_id),
+    } as unknown as AuditSnapshot,
+    after: { permission_ids: permissionIds } as unknown as AuditSnapshot,
   });
 
   revalidatePath("/admin/roles");
@@ -129,7 +132,7 @@ export async function assignRole(userId: string, roleId: string) {
     action: "update",
     table_name: "user_roles",
     row_id: null,
-    after: { user_id: userId, role_id: roleId } as any,
+    after: { user_id: userId, role_id: roleId } as unknown as AuditSnapshot,
   });
 
   revalidatePath("/admin/users");
@@ -146,7 +149,7 @@ export async function revokeRole(userId: string, roleId: string) {
     action: "delete",
     table_name: "user_roles",
     row_id: null,
-    after: { user_id: userId, role_id: roleId } as any,
+    after: { user_id: userId, role_id: roleId } as unknown as AuditSnapshot,
   });
 
   revalidatePath("/admin/users");
@@ -156,36 +159,104 @@ export async function getUsers() {
   await requirePermission("users", "read");
   const supabase = createServiceClient();
 
-  // Use get_visible_staff to exclude stealth (developer) users
-  const { data: claims } = await (await import("@/lib/supabase/auth-server")).createAuthServerClient().then((c) => c.auth.getClaims());
-  const requesterId = claims?.claims?.sub ?? "";
-
+  // `visible_staff` hides the stealth (developer) accounts from everyone who
+  // is not a developer themselves, so the RLS layer does the filtering.
   const { data, error } = await supabase.rpc("visible_staff");
   if (error) throw new Error(error.message);
 
   // Fetch roles for each user
-  const users = ((data ?? []) as any[]).map((u: any) => u);
-  const userIds = users.map((u: any) => u.user_id);
+  const users: Row<"staff">[] = (data ?? []) as Row<"staff">[];
+  const userIds = users.map((u) => u.user_id);
   const { data: roles } = await supabase
     .from("user_roles")
     .select("user_id, role_id, roles(id, name)")
     .in("user_id", userIds.length > 0 ? userIds : ["00000000-0000-0000-0000-000000000000"]);
 
-  const roleMap: Record<string, any[]> = {};
+  const roleMap: Record<string, { id: string; name: string }[]> = {};
   for (const r of roles ?? []) {
     if (!roleMap[r.user_id]) roleMap[r.user_id] = [];
     if (r.roles) roleMap[r.user_id].push(r.roles);
   }
 
-  return users.map((u: any) => ({
+  return users.map((u) => ({
     ...u,
     roles: roleMap[u.user_id] ?? [],
   }));
 }
 
+/**
+ * Invite a staff member.
+ *
+ * Creates the Supabase Auth user (which sends the invitation email), writes
+ * the `staff` record, assigns the roles, and audits the whole thing.
+ */
 export async function inviteUser(email: string, displayName: string, roleIds: string[]) {
   await requirePermission("users", "create");
-  // This requires the Supabase Auth Admin API — handled via a separate endpoint
-  // For now, return a message
-  return { message: "User invitation requires the Supabase Auth Admin API. Use the Supabase Dashboard to invite users, then assign roles here." };
+  const supabase = createServiceClient();
+
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !serviceKey) {
+    throw new Error("Supabase is not configured. The service-role key is server-only.");
+  }
+
+  const { createAuthServerClient } = await import("@/lib/supabase/auth-server");
+  const { data: claims } = await (await createAuthServerClient()).auth.getClaims();
+  const inviterId = claims?.claims?.sub ?? null;
+
+  // `invite` creates the user and emails them a link that signs them in.
+  const res = await fetch(`${url}/auth/v1/admin/invite`, {
+    method: "POST",
+    headers: {
+      apikey: serviceKey,
+      Authorization: `Bearer ${serviceKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email,
+      data: { display_name: displayName },
+      redirect_to: `${url}/auth/callback?next=/admin`,
+    }),
+  });
+
+  const body = (await res.json()) as {
+    id?: string;
+    error_description?: string;
+    msg?: string;
+  };
+
+  if (!res.ok || !body.id) {
+    throw new Error(
+      body.error_description ?? body.msg ?? "Could not send the invitation",
+    );
+  }
+
+  const userId = body.id;
+
+  const { error: staffError } = await supabase.from("staff").insert({
+    user_id: userId,
+    display_name: displayName,
+    email,
+    is_developer: false,
+    is_active: true,
+    invited_by: inviterId,
+  });
+  if (staffError) throw new Error(staffError.message);
+
+  if (roleIds.length > 0) {
+    const { error: roleError } = await supabase
+      .from("user_roles")
+      .insert(roleIds.map((roleId) => ({ user_id: userId, role_id: roleId })));
+    if (roleError) throw new Error(roleError.message);
+  }
+
+  await supabase.from("audit_log").insert({
+    action: "invite",
+    table_name: "staff",
+    row_id: userId,
+    after: { email, display_name: displayName, role_ids: roleIds } as unknown as AuditSnapshot,
+  });
+
+  revalidatePath("/admin/users");
+  return { id: userId, email };
 }

@@ -45,7 +45,13 @@ export function FaqsEditor({ faqs: initial }: { faqs: Faq[] }) {
     if (!form.question || !form.answer) { toast.error("Question and answer are required"); return; }
     startTransition(async () => {
       try {
-        const payload = { question: form.question, answer: form.answer, category: form.category, sort_order: form.sort_order, published: form.published };
+        const payload = {
+          question: form.question ?? "",
+          answer: form.answer ?? "",
+          category: form.category ?? "general",
+          sort_order: form.sort_order ?? 0,
+          published: form.published ?? true,
+        };
         if (creating) {
           const created = await createFaq(payload);
           setFaqs((prev) => [...prev, created as Faq]);

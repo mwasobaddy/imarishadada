@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/client";
 import { hasPermission } from "@/lib/admin/permissions";
+import type { Update } from "@/lib/supabase/row-types";
 
 async function requirePermission(resource: string, action: string) {
   if (!(await hasPermission(resource, action))) {
@@ -24,7 +25,7 @@ export async function getEnquiries() {
 export async function updateEnquiryStatus(id: string, status: string, notes?: string) {
   await requirePermission("enquiries", "update");
   const supabase = createServiceClient();
-  const update: any = { status };
+  const update: Update<"enquiries"> = { status };
   if (notes !== undefined) update.notes = notes;
   if (status === "read") update.read_at = new Date().toISOString();
   if (status === "replied") update.replied_at = new Date().toISOString();
@@ -42,7 +43,7 @@ export async function updateEnquiryStatus(id: string, status: string, notes?: st
     action: "update",
     table_name: "enquiries",
     row_id: id,
-    after: data as any,
+    after: data,
   });
 
   revalidatePath("/admin/enquiries");
@@ -63,7 +64,7 @@ export async function getPartnerEnquiries() {
 export async function updatePartnerEnquiryStatus(id: string, status: string, notes?: string, assignedTo?: string) {
   await requirePermission("partner_enquiries", "update");
   const supabase = createServiceClient();
-  const update: any = { status };
+  const update: Update<"partner_enquiries"> = { status };
   if (notes !== undefined) update.notes = notes;
   if (assignedTo !== undefined) update.assigned_to = assignedTo;
   if (status === "read") update.read_at = new Date().toISOString();
@@ -82,7 +83,7 @@ export async function updatePartnerEnquiryStatus(id: string, status: string, not
     action: "update",
     table_name: "partner_enquiries",
     row_id: id,
-    after: data as any,
+    after: data,
   });
 
   revalidatePath("/admin/partner-enquiries");
@@ -103,7 +104,7 @@ export async function getVolunteerApplications() {
 export async function updateVolunteerApplicationStatus(id: string, status: string, notes?: string, assignedTo?: string) {
   await requirePermission("volunteer_applications", "update");
   const supabase = createServiceClient();
-  const update: any = { status };
+  const update: Update<"volunteer_applications"> = { status };
   if (notes !== undefined) update.notes = notes;
   if (assignedTo !== undefined) update.assigned_to = assignedTo;
   if (status === "reviewing") update.read_at = new Date().toISOString();
@@ -122,7 +123,7 @@ export async function updateVolunteerApplicationStatus(id: string, status: strin
     action: "update",
     table_name: "volunteer_applications",
     row_id: id,
-    after: data as any,
+    after: data,
   });
 
   revalidatePath("/admin/volunteer-applications");

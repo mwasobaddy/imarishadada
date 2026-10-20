@@ -1,14 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createAuthServerClient } from "@/lib/supabase/auth-server";
 import { hasPermission } from "@/lib/admin/permissions";
 import { createServiceClient } from "@/lib/supabase/client";
-import type { Database } from "@/lib/supabase/types";
+import type { AuditSnapshot, Insert, Update, WithOptionalSlug } from "@/lib/supabase/row-types";
 
-type StoryRow = Database["public"]["Tables"]["stories"]["Row"];
-type StoryInsert = Database["public"]["Tables"]["stories"]["Insert"];
-type StoryUpdate = Database["public"]["Tables"]["stories"]["Update"];
 
 async function requirePermission(resource: string, action: string) {
   if (!(await hasPermission(resource, action))) {
@@ -16,21 +12,22 @@ async function requirePermission(resource: string, action: string) {
   }
 }
 
-export async function createStory(data: StoryInsert) {
+export async function createStory(data: WithOptionalSlug<"stories">) {
   await requirePermission("stories", "create");
   const supabase = createServiceClient();
 
-  // Auto-slug if not provided
-  if (!data.slug && data.title) {
-    data.slug = data.title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "");
-  }
+  // The slug is NOT NULL in the database, but the editor may leave it blank
+  // and expect one to be derived from the title.
+  const slug =
+    data.slug ||
+    (data.title
+      ? data.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+      : "");
 
+  const payload: Insert<"stories"> = { ...data, slug };
   const { data: story, error } = await supabase
     .from("stories")
-    .insert(data)
+    .insert(payload)
     .select()
     .single();
 
@@ -41,14 +38,14 @@ export async function createStory(data: StoryInsert) {
     action: "create",
     table_name: "stories",
     row_id: story.id,
-    after: story as any,
+    after: story as unknown as AuditSnapshot,
   });
 
   revalidatePath("/admin/content/stories");
   return story;
 }
 
-export async function updateStory(id: string, data: StoryUpdate) {
+export async function updateStory(id: string, data: Update<"stories">) {
   await requirePermission("stories", "update");
   const supabase = createServiceClient();
 
@@ -72,8 +69,8 @@ export async function updateStory(id: string, data: StoryUpdate) {
     action: "update",
     table_name: "stories",
     row_id: id,
-    before: before as any,
-    after: story as any,
+    before: before as unknown as AuditSnapshot,
+    after: story as unknown as AuditSnapshot,
   });
 
   revalidatePath("/admin/content/stories");
@@ -99,7 +96,7 @@ export async function deleteStory(id: string) {
     action: "delete",
     table_name: "stories",
     row_id: id,
-    before: before as any,
+    before: before as unknown as AuditSnapshot,
   });
 
   revalidatePath("/admin/content/stories");
@@ -125,7 +122,7 @@ export async function publishStory(id: string) {
     action: "publish",
     table_name: "stories",
     row_id: id,
-    after: story as any,
+    after: story as unknown as AuditSnapshot,
   });
 
   revalidatePath("/admin/content/stories");

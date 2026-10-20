@@ -1,4 +1,3 @@
-import { createAuthServerClient } from "@/lib/supabase/auth-server";
 import { getRoles, getPermissions } from "@/app/[locale]/admin/actions/roles";
 import { RolesManager } from "@/components/admin/roles-manager";
 
