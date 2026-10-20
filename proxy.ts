@@ -3,6 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 import { routing } from "@/i18n/routing";
+import { localePath } from "@/lib/seo";
 
 /**
  * Locale detection and redirect + admin route protection.
@@ -51,11 +52,13 @@ export default async function proxy(request: NextRequest) {
 
     const { data } = await supabase.auth.getClaims();
     if (!data?.claims?.sub) {
-      // Redirect to the login page, preserving the locale if present.
+      // Redirect to the login page. `localePath` omits the prefix for the
+      // default locale (English is served unprefixed), so this is a single
+      // hop rather than /en/auth/login → /auth/login.
       const locale = segments[0] && routing.locales.includes(segments[0] as any)
-        ? segments[0]
+        ? (segments[0] as "en")
         : "en";
-      const loginUrl = new URL(`/${locale}/auth/login`, request.url);
+      const loginUrl = new URL(localePath(locale, "/auth/login"), request.url);
       loginUrl.searchParams.set("next", pathname);
       return NextResponse.redirect(loginUrl);
     }
