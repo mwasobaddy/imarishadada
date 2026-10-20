@@ -57,7 +57,10 @@ export function PwaInstallPrompt() {
   }
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-md rounded-xl border border-brand-600/30 bg-card p-4 shadow-lg">
+    // Anchored top-right, under the sticky header. Bottom placement covered
+    // the chat composer and the last row of every table, which is exactly
+    // where a prompt should not be.
+    <div className="fixed right-4 top-20 z-50 w-[calc(100%-2rem)] max-w-sm rounded-xl border border-border bg-card p-4 shadow-lg sm:w-96">
       <p className="text-sm font-medium text-ink">Install Imarisha Dada Admin</p>
       <p className="mt-1 text-xs text-ink-muted">
         Add to your home screen for faster access and offline use.
@@ -76,6 +79,16 @@ export function PwaInstallPrompt() {
           className="rounded-lg border border-border bg-card px-4 py-2 text-xs font-medium text-ink-muted hover:border-brand-600 hover:text-brand-600"
         >
           Not now
+        </button>
+        <button
+          type="button"
+          onClick={dismiss}
+          aria-label="Dismiss"
+          className="absolute right-2 top-2 rounded-lg p-1 text-ink-muted transition-colors hover:bg-surface-lilac hover:text-ink"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </button>
       </div>
     </div>

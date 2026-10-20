@@ -1,7 +1,7 @@
 import { createAuthServerClient } from "@/lib/supabase/auth-server";
 import { createAuthBrowserClient } from "@/lib/supabase/auth-browser";
 
-type Permission = { resource: string; action: string };
+export type Permission = { resource: string; action: string };
 
 /**
  * Server-side: get the current user's permissions.

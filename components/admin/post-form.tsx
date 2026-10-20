@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeader } from "@/components/admin/page-header";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -90,25 +91,29 @@ export function PostForm({ initial }: { initial?: Post & { id: string; published
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-brand-600">{initial?.id ? "Edit post" : "New post"}</h1>
-        <div className="flex gap-2">
-          {initial?.id && (
-            <>
-              <button type="button" onClick={handlePublish} disabled={pending} className={`rounded-lg px-4 py-2 text-sm font-medium ${initial.published ? "border border-border bg-card text-ink-muted hover:border-brand-600 hover:text-brand-600" : "bg-green-600 text-white hover:bg-green-700"}`}>
-                {initial.published ? "Unpublish" : "Publish"}
-              </button>
-              <button type="button" onClick={handleDelete} disabled={pending} className="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-100">
-                Delete
-              </button>
-            </>
-          )}
-          <button type="button" onClick={save} disabled={pending} className="rounded-full bg-brand-600 px-6 py-2 text-sm font-medium text-brand-50 hover:bg-brand-700 disabled:opacity-50">
-            {pending ? "Saving…" : "Save"}
-          </button>
-        </div>
-      </div>
+    <div className="mx-auto max-w-6xl space-y-6">
+      <PageHeader
+        eyebrow="Content"
+        title={initial?.id ? "Edit post" : "New post"}
+        description="News and announcements. A post can be scheduled to publish at a future date."
+        action={(
+          <div className="flex flex-wrap gap-2">
+            {initial?.id && (
+              <>
+                <button type="button" onClick={handlePublish} disabled={pending} className={`rounded-lg px-4 py-2 text-sm font-medium ${initial.published ? "border border-border bg-card text-ink-muted hover:border-brand-600 hover:text-brand-600" : "bg-green-600 text-white hover:bg-green-700"}`}>
+                  {initial.published ? "Unpublish" : "Publish"}
+                </button>
+                <button type="button" onClick={handleDelete} disabled={pending} className="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-100">
+                  Delete
+                </button>
+              </>
+            )}
+            <button type="button" onClick={save} disabled={pending} className="rounded-full bg-brand-600 px-6 py-2 text-sm font-medium text-brand-50 hover:bg-brand-700 disabled:opacity-50">
+              {pending ? "Saving…" : "Save"}
+            </button>
+          </div>
+        )}
+      />
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-2">

@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeader } from "@/components/admin/page-header";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -71,13 +72,12 @@ export function SettingsEditor({
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-brand-600">Settings</h1>
-        <p className="mt-1 text-sm text-ink-muted">
-          Site-wide configuration. Financial settings require dual confirmation.
-        </p>
-      </div>
+    <div className="mx-auto max-w-6xl space-y-6">
+      <PageHeader
+        eyebrow="System"
+        title="Settings"
+        description="Site-wide configuration. Financial settings require dual confirmation."
+      />
 
       {/* Pending changes */}
       {pendingChanges.length > 0 && (

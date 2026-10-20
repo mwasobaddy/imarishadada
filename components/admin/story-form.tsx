@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeader } from "@/components/admin/page-header";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -141,53 +142,55 @@ export function StoryForm({
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-brand-600">
-          {initial?.id ? "Edit story" : "New story"}
-        </h1>
-        <div className="flex gap-2">
-          {initial?.id && (
-            <>
-              {initial?.published ? (
+    <div className="mx-auto max-w-6xl space-y-6">
+      <PageHeader
+        eyebrow="Content"
+        title={initial?.id ? "Edit story" : "New story"}
+        description="Consent tier governs whether the name and photograph may appear. Changing it requires re-attested consent."
+        action={(
+          <div className="flex flex-wrap gap-2">
+            {initial?.id && (
+              <>
+                {initial?.published ? (
+                  <button
+                    type="button"
+                    onClick={handleUnpublish}
+                    disabled={pending}
+                    className="rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-ink-muted hover:border-brand-600 hover:text-brand-600"
+                  >
+                    Unpublish
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handlePublish}
+                    disabled={pending}
+                    className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
+                  >
+                    Publish
+                  </button>
+                )}
                 <button
                   type="button"
-                  onClick={handleUnpublish}
+                  onClick={handleDelete}
                   disabled={pending}
-                  className="rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-ink-muted hover:border-brand-600 hover:text-brand-600"
+                  className="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-100"
                 >
-                  Unpublish
+                  Delete
                 </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={handlePublish}
-                  disabled={pending}
-                  className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
-                >
-                  Publish
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={handleDelete}
-                disabled={pending}
-                className="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-100"
-              >
-                Delete
-              </button>
-            </>
-          )}
-          <button
-            type="button"
-            onClick={save}
-            disabled={pending}
-            className="rounded-full bg-brand-600 px-6 py-2 text-sm font-medium text-brand-50 hover:bg-brand-700 disabled:opacity-50"
-          >
-            {pending ? "Saving…" : "Save"}
-          </button>
-        </div>
-      </div>
+              </>
+            )}
+            <button
+              type="button"
+              onClick={save}
+              disabled={pending}
+              className="rounded-full bg-brand-600 px-6 py-2 text-sm font-medium text-brand-50 hover:bg-brand-700 disabled:opacity-50"
+            >
+              {pending ? "Saving…" : "Save"}
+            </button>
+          </div>
+        )}
+      />
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-2">

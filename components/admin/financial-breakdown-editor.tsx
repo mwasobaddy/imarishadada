@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
+
+import { PageHeader } from "@/components/admin/page-header";
 import type { Insert } from "@/lib/supabase/row-types";
 import { toast } from "sonner";
 
@@ -73,16 +75,24 @@ export function FinancialBreakdownEditor({ breakdown: initial, programmes }: { b
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-brand-600">Financial breakdown</h1>
-          <p className="mt-1 text-sm text-ink-muted">{rows.length} entries. Published on the transparency page.</p>
-        </div>
-        <button type="button" onClick={startCreate} className="rounded-full bg-brand-600 px-5 py-2 text-sm font-medium text-brand-50 hover:bg-brand-700">
-          New entry
-        </button>
-      </div>
+    <div className="mx-auto max-w-6xl space-y-6">
+      <PageHeader
+        eyebrow="Operations"
+        title="Financial breakdown"
+        description="Published on the transparency page."
+        action={(
+          <button
+            type="button"
+            onClick={startCreate}
+            className="inline-flex min-h-10 items-center gap-2 rounded-full bg-brand-600 px-5 py-2 text-sm font-medium text-brand-50 shadow-sm transition-all hover:bg-brand-700 hover:shadow-md"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14M5 12h14" />
+            </svg>
+            New entry
+          </button>
+        )}
+      />
 
       {creating && (
         <div className="rounded-xl border border-border bg-card p-6 shadow-sm">

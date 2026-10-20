@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
+
+import { PageHeader } from "@/components/admin/page-header";
 import { toast } from "sonner";
 
 import { createRole, updateRolePermissions, deleteRole } from "@/app/[locale]/admin/actions/roles";
@@ -110,22 +112,24 @@ export function RolesManager({ roles: initialRoles, permissions }: { roles: Role
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-brand-600">Roles & permissions</h1>
-          <p className="mt-1 text-sm text-ink-muted">
-            {roles.length} roles, {permissions.length} permissions.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={startCreate}
-          className="rounded-full bg-brand-600 px-5 py-2 text-sm font-medium text-brand-50 hover:bg-brand-700"
-        >
-          New role
-        </button>
-      </div>
+    <div className="mx-auto max-w-6xl space-y-6">
+      <PageHeader
+        eyebrow="System"
+        title="Roles & permissions"
+        description="Roles are collections of permissions, not fixed job titles."
+        action={(
+          <button
+            type="button"
+            onClick={startCreate}
+            className="inline-flex min-h-10 items-center gap-2 rounded-full bg-brand-600 px-5 py-2 text-sm font-medium text-brand-50 shadow-sm transition-all hover:bg-brand-700 hover:shadow-md"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14M5 12h14" />
+            </svg>
+            New role
+          </button>
+        )}
+      />
 
       {(creating || editing) && (
         <div className="rounded-xl border border-border bg-card p-6 shadow-sm">

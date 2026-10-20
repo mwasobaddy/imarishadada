@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeader } from "@/components/admin/page-header";
 import { useState, useTransition, useRef } from "react";
 import { toast } from "sonner";
 
@@ -100,14 +101,12 @@ export function MediaLibrary({ media: initial }: { media: MediaItem[] }) {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-brand-600">Media library</h1>
-        <p className="mt-1 text-sm text-ink-muted">
-          {media.length} assets. Every upload requires alt text. Consent tier
-          gates whether an image can be attached to a published story.
-        </p>
-      </div>
+    <div className="mx-auto max-w-6xl space-y-6">
+      <PageHeader
+        eyebrow="Operations"
+        title="Media library"
+        description="Every upload requires alt text. Consent tier gates whether an image can be attached to a published story."
+      />
 
       {/* Upload form */}
       <form onSubmit={handleUpload} className="rounded-xl border border-border bg-card p-6 space-y-4">

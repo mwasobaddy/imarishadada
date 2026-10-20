@@ -1,16 +1,16 @@
 import { getCurrentStaff } from "@/lib/admin/permissions";
+import { PageHeader } from "@/components/admin/page-header";
 import { RealtimeChat } from "@/components/admin/realtime-chat";
 
 export default async function ChatPage() {
   const staff = await getCurrentStaff();
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-brand-600">Team chat</h1>
-        <p className="mt-1 text-sm text-ink-muted">
-          Real-time messaging for authenticated staff. Messages are immutable.
-        </p>
-      </div>
+    <div className="mx-auto max-w-4xl">
+      <PageHeader
+        eyebrow="Operations"
+        title="Team chat"
+        description="Real-time messaging for authenticated staff. Messages are immutable — there is no edit, and no delete."
+      />
       <RealtimeChat channel="general" userName={staff?.display_name ?? "Unknown"} />
     </div>
   );

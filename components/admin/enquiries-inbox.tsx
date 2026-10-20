@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeader } from "@/components/admin/page-header";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -63,19 +64,13 @@ export function EnquiriesInbox({
   const [tab, setTab] = useState<"contact" | "partner" | "volunteer">("contact");
   const [pending, startTransition] = useTransition();
 
-  const newCount =
-    enquiries.filter((e) => e.status === "new").length +
-    partnerEnquiries.filter((e) => e.status === "new").length +
-    volunteerApplications.filter((e) => e.status === "new").length;
-
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-brand-600">Enquiries</h1>
-        <p className="mt-1 text-sm text-ink-muted">
-          {newCount} new across all channels.
-        </p>
-      </div>
+    <div className="mx-auto max-w-6xl space-y-6">
+      <PageHeader
+        eyebrow="Operations"
+        title="Enquiries"
+        description={`{newCount} new across all channels.`}
+      />
 
       <div className="flex gap-2 border-b border-border">
         {[

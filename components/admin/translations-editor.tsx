@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
+
+import { PageHeader } from "@/components/admin/page-header";
 import { toast } from "sonner";
 
 import { createTranslation, deleteTranslation, reviewTranslation } from "@/app/[locale]/admin/actions/translations";
@@ -84,19 +86,24 @@ export function TranslationsEditor({ translations: initial }: { translations: Tr
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-brand-600">Translations</h1>
-          <p className="mt-1 text-sm text-ink-muted">
-            {translations.length} overrides. Machine translation is prohibited on
-            safeguarding, SRHR, financial, tax, and personal testimony content.
-          </p>
-        </div>
-        <button type="button" onClick={startCreate} className="rounded-full bg-brand-600 px-5 py-2 text-sm font-medium text-brand-50 hover:bg-brand-700">
-          New translation
-        </button>
-      </div>
+    <div className="mx-auto max-w-6xl space-y-6">
+      <PageHeader
+        eyebrow="System"
+        title="Translations"
+        description="Machine translation is prohibited on safeguarding, SRHR, financial, tax, and personal testimony content."
+        action={(
+          <button
+            type="button"
+            onClick={startCreate}
+            className="inline-flex min-h-10 items-center gap-2 rounded-full bg-brand-600 px-5 py-2 text-sm font-medium text-brand-50 shadow-sm transition-all hover:bg-brand-700 hover:shadow-md"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14M5 12h14" />
+            </svg>
+            New translation
+          </button>
+        )}
+      />
 
       {creating && (
         <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
