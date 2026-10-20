@@ -18,23 +18,37 @@ import { breadcrumbJsonLd, jsonLdScript } from "@/lib/seo";
  * page rather than being buried in a policy nobody opens.
  */
 
-export const metadata: Metadata = {
-  title: "Stories",
-  description:
-    "Stories from the girls and young women in our programmes in Kibera, published only with recorded consent.",
-  alternates: {
-    canonical: "/stories",
-    languages: { "en-KE": "/stories", "x-default": "/stories" },
-  },
-  openGraph: {
-    type: "website",
-    url: "/stories",
-    locale: "en_KE",
+export async function generateMetadata({
+  params,
+  searchParams,
+}: PageProps<"/[locale]/stories">): Promise<Metadata> {
+  const { locale } = await params;
+  const sp = await searchParams;
+  const programme = typeof sp.programme === "string" ? sp.programme : null;
+
+  // Filtered URLs are indexable in their own right — each filter shows a
+  // different set of stories. Give them a self-referencing canonical and
+  // hreflang so search engines do not flag "no self-referencing hreflang".
+  const path = programme ? `/stories?programme=${programme}` : "/stories";
+
+  return {
+    title: "Stories",
+    description:
+      "Stories from the girls and young women in our programmes in Kibera, published only with recorded consent.",
+    alternates: {
+      canonical: path,
+      languages: { "en-KE": path, "x-default": path },
+    },
+    openGraph: {
+      type: "website",
+      url: path,
+      locale: "en_KE",
       images: ["/opengraph-image"],
-    title: "Stories | Imarisha Dada",
-    description: "Stories from Kibera, published only with recorded consent.",
-  },
-};
+      title: "Stories | Imarisha Dada",
+      description: "Stories from Kibera, published only with recorded consent.",
+    },
+  };
+}
 
 async function StoriesBody({
   searchParams,
