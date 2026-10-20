@@ -17,6 +17,7 @@ import {
   getTeamMembers,
   getAboutProgrammes,
 } from "@/lib/data/about";
+import { isVisible } from "@/lib/data/sections";
 import { breadcrumbJsonLd, jsonLdScript, absoluteUrl } from "@/lib/seo";
 
 const TITLE = "About us";
@@ -74,29 +75,47 @@ export default async function AboutPage({
   return (
     <>
       <main id="main">
-        <PageHero
-          eyebrow={sections["about-hero"]?.eyebrow}
-          heading={sections["about-hero"]?.heading ?? "Imarisha Dada"}
-          body={sections["about-hero"]?.body}
+        {isVisible(sections["about-hero"]) ? (
+          <PageHero
+            eyebrow={sections["about-hero"]!.eyebrow}
+            heading={sections["about-hero"]!.heading}
+            body={sections["about-hero"]!.body}
+          />
+        ) : null}
+
+        {isVisible(sections["about-story"]) ? (
+          <AboutStory
+            section={sections["about-story"]!}
+            carousel={sections["about-carousel"]}
+          />
+        ) : null}
+
+        <AboutVisionMission
+          vision={sections["about-vision"]}
+          mission={sections["about-mission"]}
         />
 
-        <AboutStory
-          section={sections["about-story"]!}
-          carousel={sections["about-carousel"]!}
-        />
-        <AboutVisionMission
-          vision={sections["about-vision"]!}
-          mission={sections["about-mission"]!}
-        />
-        <AboutValues
-          section={sections["about-values"]!}
-          values={values}
-          carousel={sections["about-carousel"]!}
-        />
-        <AboutWork section={sections["about-work"]!} programmes={programmes} />
-        <AboutTeam section={sections["about-team"]!} members={members} />
+        {isVisible(sections["about-values"]) ? (
+          <AboutValues
+            section={sections["about-values"]!}
+            values={values}
+            carousel={sections["about-carousel"]}
+          />
+        ) : null}
+
+        {isVisible(sections["about-work"]) ? (
+          <AboutWork section={sections["about-work"]!} programmes={programmes} />
+        ) : null}
+
+        {isVisible(sections["about-team"]) ? (
+          <AboutTeam section={sections["about-team"]!} members={members} />
+        ) : null}
+
         <AboutField />
-        <AboutApproach section={sections["about-approach"]!} />
+
+        {isVisible(sections["about-approach"]) ? (
+          <AboutApproach section={sections["about-approach"]!} />
+        ) : null}
       </main>
 
       <script

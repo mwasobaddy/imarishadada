@@ -50,19 +50,59 @@ type SectionRow = {
   stat_line: string | null;
   body_secondary: string | null;
   steps: { title: string; description: string }[] | null;
-  images: { path: string; alt: string }[] | null;
+  images: { path: string; alt: string; caption?: string }[] | null;
   image_path: string | null;
   image_alt: string | null;
+  active: boolean;
 };
 
 /**
- * Fallbacks, used when Supabase is unreachable or a key is not seeded.
+ * A section that exists but is switched off, or is absent entirely.
+ *
+ * `heading` is empty and `active` is false, so a page that guards on `active`
+ * renders nothing — which is what "Hide section" is supposed to mean. Under
+ * RLS the two states are indistinguishable from the public side; see
+ * `getSection`.
+ */
+function hidden(key: string): SiteSection {
+  return {
+    key,
+    eyebrow: null,
+    heading: "",
+    body: null,
+    ctaLabel: null,
+    ctaHref: null,
+    active: false,
+  };
+}
+
+/**
+ * Whether a section should render.
+ *
+ * Every page that composes editor-managed sections guards with this. A hidden
+ * section arrives as `hidden(key)` — an empty heading with `active: false` —
+ * rather than being filtered out, so the caller decides what to omit and the
+ * page's structure stays readable.
+ */
+export function isVisible(section: SiteSection | undefined | null): boolean {
+  return section?.active === true;
+}
+
+/**
+ * Fallbacks, used when Supabase is unreachable or not configured.
  *
  * These mirror `supabase/migrations/0013_pages.sql`. They exist so a database
  * blip renders the last-known-good copy rather than an empty heading — an
  * empty `<h1>` is worse than a stale one.
+ *
+ * They are NOT used when a row exists and is switched off, nor when a row is
+ * simply absent. Both resolve to `hidden()`. See the note on `getSection`:
+ * applying the fallback there made "Hide section" restore the code copy instead
+ * of hiding anything.
+ *
+ * `active` is therefore omitted here and injected by `fallbackFor()`.
  */
-const FALLBACKS: Record<string, SiteSection> = {
+const FALLBACKS: Record<string, Omit<SiteSection, "active">> = {
   "home-hero": {
     key: "home-hero",
     eyebrow: null,
@@ -179,7 +219,86 @@ const FALLBACKS: Record<string, SiteSection> = {
       { path: "/images/about/about-facilitation.avif", alt: "A participant drawing on a flipchart while the group watches" },
     ],
   },
+  /**
+   * Impact, mirrors migration `0018`.
+   *
+   * The reporting period is deliberately absent from all of this copy — it is
+   * rendered by the components from `REPORTING_PERIOD` in `lib/data/impact.ts`,
+   * because it has to agree with `impact_stats.period` on every row and would
+   * drift as prose. See the note at the foot of that migration.
+   */
+  "impact-hero": {
+    key: "impact-hero",
+    eyebrow: "Our impact",
+    heading: "Numbers, and how we got them.",
+    body: "Every figure on this page covers the same fixed reporting period, stated below. Where we do not have a number, we say so rather than estimate.",
+    ctaLabel: null,
+    ctaHref: null,
+  },
+  "impact-headline": {
+    key: "impact-headline",
+    eyebrow: null,
+    heading: "The headline numbers",
+    body: "Every figure below carries the period it covers.",
+    ctaLabel: null,
+    ctaHref: null,
+  },
+  "impact-by-programme": {
+    key: "impact-by-programme",
+    eyebrow: null,
+    heading: "By programme",
+    body: null,
+    ctaLabel: null,
+    ctaHref: null,
+  },
+  "impact-methodology": {
+    key: "impact-methodology",
+    eyebrow: "Methodology",
+    heading: "How we count",
+    body: "A number without a definition is a claim. These are ours.",
+    ctaLabel: null,
+    ctaHref: null,
+    steps: [
+      { title: "Participants", description: "A girl or young woman who attended at least one programme session." },
+      { title: "Re-enrolment", description: "Confirmed by written confirmation from the receiving school, not by the participant's word alone." },
+      { title: "Start-up capital", description: "Disbursed and acknowledged in writing by the recipient." },
+      { title: "Safe spaces", description: "A location running a scheduled, staffed programme that participants attend without referral." },
+    ],
+  },
+  "impact-gaps": {
+    key: "impact-gaps",
+    eyebrow: null,
+    heading: "What we do not yet measure",
+    body: "Anyone can publish a percentage. These are the things we cannot claim, and a funder should be able to see them without asking.",
+    ctaLabel: null,
+    ctaHref: null,
+  },
+  "impact-reports": {
+    key: "impact-reports",
+    eyebrow: null,
+    heading: "Reports and documents",
+    body: "The written record behind the numbers. A number with no picture behind it is an assertion, so the photographs below sit beside the figures.",
+    ctaLabel: null,
+    ctaHref: null,
+    images: [
+      { path: "/images/impact/impact-group-with-banner.avif", alt: "The full group of participants photographed with the organisation's banner", caption: "The cohort behind the 2025–26 figures" },
+      { path: "/images/impact/impact-supplies-distributed.avif", alt: "Participants handing out supplies to families at the community centre", caption: "What a gift becomes on the ground" },
+      { path: "/images/impact/impact-community-meal.avif", alt: "A community meal served at the community centre in Kibera", caption: "Community outreach, Kibera" },
+      { path: "/images/impact/impact-group-outdoors.avif", alt: "Participants and staff standing together outside the community centre, smiling", caption: "The team and the girls, Kibera" },
+    ],
+  },
 };
+
+/**
+ * The code copy for a key, switched on.
+ *
+ * `active: true` because a fallback is only ever reached when there is nothing
+ * editorial to respect — the database is unreachable, or not configured at all.
+ */
+function fallbackFor(key: string): SiteSection | null {
+  const fallback = FALLBACKS[key];
+  return fallback ? { ...fallback, active: true } : null;
+}
 
 function toSection(row: SectionRow): SiteSection {
   const fallback = FALLBACKS[row.section_key];
@@ -198,14 +317,44 @@ function toSection(row: SectionRow): SiteSection {
     images: row.images ?? fallback?.images ?? null,
     imagePath: row.image_path ?? fallback?.imagePath ?? null,
     imageAlt: row.image_alt ?? fallback?.imageAlt ?? null,
+    active: row.active,
   };
 }
 
-const SELECT =
-  "section_key, eyebrow, heading, body, cta_label, cta_href, cta_secondary_label, cta_secondary_href, stat_line, body_secondary, steps, images, image_path, image_alt";
+/**
+ * The columns `toSection` reads.
+ *
+ * Exported, and asserted against by a test, because omitting one here does not
+ * fail loudly: PostgREST returns `undefined` for a column that was not
+ * selected, `toSection` falls back to the code copy, and — for `active` — the
+ * section resolves as hidden. That exact omission shipped once: every section
+ * on every migrated page disappeared, and the build was green.
+ *
+ * Never `select("*")` — the project rules forbid it, and a narrow column list
+ * is the point.
+ */
+export const SECTION_SELECT =
+  "section_key, eyebrow, heading, body, cta_label, cta_href, cta_secondary_label, cta_secondary_href, stat_line, body_secondary, steps, images, image_path, image_alt, active";
 
 /**
  * One section, by key. Cached until the matching `revalidateTag` fires.
+ *
+ * ## Why the fallback is not used when the row is absent
+ *
+ * `site_sections_public_read` is `using (active = true)`, so anon cannot see a
+ * row the editor has switched off. From this side, "hidden" and "absent" are
+ * the same signal.
+ *
+ * This used to fall back to the code copy in both cases, which meant **"Hide
+ * section" silently restored the hardcoded copy instead of removing the
+ * section** — the exact opposite of what the button says, with no error to
+ * notice. The fallback is for a database that is unreachable or unconfigured,
+ * not for a decision an editor made, so it now applies only on a query error.
+ *
+ * The trade-off, stated plainly: a section key added in code before its seed
+ * migration is applied renders nothing rather than the code copy. That is
+ * visible immediately in development, and it is preferable to a control that
+ * lies.
  */
 export async function getSection(key: string): Promise<SiteSection> {
   "use cache";
@@ -213,28 +362,40 @@ export async function getSection(key: string): Promise<SiteSection> {
   cacheTag(sectionTag(key), SECTIONS_TAG);
 
   if (!isSupabaseConfigured()) {
-    return FALLBACKS[key] ?? { key, eyebrow: null, heading: "", body: null, ctaLabel: null, ctaHref: null };
+    return fallbackFor(key) ?? hidden(key);
   }
 
   const { data, error } = await createClient()
     .from("site_sections")
-    .select(SELECT)
+    .select(SECTION_SELECT)
     .eq("section_key", key)
-    .eq("active", true)
     .maybeSingle();
 
-  if (error || !data) {
-    if (error) console.error(`[sections] "${key}" failed:`, error.message);
-    return FALLBACKS[key] ?? { key, eyebrow: null, heading: "", body: null, ctaLabel: null, ctaHref: null };
+  // A database problem. Render the last-known-good copy rather than an empty
+  // heading — an empty `<h1>` is worse than a stale one.
+  if (error) {
+    console.error(`[sections] "${key}" failed:`, error.message);
+    return fallbackFor(key) ?? hidden(key);
   }
 
-  return toSection(data as SectionRow);
+  // No row, no error: the editor switched it off. Render nothing.
+  if (!data) return hidden(key);
+
+  const row = data as SectionRow;
+  // Defensive. Unreachable while the policy filters on `active`, and correct
+  // the day it stops.
+  if (!row.active) return hidden(key);
+
+  return toSection(row);
 }
 
 /**
- * Every active section on a page, in order.
+ * Every visible section on a page, in order.
  *
- * Used by pages that render a run of sections rather than named keys.
+ * Used by pages that render a run of sections rather than named keys. Hidden
+ * rows do not appear: `site_sections_public_read` filters them out at the
+ * database, which is the same reason `getSection` cannot distinguish hidden
+ * from absent.
  */
 export async function getPageSections(pageKey: string): Promise<SiteSection[]> {
   "use cache";
@@ -245,9 +406,8 @@ export async function getPageSections(pageKey: string): Promise<SiteSection[]> {
 
   const { data, error } = await createClient()
     .from("site_sections")
-    .select(SELECT)
+    .select(SECTION_SELECT)
     .eq("page_key", pageKey)
-    .eq("active", true)
     .order("sort_order");
 
   if (error || !data) {
@@ -255,5 +415,7 @@ export async function getPageSections(pageKey: string): Promise<SiteSection[]> {
     return [];
   }
 
-  return (data as SectionRow[]).map(toSection);
+  return (data as SectionRow[]).map((row) =>
+    row.active ? toSection(row) : hidden(row.section_key),
+  );
 }

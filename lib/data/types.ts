@@ -33,9 +33,19 @@ export type SiteSection = {
   /** Ordered steps inside a section. Same shape as `ProgrammeOutcome[]`. */
   steps?: ProgrammeOutcome[] | null;
   /** Ordered photographs for a carousel or gallery. */
-  images?: { path: string; alt: string }[] | null;
+  images?: { path: string; alt: string; caption?: string }[] | null;
   imagePath?: string | null;
   imageAlt?: string | null;
+  /**
+   * Whether the editor has this section switched on.
+   *
+   * Carried on the resolved section rather than filtered in the query, because
+   * "the row is hidden" and "the row does not exist yet" are different states
+   * and only one of them should fall back to code. Filtering in SQL collapsed
+   * them, so hiding a section silently restored the hardcoded copy instead of
+   * removing the section — the opposite of what the button says.
+   */
+  active: boolean;
 };
 
 export type ImpactStat = {

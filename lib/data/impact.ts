@@ -1,7 +1,8 @@
 import { cacheLife, cacheTag } from "next/cache";
 
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
-import { effectiveConsentTier, type ConsentTier } from "@/lib/data/types";
+import { getSection } from "@/lib/data/sections";
+import { effectiveConsentTier, type ConsentTier, type SiteSection } from "@/lib/data/types";
 
 /**
  * Impact and stories data.
@@ -201,10 +202,77 @@ export const METHODOLOGY = [
  * Publishing the gaps is the most credible thing on the page. A funder reading
  * a wall of percentages should be able to see the blind spots without having to
  * ask.
+ *
+ * ## This is now a fallback
+ *
+ * The four gaps live in `transparency_gaps`, which has existed since migration
+ * `0007` and been publicly readable since `0009` — it was simply never filled,
+ * so this page and the transparency page each carried their own copy of the
+ * same four gaps, in two different phrasings.
+ *
+ * Migration `0018` seeded the table with one canonical phrasing. This array
+ * mirrors it so a database blip renders the last-known-good list rather than an
+ * empty section; `getMeasurementGaps()` prefers the table.
  */
 export const MEASUREMENT_GAPS = [
-  "Long-term retention beyond 12 months.",
+  "Long-term retention beyond twelve months.",
   "Income change for participants funded with start-up capital.",
-  "Whether re-enrolment holds when the follow-through funding ends.",
-  "Cost per participant, which we cannot yet state honestly because our overhead allocation is not settled.",
+  "Whether re-enrolment holds once follow-through funding ends.",
+  "Cost per participant.",
 ] as const;
+
+/**
+ * The gaps, from the table.
+ *
+ * Ordered by `sort_order`, which is editorial: the list is read top to bottom
+ * and the first item is the one a reader remembers. `status` is deliberately
+ * not filtered on — a gap that has been closed is more informative than one
+ * that has been deleted, so the row stays and the status changes.
+ */
+export async function getMeasurementGaps(): Promise<string[]> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("transparency-gaps");
+
+  if (!isSupabaseConfigured()) return [...MEASUREMENT_GAPS];
+
+  const { data, error } = await createClient()
+    .from("transparency_gaps")
+    .select("item, sort_order")
+    .order("sort_order");
+
+  if (error) {
+    console.error("[data] transparency_gaps query failed:", error.message);
+    return [...MEASUREMENT_GAPS];
+  }
+  if (!data?.length) return [...MEASUREMENT_GAPS];
+
+  return data.map((r) => r.item as string);
+}
+
+/**
+ * The Impact page's sections, keyed.
+ *
+ * Mirrors `getAboutSections()`. Each key resolves through `getSection`, which
+ * carries its own cache tag, so editing the methodology block does not
+ * invalidate the hero.
+ */
+export async function getImpactSections(): Promise<Record<string, SiteSection>> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("sections");
+
+  const keys = [
+    "impact-hero",
+    "impact-headline",
+    "impact-by-programme",
+    "impact-methodology",
+    "impact-gaps",
+    "impact-reports",
+  ];
+  return Object.fromEntries(
+    await Promise.all(
+      keys.map(async (key) => [key, await getSection(key)] as const),
+    ),
+  );
+}

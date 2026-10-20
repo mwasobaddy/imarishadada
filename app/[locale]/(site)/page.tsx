@@ -14,7 +14,7 @@ import {
   getImpactStats,
   getProgrammes,
 } from "@/lib/data/home";
-import { getSection } from "@/lib/data/sections";
+import { getSection, isVisible } from "@/lib/data/sections";
 import { HERO_PORTRAIT } from "@/lib/data/hero-portrait";
 import { buildLanguageAlternates, jsonLdScript, webSiteJsonLd } from "@/lib/seo";
 
@@ -90,20 +90,22 @@ export default async function HomePage({
           and the CTA labels without a deploy. The component's own defaults are
           the fallback, so a database blip renders the last-known-good page
           rather than an empty <h1>. */}
-      <Hero
-        title={hero.heading}
-        subtitle={hero.body ?? ""}
-        primaryCta={{
-          label: hero.ctaLabel ?? "Donate",
-          href: hero.ctaHref ?? "/donate",
-        }}
-        secondaryCta={{
-          label: hero.ctaSecondaryLabel ?? "See our impact",
-          href: hero.ctaSecondaryHref ?? "#impact",
-        }}
-        portrait={HERO_PORTRAIT}
-        impactLine={hero.statLine ?? ""}
-      />
+      {isVisible(hero) ? (
+        <Hero
+          title={hero.heading}
+          subtitle={hero.body ?? ""}
+          primaryCta={{
+            label: hero.ctaLabel ?? "Donate",
+            href: hero.ctaHref ?? "/donate",
+          }}
+          secondaryCta={{
+            label: hero.ctaSecondaryLabel ?? "See our impact",
+            href: hero.ctaSecondaryHref ?? "#impact",
+          }}
+          portrait={HERO_PORTRAIT}
+          impactLine={hero.statLine ?? ""}
+        />
+      ) : null}
 
       {/* Registration number is not published until issued — TrustStrip
           renders nothing rather than a placeholder. */}
@@ -113,7 +115,9 @@ export default async function HomePage({
         <StatCounter stats={stats} />
       </div>
 
-      <Programmes programmes={programmes} section={programmesSection} />
+      {isVisible(programmesSection) ? (
+        <Programmes programmes={programmes} section={programmesSection} />
+      ) : null}
       <FeaturedStory story={story} />
       <GivingWays tiers={tiers} />
       <ClosingCta />

@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Container } from "@/components/site/container";
 import { AboutPhotoCarousel } from "@/components/about/photo-carousel";
 import { Programmes } from "@/components/sections/programmes";
+import { isVisible } from "@/lib/data/sections";
 import type { Programme, SiteSection } from "@/lib/data/types";
 
 export function AboutStory({
@@ -10,7 +11,7 @@ export function AboutStory({
   carousel,
 }: {
   section: SiteSection;
-  carousel: SiteSection;
+  carousel?: SiteSection | null;
 }) {
   return (
     <section aria-labelledby="about-story-heading" className="py-section bg-surface">
@@ -22,8 +23,8 @@ export function AboutStory({
         */}
         <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16">
           <AboutPhotoCarousel
-            images={carousel.images ?? []}
-            caption={carousel.body}
+            images={isVisible(carousel) ? (carousel!.images ?? []) : []}
+            caption={carousel?.body}
             className="lg:order-1"
           />
 
@@ -57,22 +58,31 @@ export function AboutStory({
 /**
  * Vision and mission sit together because readers compare them: the mission is
  * the vehicle, the vision the destination.
+ *
+ * Either may be switched off in the admin. One alone still renders — a
+ * two-column grid with one column is worse than a single full-width card.
  */
 export function AboutVisionMission({
   vision,
   mission,
 }: {
-  vision: SiteSection;
-  mission: SiteSection;
+  vision?: SiteSection | null;
+  mission?: SiteSection | null;
 }) {
+  const cards = [
+    { section: vision, id: "about-vision-heading" },
+    { section: mission, id: "about-mission-heading" },
+  ].filter(
+    (card): card is { section: SiteSection; id: string } => isVisible(card.section),
+  );
+
+  if (cards.length === 0) return null;
+
   return (
     <section aria-labelledby="about-vision-heading" className="bg-surface pb-section">
       <Container>
         <div className="grid gap-5 sm:grid-cols-2">
-          {[
-            { section: vision, id: "about-vision-heading" },
-            { section: mission, id: "about-mission-heading" },
-          ].map(({ section, id }) => (
+          {cards.map(({ section, id }) => (
             <article
               key={id}
               className="rounded-2xl bg-surface-lilac p-8 sm:p-10"
@@ -104,7 +114,7 @@ export function AboutValues({
 }: {
   section: SiteSection;
   values: import("@/lib/data/types").CoreValue[];
-  carousel: SiteSection;
+  carousel?: SiteSection | null;
 }) {
   if (values.length === 0) return null;
 
@@ -146,7 +156,7 @@ export function AboutValues({
             repeating it verbatim reads as a copy-paste rather than a design.
           */}
           <AboutPhotoCarousel
-            images={carousel.images ?? []}
+            images={isVisible(carousel) ? (carousel!.images ?? []) : []}
             className="lg:order-last"
           />
         </div>

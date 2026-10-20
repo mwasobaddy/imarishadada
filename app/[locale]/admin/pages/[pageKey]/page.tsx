@@ -81,7 +81,7 @@ export default async function PageSectionsPage({
                 section={{
                   ...section,
                   steps: (section.steps as { title: string; description: string }[] | null) ?? null,
-                  images: (section.images as { path: string; alt: string }[] | null) ?? null,
+                  images: (section.images as { path: string; alt: string; caption?: string }[] | null) ?? null,
                 }}
                 route={page.route}
                 media={media}

@@ -29,11 +29,21 @@ export function StatCounter({
   headingId = "impact-heading",
   heading = "Last year, in Kibera",
   intro = "Every figure below carries the period it covers.",
+  period,
 }: {
   stats: ImpactStat[];
   headingId?: string;
   heading?: string;
   intro?: string;
+  /**
+   * The reporting window, rendered rather than written.
+   *
+   * It appears six times on `/impact` and must agree with the per-row `period`
+   * on every figure. As prose it would drift the first time someone updated a
+   * number without updating the sentence around it, so the component renders it
+   * and the copy only refers to it.
+   */
+  period?: string;
 }) {
   const container = useRef<HTMLElement>(null);
 
@@ -112,6 +122,12 @@ export function StatCounter({
         </h2>
 
         <p className="mt-3 max-w-xl text-base text-ink-inverse">{intro}</p>
+
+        {period ? (
+          <p className="mt-2 text-sm font-medium text-brand-100">
+            Reporting period: {period}
+          </p>
+        ) : null}
 
         {/* Definition list: the value/label/period relationship is meaningful
             and should be exposed as such, not as loose divs. */}

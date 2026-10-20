@@ -21,7 +21,7 @@ type Section = {
   stat_line: string | null;
   body_secondary: string | null;
   steps: { title: string; description: string }[] | null;
-  images: { path: string; alt: string }[] | null;
+  images: { path: string; alt: string; caption?: string }[] | null;
   image_path: string | null;
   image_alt: string | null;
   seo_title: string | null;
@@ -452,6 +452,34 @@ export function SectionEditor({
                           }`}
                         />
                       </div>
+                    </div>
+
+                    {/*
+                      Caption is optional, and it is not a longer alt.
+                      Alt describes the photograph for someone who cannot see
+                      it; the caption says what the photograph is evidence of.
+                      A grid of figures needs the second; a carousel does not,
+                      which is why the About carousel leaves this empty and puts
+                      one line under the whole stage instead.
+                    */}
+                    <div className="mt-3">
+                      <label
+                        htmlFor={`section-image-caption-${i}`}
+                        className="text-[11px] font-medium text-ink-muted"
+                      >
+                        Caption (optional)
+                      </label>
+                      <input
+                        id={`section-image-caption-${i}`}
+                        value={image.caption ?? ""}
+                        onChange={(e) => {
+                          const next = [...(form.images ?? [])];
+                          next[i] = { ...next[i]!, caption: e.target.value };
+                          set("images", next);
+                        }}
+                        placeholder="Leave blank to show no caption"
+                        className={inputClass}
+                      />
                     </div>
                   </li>
                 ))}

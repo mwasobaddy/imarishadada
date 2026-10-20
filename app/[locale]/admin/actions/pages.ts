@@ -126,7 +126,7 @@ export type SectionPatch = {
   stat_line?: string | null;
   body_secondary?: string | null;
   steps?: { title: string; description: string }[] | null;
-  images?: { path: string; alt: string }[] | null;
+  images?: { path: string; alt: string; caption?: string }[] | null;
   image_path?: string | null;
   image_alt?: string | null;
   seo_title?: string | null;
