@@ -10,8 +10,10 @@ import {
   type Programme,
   type ProgrammeOutcome,
   type ProgrammePage,
+  type SiteSection,
 } from "@/lib/data/types";
 import { resolveProgrammeImage } from "@/lib/data/programme-images";
+import { getSection } from "@/lib/data/sections";
 
 /**
  * Programme detail data.
@@ -481,3 +483,26 @@ export async function getPartnerSchools(programmeSlug?: string): Promise<
       note: (r.note as string | null) ?? null,
     }));
   }
+
+
+/**
+ * The four sections of the programmes index, keyed by section key.
+ *
+ * Same shape as `getAboutSections` so the two pages are wired identically and
+ * a new page is a copy of an existing one rather than a new pattern.
+ */
+export async function getProgrammeSections(): Promise<Record<string, SiteSection>> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("sections");
+
+  const keys = [
+    "programmes-hero",
+    "programmes-pathway",
+    "programmes-measure",
+    "programmes-unrestricted",
+  ];
+  return Object.fromEntries(
+    await Promise.all(keys.map(async (key) => [key, await getSection(key)] as const)),
+  );
+}

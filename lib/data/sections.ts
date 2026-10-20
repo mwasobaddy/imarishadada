@@ -48,6 +48,8 @@ type SectionRow = {
   cta_secondary_label: string | null;
   cta_secondary_href: string | null;
   stat_line: string | null;
+  body_secondary: string | null;
+  steps: { title: string; description: string }[] | null;
   image_path: string | null;
   image_alt: string | null;
 };
@@ -166,13 +168,15 @@ function toSection(row: SectionRow): SiteSection {
     ctaSecondaryLabel: row.cta_secondary_label ?? fallback?.ctaSecondaryLabel ?? null,
     ctaSecondaryHref: row.cta_secondary_href ?? fallback?.ctaSecondaryHref ?? null,
     statLine: row.stat_line ?? fallback?.statLine ?? null,
+    bodySecondary: row.body_secondary ?? fallback?.bodySecondary ?? null,
+    steps: row.steps ?? fallback?.steps ?? null,
     imagePath: row.image_path ?? fallback?.imagePath ?? null,
     imageAlt: row.image_alt ?? fallback?.imageAlt ?? null,
   };
 }
 
 const SELECT =
-  "section_key, eyebrow, heading, body, cta_label, cta_href, cta_secondary_label, cta_secondary_href, stat_line, image_path, image_alt";
+  "section_key, eyebrow, heading, body, cta_label, cta_href, cta_secondary_label, cta_secondary_href, stat_line, body_secondary, steps, image_path, image_alt";
 
 /**
  * One section, by key. Cached until the matching `revalidateTag` fires.

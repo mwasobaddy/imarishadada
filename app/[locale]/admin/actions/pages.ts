@@ -46,7 +46,7 @@ function revalidateSection(sectionKey: string, pageKey: string | null) {
 }
 
 const SELECT =
-  "section_key, page_key, eyebrow, heading, body, cta_label, cta_href, cta_secondary_label, cta_secondary_href, stat_line, image_path, image_alt, seo_title, seo_description, sort_order, active";
+  "section_key, page_key, eyebrow, heading, body, body_secondary, steps, cta_label, cta_href, cta_secondary_label, cta_secondary_href, stat_line, image_path, image_alt, seo_title, seo_description, sort_order, active";
 
 // ---------------------------------------------------------------------------
 // Reads — uncached, service client, for the editor
@@ -124,6 +124,8 @@ export type SectionPatch = {
   cta_secondary_label?: string | null;
   cta_secondary_href?: string | null;
   stat_line?: string | null;
+  body_secondary?: string | null;
+  steps?: { title: string; description: string }[] | null;
   image_path?: string | null;
   image_alt?: string | null;
   seo_title?: string | null;

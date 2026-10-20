@@ -1213,6 +1213,7 @@ export type Database = {
         Row: {
           active: boolean
           body: string | null
+          body_secondary: string | null
           created_at: string
           cta_href: string | null
           cta_label: string | null
@@ -1229,11 +1230,13 @@ export type Database = {
           seo_title: string | null
           sort_order: number
           stat_line: string | null
+          steps: Json | null
           updated_at: string
         }
         Insert: {
           active?: boolean
           body?: string | null
+          body_secondary?: string | null
           created_at?: string
           cta_href?: string | null
           cta_label?: string | null
@@ -1250,11 +1253,13 @@ export type Database = {
           seo_title?: string | null
           sort_order?: number
           stat_line?: string | null
+          steps?: Json | null
           updated_at?: string
         }
         Update: {
           active?: boolean
           body?: string | null
+          body_secondary?: string | null
           created_at?: string
           cta_href?: string | null
           cta_label?: string | null
@@ -1271,6 +1276,7 @@ export type Database = {
           seo_title?: string | null
           sort_order?: number
           stat_line?: string | null
+          steps?: Json | null
           updated_at?: string
         }
         Relationships: []
@@ -1710,6 +1716,7 @@ export type Database = {
         }[]
       }
       prune_rate_limits: { Args: never; Returns: number }
+      social_links_valid: { Args: { v: Json }; Returns: boolean }
       visible_staff: {
         Args: never
         Returns: {

@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Eye, EyeOff, ExternalLink } from "lucide-react";
+import { Eye, EyeOff, ExternalLink, Plus, X } from "lucide-react";
 
 import { updateSection, toggleSection, type SectionPatch } from "@/app/[locale]/admin/actions/pages";
 import { MediaPicker, type MediaOption } from "@/components/admin/media-picker";
@@ -19,6 +19,8 @@ type Section = {
   cta_secondary_label: string | null;
   cta_secondary_href: string | null;
   stat_line: string | null;
+  body_secondary: string | null;
+  steps: { title: string; description: string }[] | null;
   image_path: string | null;
   image_alt: string | null;
   seo_title: string | null;
@@ -65,6 +67,8 @@ export function SectionEditor({
           cta_secondary_label: form.cta_secondary_label || null,
           cta_secondary_href: form.cta_secondary_href || null,
           stat_line: form.stat_line || null,
+          body_secondary: form.body_secondary || null,
+          steps: form.steps && form.steps.length > 0 ? form.steps : null,
           image_path: form.image_path || null,
           image_alt: form.image_alt || null,
           seo_title: form.seo_title || null,
@@ -176,6 +180,20 @@ export function SectionEditor({
             />
           </Field>
 
+          {form.body_secondary !== null && (
+            <Field
+              label="Second paragraph"
+              hint="Used by two-column sections"
+            >
+              <textarea
+                value={form.body_secondary ?? ""}
+                onChange={(e) => set("body_secondary", e.target.value)}
+                rows={2}
+                className={`${inputClass} resize-y`}
+              />
+            </Field>
+          )}
+
           {form.stat_line !== null && (
             <Field label="Stat line" hint="Figures shown with this section">
               <input
@@ -221,6 +239,109 @@ export function SectionEditor({
               />
             </Field>
           </div>
+
+          {/* Ordered steps */}
+          {form.steps !== null && (
+            <div className="rounded-lg border border-border bg-surface p-4">
+              <div className="flex items-baseline justify-between gap-2">
+                <p className="text-sm font-medium text-ink">
+                  Steps ({form.steps?.length ?? 0})
+                </p>
+                <span className="text-[11px] text-ink-muted/70">
+                  Rendered in this order
+                </span>
+              </div>
+
+              <ul className="mt-3 space-y-2">
+                {(form.steps ?? []).map((step, i) => (
+                  <li
+                    key={i}
+                    className="rounded-lg border border-border bg-card p-3"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-surface-lilac font-mono text-[10px] text-ink-muted">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <input
+                        value={step.title}
+                        onChange={(e) => {
+                          const next = [...(form.steps ?? [])];
+                          next[i] = { ...next[i]!, title: e.target.value };
+                          set("steps", next);
+                        }}
+                        placeholder="Step title"
+                        className="flex-1 rounded-md border border-border bg-card px-2.5 py-1.5 text-sm text-ink focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-600/20"
+                      />
+                      <button
+                        type="button"
+                        disabled={i === 0}
+                        onClick={() => {
+                          const next = [...(form.steps ?? [])];
+                          [next[i - 1], next[i]] = [next[i]!, next[i - 1]!];
+                          set("steps", next);
+                        }}
+                        aria-label={`Move step ${i + 1} up`}
+                        className="rounded-md p-1.5 text-ink-muted transition-colors hover:bg-surface-lilac hover:text-ink disabled:opacity-30"
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        disabled={i === (form.steps?.length ?? 0) - 1}
+                        onClick={() => {
+                          const next = [...(form.steps ?? [])];
+                          [next[i], next[i + 1]] = [next[i + 1]!, next[i]!];
+                          set("steps", next);
+                        }}
+                        aria-label={`Move step ${i + 1} down`}
+                        className="rounded-md p-1.5 text-ink-muted transition-colors hover:bg-surface-lilac hover:text-ink disabled:opacity-30"
+                      >
+                        ↓
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          set(
+                            "steps",
+                            (form.steps ?? []).filter((_, j) => j !== i),
+                          )
+                        }
+                        aria-label={`Remove step ${i + 1}`}
+                        className="rounded-md p-1.5 text-red-600 transition-colors hover:bg-red-50"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                    <textarea
+                      value={step.description}
+                      onChange={(e) => {
+                        const next = [...(form.steps ?? [])];
+                        next[i] = { ...next[i]!, description: e.target.value };
+                        set("steps", next);
+                      }}
+                      placeholder="What happens at this step"
+                      rows={2}
+                      className="mt-2 w-full resize-y rounded-md border border-border bg-card px-2.5 py-1.5 text-sm text-ink focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-600/20"
+                    />
+                  </li>
+                ))}
+              </ul>
+
+              <button
+                type="button"
+                onClick={() =>
+                  set("steps", [
+                    ...(form.steps ?? []),
+                    { title: "", description: "" },
+                  ])
+                }
+                className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-ink-muted transition-colors hover:border-brand-600 hover:text-brand-600"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Add step
+              </button>
+            </div>
+          )}
 
           {/* Image */}
           <div className="grid gap-4 sm:grid-cols-2">

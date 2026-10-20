@@ -28,6 +28,10 @@ export type SiteSection = {
   ctaSecondaryHref?: string | null;
   /** Optional single line of figures shown with the section. */
   statLine?: string | null;
+  /** Optional second paragraph, for two-column sections. */
+  bodySecondary?: string | null;
+  /** Ordered steps inside a section. Same shape as `ProgrammeOutcome[]`. */
+  steps?: ProgrammeOutcome[] | null;
   imagePath?: string | null;
   imageAlt?: string | null;
 };

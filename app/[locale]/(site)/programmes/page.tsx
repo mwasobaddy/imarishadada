@@ -8,6 +8,7 @@ import { Container } from "@/components/site/container";
 import { ProgrammeCard } from "@/components/sections/programme-card";
 import { JourneySnake } from "@/components/sections/journey-snake";
 import { getProgrammes } from "@/lib/data/home";
+import { getProgrammeSections } from "@/lib/data/programmes";
 import { absoluteUrl, breadcrumbJsonLd, jsonLdScript } from "@/lib/seo";
 
 /**
@@ -59,33 +60,18 @@ export const metadata: Metadata = {
  * marked with a visible caveat rather than asserted as fact. Confirm how the
  * programmes actually connect, then delete `unverified` and the note below.
  */
-const PATHWAY = [
-  {
-    title: "A girl arrives",
-    body: "She joins Dada Space at nine. She learns she is allowed to want things.",
-  },
-  {
-    title: "She leaves school",
-    body: "Something happens: pregnancy, cost, or stigma. Without support she stays out.",
-  },
-  {
-    title: "She returns",
-    body: "School Re-entry brings her back, and stays with her through the year.",
-  },
-  {
-    title: "She stabilises",
-    body: "Savings, psychosocial support, and a mentor who has been through it.",
-  },
-  {
-    title: "She starts earning",
-    body: "Economic Empowerment funds her first business.",
-  },
-  {
-    title: "She leads",
-    body: "She comes back as a mentor. The cycle restarts, one level up.",
-  },
-];
-
+/**
+ * The pathway caveat is a gate, not copy.
+ *
+ * doc/roadmap/programmes.md is explicit that the sequence is a claim rather
+ * than a description, and that a donor will ask: "If Dada Space participants
+ * do not in practice feed into re-entry and economic programmes, do not imply
+ * a pipeline."
+ *
+ * The editor can reword the caveat (it lives in `programmes-pathway.body`) but
+ * cannot switch it off. Removing it requires a code change, and therefore a
+ * conversation. Same reasoning as consent tiers.
+ */
 const PATHWAY_UNVERIFIED = true;
 
 export default async function ProgrammesPage({
@@ -99,7 +85,10 @@ export default async function ProgrammesPage({
   // page they wrap.
   setRequestLocale(locale);
 
-  const programmes = await getProgrammes();
+  const [programmes, sections] = await Promise.all([
+    getProgrammes(),
+    getProgrammeSections(),
+  ]);
 
   const listJsonLd = {
     "@context": "https://schema.org",
@@ -119,9 +108,9 @@ export default async function ProgrammesPage({
     <>
       <main id="main">
         <PageHero
-          eyebrow="Our work"
-          heading="Three programmes, one aim."
-          body="A girl in Kibera decides her own future. These are the three programmes that get her there, and the evidence we hold for each."
+          eyebrow={sections["programmes-hero"]!.eyebrow ?? undefined}
+          heading={sections["programmes-hero"]!.heading}
+          body={sections["programmes-hero"]!.body ?? undefined}
         />
 
         <section aria-labelledby="programmes-list-heading" className="py-section bg-surface">
@@ -147,14 +136,16 @@ export default async function ProgrammesPage({
         <section aria-labelledby="pathway-heading" className="bg-surface-lilac py-section">
           <Container>
             <div className="max-w-2xl">
-              <p className="text-sm font-medium tracking-wide text-brand-600 uppercase">
-                How they fit together
-              </p>
+              {sections["programmes-pathway"]!.eyebrow && (
+                <p className="text-sm font-medium tracking-wide text-brand-600 uppercase">
+                  {sections["programmes-pathway"]!.eyebrow}
+                </p>
+              )}
               <h2
                 id="pathway-heading"
                 className="mt-3 text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
               >
-                One girl, over years and not three programmes
+                {sections["programmes-pathway"]!.heading}
               </h2>
             </div>
 
@@ -166,13 +157,16 @@ export default async function ProgrammesPage({
                 <span className="font-semibold text-brand-600">
                   Draft — not yet verified.
                 </span>{" "}
-                This pathway describes how we intend the programmes to connect. It
-                has not yet been confirmed against how they operate in practice, so
-                please treat it as provisional.
+                {sections["programmes-pathway"]!.body}
               </p>
             ) : null}
 
-            <JourneySnake items={PATHWAY.map((step) => ({ title: step.title, body: step.body }))} />
+            <JourneySnake
+              items={(sections["programmes-pathway"]!.steps ?? []).map((step) => ({
+                title: step.title,
+                body: step.description,
+              }))}
+            />
           </Container>
         </section>
 
@@ -184,16 +178,16 @@ export default async function ProgrammesPage({
                 id="measure-heading"
                 className="text-3xl font-semibold tracking-tight text-ink-inverse sm:text-4xl"
               >
-                How we measure
+                {sections["programmes-measure"]!.heading}
               </h2>
               <p className="measure mt-4 text-lg text-brand-100">
-                Every figure we publish is dated, and we say how it was counted.
+                {sections["programmes-measure"]!.body}
               </p>
               <Link
-                href="/impact"
+                href={sections["programmes-measure"]!.ctaHref ?? "/impact"}
                 className="mt-6 inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2 text-sm font-medium text-brand-100 underline decoration-brand-100/40 underline-offset-4 hover:decoration-brand-100 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-50"
               >
-                Our impact and methodology
+                {sections["programmes-measure"]!.ctaLabel}
                 <svg
                   aria-hidden="true"
                   viewBox="0 0 24 24"
@@ -220,24 +214,22 @@ export default async function ProgrammesPage({
                   id="unrestricted-heading"
                   className="text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
                 >
-                  A gift that moves with a girl
+                  {sections["programmes-unrestricted"]!.heading}
                 </h2>
                 <p className="measure mt-4 text-lg text-ink-muted">
-                  Unrestricted giving lets a participant move between programmes as
-                  her needs change, which is how the pathway above actually works.
+                  {sections["programmes-unrestricted"]!.body}
                 </p>
               </div>
 
               <div className="flex flex-col justify-center rounded-2xl border border-brand-600/30 bg-brand-50 p-8">
                 <p className="measure text-ink-muted">
-                  Restricted funds are easier to raise. Unrestricted funds change more
-                  lives, because nobody has to guess the right programme in advance.
+                  {sections["programmes-unrestricted"]!.bodySecondary}
                 </p>
                 <InteractiveHoverButton
-                  href="/donate"
+                  href={sections["programmes-unrestricted"]!.ctaHref ?? "/donate"}
                   className="mt-6 min-h-13 rounded-full bg-gold px-8 text-base font-semibold text-gold-ink w-fit"
                 >
-                  Give where it&rsquo;s needed
+                  {sections["programmes-unrestricted"]!.ctaLabel}
                 </InteractiveHoverButton>
               </div>
             </div>

@@ -78,7 +78,10 @@ export default async function PageSectionsPage({
             {sections.map((section) => (
               <SectionEditor
                 key={section.section_key}
-                section={section}
+                section={{
+                  ...section,
+                  steps: (section.steps as { title: string; description: string }[] | null) ?? null,
+                }}
                 route={page.route}
                 media={media}
               />
