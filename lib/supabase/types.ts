@@ -1254,6 +1254,7 @@ export type Database = {
           published_at: string | null
           quote: string | null
           reading_minutes: number | null
+          scheduled_at: string | null
           slug: string
           title: string
           updated_at: string
@@ -1273,6 +1274,7 @@ export type Database = {
           published_at?: string | null
           quote?: string | null
           reading_minutes?: number | null
+          scheduled_at?: string | null
           slug: string
           title: string
           updated_at?: string
@@ -1292,6 +1294,7 @@ export type Database = {
           published_at?: string | null
           quote?: string | null
           reading_minutes?: number | null
+          scheduled_at?: string | null
           slug?: string
           title?: string
           updated_at?: string
