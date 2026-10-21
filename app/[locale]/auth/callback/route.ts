@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAuthServerClient } from "@/lib/supabase/auth-server";
+import { safeNextPath } from "@/lib/auth/next-path";
 
 /**
  * Auth callback. Supabase redirects here after a magic link click with a
@@ -14,7 +15,7 @@ export async function GET(request: Request) {
   const next = url.searchParams.get("next") ?? "/admin";
 
   // Open-redirect guard: only relative paths.
-  const safeNext = next.startsWith("/") && !next.startsWith("//") ? next : "/admin";
+  const safeNext = safeNextPath(next);
 
   if (code) {
     const supabase = await createAuthServerClient();
