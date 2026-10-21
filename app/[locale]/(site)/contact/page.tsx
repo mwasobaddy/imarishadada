@@ -9,7 +9,12 @@ import {
   ContactMethods,
 } from "@/components/sections/contact-methods";
 import { ContactForm } from "@/components/sections/contact-form";
-import { getContactDetails, getEnquiryTypes } from "@/lib/data/contact";
+import {
+  getContactDetails,
+  getContactSections,
+  getEnquiryTypes,
+} from "@/lib/data/contact";
+import { isVisible } from "@/lib/data/sections";
 import { absoluteUrl, breadcrumbJsonLd, jsonLdScript } from "@/lib/seo";
 import { Link } from "@/i18n/navigation";
 
@@ -85,10 +90,18 @@ export default async function ContactPage({
   // page they wrap.
   setRequestLocale(locale);
 
-  const [contact, enquiryTypes] = await Promise.all([
+  const [contact, enquiryTypes, sections] = await Promise.all([
     getContactDetails(),
     getEnquiryTypes(),
+    getContactSections(),
   ]);
+
+  const hero = sections["contact-hero"];
+  const methods = sections["contact-methods"];
+  const methodsOther = sections["contact-methods-other"];
+  const form = sections["contact-form"];
+  const faqs = sections["contact-faqs"];
+  const partner = sections["contact-partner"];
 
   const contactPointJsonLd = {
     "@context": "https://schema.org",
@@ -125,55 +138,71 @@ export default async function ContactPage({
   return (
     <>
       <main id="main">
-        <PageHero
-          eyebrow="Contact"
-          heading="Talk to us."
-          body="Ask about the work, partner with us, volunteer, or press us. Every message is read by a person on the team."
-        >
-          {/* Trust architecture, in the first screen.
-              Someone landing on a contact page is often checking whether the
-              organisation is real before they send anything. Where we are, how
-              we respond, and a duty-of-care link to the safeguarding policy —
-              all three, above the fold. */}
-          <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm text-ink-muted">
-            {/*
-              Giving is not a contact. A donor who lands here looking to give
-              should be on the donation page, not filling in a form. WANDR:
-              "Navigation labels should use user language, not organizational
-              language."
-            */}
-            <li className="flex items-center gap-2">
-              <Heart aria-hidden="true" className="size-4 shrink-0 text-brand-600" />
-              <Link
-                href="/donate"
-                className="font-medium text-brand-600 underline decoration-brand-600/40 underline-offset-4 hover:decoration-brand-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
-              >
-                Want to give? The donation page is faster
-              </Link>
-            </li>
-            {contact.address ? (
-              <li className="flex items-center gap-2">
-                <MapPin aria-hidden="true" className="size-4 shrink-0 text-brand-600" />
-                {contact.address}
-              </li>
-            ) : null}
-            <li className="flex items-center gap-2">
-              <Clock aria-hidden="true" className="size-4 shrink-0 text-brand-600" />
-              {contact.responseTimes?.email ?? contact.responseTime}
-            </li>
-            <li className="flex items-center gap-2">
-              <ShieldCheck aria-hidden="true" className="size-4 shrink-0 text-brand-600" />
-              <Link
-                href="/legal/safeguarding"
-                className="underline decoration-ink-muted/40 underline-offset-4 hover:text-brand-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
-              >
-                How we protect the girls we work with
-              </Link>
-            </li>
-          </ul>
-        </PageHero>
+        {isVisible(hero) ? (
+          <PageHero eyebrow={hero.eyebrow} heading={hero.heading} body={hero.body}>
+            {/* Trust architecture, in the first screen.
+                Someone landing on a contact page is often checking whether the
+                organisation is real before they send anything. Where we are, how
+                we respond, and a duty-of-care link to the safeguarding policy —
+                all three, above the fold.
 
-        <ContactMethods contact={contact} />
+                The two links are the section's primary and secondary CTAs, and
+                the two facts between them come from `settings`. The strip is
+                ordered link / fact / fact / link so the reader gets a route in
+                and a route to the policy around the details. */}
+            <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm text-ink-muted">
+              {/*
+                Giving is not a contact. A donor who lands here looking to give
+                should be on the donation page, not filling in a form. WANDR:
+                "Navigation labels should use user language, not organizational
+                language."
+              */}
+              {hero.ctaLabel && hero.ctaHref ? (
+                <li className="flex items-center gap-2">
+                  <Heart aria-hidden="true" className="size-4 shrink-0 text-brand-600" />
+                  <Link
+                    href={hero.ctaHref}
+                    className="font-medium text-brand-600 underline decoration-brand-600/40 underline-offset-4 hover:decoration-brand-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
+                  >
+                    {hero.ctaLabel}
+                  </Link>
+                </li>
+              ) : null}
+
+              {contact.address ? (
+                <li className="flex items-center gap-2">
+                  <MapPin aria-hidden="true" className="size-4 shrink-0 text-brand-600" />
+                  {contact.address}
+                </li>
+              ) : null}
+
+              <li className="flex items-center gap-2">
+                <Clock aria-hidden="true" className="size-4 shrink-0 text-brand-600" />
+                {contact.responseTimes?.email ?? contact.responseTime}
+              </li>
+
+              {hero.ctaSecondaryLabel && hero.ctaSecondaryHref ? (
+                <li className="flex items-center gap-2">
+                  <ShieldCheck aria-hidden="true" className="size-4 shrink-0 text-brand-600" />
+                  <Link
+                    href={hero.ctaSecondaryHref}
+                    className="underline decoration-ink-muted/40 underline-offset-4 hover:text-brand-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
+                  >
+                    {hero.ctaSecondaryLabel}
+                  </Link>
+                </li>
+              ) : null}
+            </ul>
+          </PageHero>
+        ) : null}
+
+        {isVisible(methods) && isVisible(methodsOther) ? (
+          <ContactMethods
+            contact={contact}
+            section={methods}
+            otherSection={methodsOther}
+          />
+        ) : null}
 
         {/* ---- The form, and the answers that stop a wasted enquiry ----
             The FAQ sits beside the form rather than below it, so a visitor can
@@ -182,39 +211,48 @@ export default async function ContactPage({
           <Container>
             <div className="grid gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16">
               <div className="max-w-2xl">
-                <h2
-                  id="form-heading"
-                  className="text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
-                >
-                  Write to us
-                </h2>
-                <p className="measure mt-4 text-lg text-ink-muted">
-                  This reaches our team inbox. If your message is about an existing
-                  donation, quote your reference so we can find it quickly.
-                </p>
+                {isVisible(form) ? (
+                  <>
+                    <h2
+                      id="form-heading"
+                      className="text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
+                    >
+                      {form.heading}
+                    </h2>
+                    {form.body ? (
+                      <p className="measure mt-4 text-lg text-ink-muted">
+                        {form.body}
+                      </p>
+                    ) : null}
+                  </>
+                ) : null}
 
-                <ContactFaqs variant="inline" />
+                {isVisible(faqs) ? <ContactFaqs section={faqs} /> : null}
 
                 {/* Partnering gets a route, not a footnote. The enquiry-type
                     dropdown already does the routing; this says so, and
                     points at the page that actually helps. */}
-                <div className="mt-8 rounded-card border border-brand-600/30 bg-brand-50 p-6">
-                  <h3 className="text-base font-semibold text-brand-600">
-                    Partnering or fundraising?
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-                    For institutional partnerships and funding proposals, ask for
-                    a partner in the dropdown because it routes faster than a general
-                    enquiry.
-                  </p>
-                  <Link
-                    href="/partner"
-                    className="mt-3 inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-brand-600 underline decoration-brand-600/40 underline-offset-4 hover:decoration-brand-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
-                  >
-                    Read about partnering with us
-                    <ArrowRight aria-hidden="true" className="size-4" />
-                  </Link>
-                </div>
+                {isVisible(partner) ? (
+                  <div className="mt-8 rounded-card border border-brand-600/30 bg-brand-50 p-6">
+                    <h3 className="text-base font-semibold text-brand-600">
+                      {partner.heading}
+                    </h3>
+                    {partner.body ? (
+                      <p className="mt-2 text-sm leading-relaxed text-ink-muted">
+                        {partner.body}
+                      </p>
+                    ) : null}
+                    {partner.ctaLabel && partner.ctaHref ? (
+                      <Link
+                        href={partner.ctaHref}
+                        className="mt-3 inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-brand-600 underline decoration-brand-600/40 underline-offset-4 hover:decoration-brand-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
+                      >
+                        {partner.ctaLabel}
+                        <ArrowRight aria-hidden="true" className="size-4" />
+                      </Link>
+                    ) : null}
+                  </div>
+                ) : null}
               </div>
 
               <ContactForm enquiryTypes={enquiryTypes} />

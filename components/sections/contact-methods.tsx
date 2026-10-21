@@ -3,6 +3,7 @@ import { Clock, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { Container } from "@/components/site/container";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import type { ContactDetails } from "@/lib/data/contact";
+import type { SiteSection } from "@/lib/data/types";
 
 /**
  * Contact methods.
@@ -46,7 +47,16 @@ import type { ContactDetails } from "@/lib/data/contact";
  * because `hello@imarishadada.org` does not resolve until the domain is live,
  * and publishing an address that bounces is worse than publishing none.
  */
-export function ContactMethods({ contact }: { contact: ContactDetails }) {
+export function ContactMethods({
+  contact,
+  section,
+  otherSection,
+}: {
+  contact: ContactDetails;
+  section: SiteSection;
+  /** The "Other ways to reach us" heading above the three secondary cards. */
+  otherSection: SiteSection;
+}) {
   const whatsappHref = contact.whatsapp
     ? `https://wa.me/${contact.whatsapp}?text=${encodeURIComponent(contact.whatsappPrefill)}`
     : null;
@@ -55,20 +65,20 @@ export function ContactMethods({ contact }: { contact: ContactDetails }) {
     <section aria-labelledby="methods-heading" className="py-section bg-surface">
       <Container>
         <div className="max-w-2xl">
-          <p className="text-sm font-medium tracking-wide text-brand-600 uppercase">
-            Get in touch
-          </p>
+          {section.eyebrow ? (
+            <p className="text-sm font-medium tracking-wide text-brand-600 uppercase">
+              {section.eyebrow}
+            </p>
+          ) : null}
           <h2
             id="methods-heading"
             className="mt-3 text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
           >
-            Start with WhatsApp
+            {section.heading}
           </h2>
-          <p className="measure mt-4 text-lg text-ink-muted">
-            It is the fastest way to reach us, and every message is read by a
-            person on the team, not a bot, and not a shared inbox nobody
-            opens.
-          </p>
+          {section.body ? (
+            <p className="measure mt-4 text-lg text-ink-muted">{section.body}</p>
+          ) : null}
         </div>
 
         {/* ---- Primary channel: WhatsApp --------------------------- */}
@@ -136,7 +146,7 @@ export function ContactMethods({ contact }: { contact: ContactDetails }) {
 
         {/* ---- Secondary channels ---------------------------------- */}
         <h3 className="mt-14 text-sm font-semibold tracking-wide text-ink uppercase">
-          Other ways to reach us
+          {otherSection.heading}
         </h3>
 
         <ul className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -269,77 +279,41 @@ function PlaceholderNote({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * The three questions a prospective donor asks most.
+ * The questions a prospective donor asks most.
  *
- * Kept here rather than fetched, so the contact page does not depend on
- * `/faq` existing, and so the answers sit next to the form they are meant to
- * prevent a wasted enquiry about.
+ * ## Kept on this page, not pulled from `/faq`
+ *
+ * The roadmap's reason: the answers have to sit next to the form they are meant
+ * to prevent a wasted enquiry about, and this page must not depend on `/faq`
+ * having content. The `faqs` table is empty, so a shared source would render
+ * nothing here — the exact opposite of the point.
+ *
+ * The copy is editable as `steps` on the `contact-faqs` section, because a
+ * question and an answer are exactly the `{title, description}` shape the
+ * pathway, the methodology and the giving promises already use.
  */
-const CONTACT_FAQS = [
-  {
-    q: "Do you offer monthly giving?",
-    a: "Yes, every amount on our giving ladder can be given monthly. Monthly gifts are what keep a mentor in a girl's life through the whole school year.",
-  },
-  {
-    q: "Can I give from outside Kenya?",
-    a: "Yes, by card. Receipts are issued for every gift, in your currency.",
-  },
-  {
-    q: "Do you accept in-kind donations?",
-    a: "Message us first. We cannot always accept physical goods, and an unasked-for donation is often unusable.",
-  },
-];
-
-/**
- * FAQ teaser.
- *
- * Two shapes:
- *
- *   * `inline` — a compact list that sits beside the form. This is the one
- *     that matters: the answers are read *before* the visitor writes, which is
- *     the only time they prevent a wasted enquiry. On the old page this sat
- *     at the very bottom, after the form, where it prevented nothing.
- *   * `section` — a standalone band, for a page that has no form to sit
- *     beside.
- */
-export function ContactFaqs({ variant = "section" }: { variant?: "inline" | "section" }) {
-  if (variant === "inline") {
-    return (
-      <div className="mt-8">
-        <h3 className="text-sm font-semibold tracking-wide text-ink uppercase">
-          Before you write
-        </h3>
-        <dl className="mt-4 space-y-3">
-          {CONTACT_FAQS.map((faq) => (
-            <div key={faq.q} className="rounded-card border border-border bg-card p-4">
-              <dt className="font-semibold text-ink">{faq.q}</dt>
-              <dd className="measure mt-1 text-sm text-ink-muted">{faq.a}</dd>
-            </div>
-          ))}
-        </dl>
-      </div>
-    );
-  }
+export function ContactFaqs({ section }: { section: SiteSection }) {
+  const faqs = section.steps ?? [];
+  if (faqs.length === 0) return null;
 
   return (
-    <section aria-labelledby="contact-faq-heading" className="bg-surface-lilac py-section">
-      <Container>
-        <h2
-          id="contact-faq-heading"
-          className="text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
-        >
-          Before you write
-        </h2>
-
-        <dl className="mt-10 space-y-4">
-          {CONTACT_FAQS.map((faq) => (
-            <div key={faq.q} className="rounded-card border border-border bg-card p-6">
-              <dt className="text-lg font-semibold text-ink">{faq.q}</dt>
-              <dd className="measure mt-2 text-ink-muted">{faq.a}</dd>
-            </div>
-          ))}
-        </dl>
-      </Container>
-    </section>
+    <div className="mt-8">
+      <h3 className="text-sm font-semibold tracking-wide text-ink uppercase">
+        {section.heading}
+      </h3>
+      <dl className="mt-4 space-y-3">
+        {faqs.map((faq) => (
+          <div
+            key={faq.title}
+            className="rounded-card border border-border bg-card p-4"
+          >
+            <dt className="font-semibold text-ink">{faq.title}</dt>
+            <dd className="measure mt-1 text-sm text-ink-muted">
+              {faq.description}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </div>
   );
 }

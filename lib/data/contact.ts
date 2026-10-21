@@ -3,6 +3,8 @@ import { createHash } from "node:crypto";
 
 
 import { createServiceClient, isServiceRoleConfigured } from "@/lib/supabase/client";
+import { getSection } from "@/lib/data/sections";
+import type { SiteSection } from "@/lib/data/types";
 import {
   RATE_LIMIT_MAX,
   RATE_LIMIT_WINDOW_MINUTES,
@@ -122,6 +124,34 @@ export async function getEnquiryTypes(): Promise<EnquiryTypeOption[]> {
 
   if (error || !Array.isArray(data?.value)) return SEED_TYPES;
   return data.value as EnquiryTypeOption[];
+}
+
+/**
+ * The contact page's sections, keyed.
+ *
+ * Note what is NOT here: the phone number, the address, office hours and the
+ * per-channel response times all come from `settings` via `getContactDetails`.
+ * This is only the copy around them, so a change to the number never has to be
+ * made in two places.
+ */
+export async function getContactSections(): Promise<Record<string, SiteSection>> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("sections");
+
+  const keys = [
+    "contact-hero",
+    "contact-methods",
+    "contact-methods-other",
+    "contact-form",
+    "contact-faqs",
+    "contact-partner",
+  ];
+  return Object.fromEntries(
+    await Promise.all(
+      keys.map(async (key) => [key, await getSection(key)] as const),
+    ),
+  );
 }
 
 /**

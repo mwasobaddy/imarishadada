@@ -161,6 +161,16 @@ export async function updateSection(sectionKey: string, patch: SectionPatch) {
     );
   }
 
+  // And for steps. A step with no title renders as an unlabelled block — on the
+  // programmes pathway it is the only thing identifying the step, and on the
+  // contact page it is the question the answer belongs to. An empty one is a
+  // hole in the page, not a placeholder.
+  if (patch.steps?.some((step) => !step.title?.trim())) {
+    throw new Error(
+      "Every step needs a title. Remove the empty row or fill it in.",
+    );
+  }
+
   // Metadata is a separate permission — a careless title costs rankings.
   const touchesSeo = patch.seo_title !== undefined || patch.seo_description !== undefined;
   if (touchesSeo && !(await hasPermission("pages", "seo"))) {
