@@ -13,6 +13,12 @@ import { GivingWays } from "@/components/sections/giving-ways";
 import { Hero } from "@/components/sections/hero";
 import { PartnerStrip } from "@/components/sections/partner-strip";
 import { StatCounter } from "@/components/sections/stat-counter";
+import {
+  WaysOrganisation,
+  WaysOther,
+  WaysRails,
+  WaysTransparency,
+} from "@/components/sections/ways-to-give";
 import { ProseSection } from "@/components/transparency/prose-section";
 import {
   TransparencyGaps,
@@ -234,6 +240,26 @@ export function ExactSectionPreview({
       // from that page to itself is a dead end.
       return <GivingWays tiers={data.tiers ?? []} section={section} moreHref={null} />;
 
+    case "ways-rails":
+      return (
+        <WaysRails
+          section={section}
+          rails={data.rails ?? FALLBACK_RAILS}
+          bank={data.bank ?? FALLBACK_BANK}
+          statuses={data.railStatuses ?? FALLBACK_STATUSES}
+          bankReady={data.bankReady ?? false}
+        />
+      );
+
+    case "ways-transparency":
+      return <WaysTransparency section={section} />;
+
+    case "ways-organisation":
+      return <WaysOrganisation section={section} />;
+
+    case "ways-other":
+      return <WaysOther section={section} />;
+
     /* ---- The mastheads ---- */
 
     default:
@@ -280,6 +306,10 @@ export const EXACT_SECTION_KEYS = new Set([
   "stories-grid",
   "stories-consent",
   "ways-ladder",
+  "ways-rails",
+  "ways-transparency",
+  "ways-organisation",
+  "ways-other",
   "impact-headline",
   "impact-by-programme",
   "impact-methodology",
@@ -326,3 +356,29 @@ const EMPTY_COUNTS: ConsentTierCounts = {
 export function isExactSectionKey(sectionKey: string): boolean {
   return EXACT_SECTION_KEYS.has(sectionKey) || sectionKey.endsWith("-hero");
 }
+
+/**
+ * The payment rails, when the preview has none.
+ *
+ * Empty rather than invented: a preview must not show a rail the site does
+ * not offer, and the server always sends the real configuration.
+ */
+const FALLBACK_RAILS = {
+  mpesa: { label: "M-Pesa", hint: "", enabled: false },
+  card: { label: "Card", hint: "", enabled: false },
+  bank: { label: "Bank transfer", hint: "", enabled: false },
+} as never;
+
+const FALLBACK_BANK = {
+  accountName: null,
+  bankName: null,
+  accountNumber: null,
+  branch: null,
+  instructions: null,
+} as never;
+
+const FALLBACK_STATUSES = {
+  mpesa: "coming_soon",
+  card: "coming_soon",
+  bank: "coming_soon",
+} as never;

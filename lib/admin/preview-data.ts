@@ -1,8 +1,16 @@
 import { getCoreValues, getTeamMembers } from "@/lib/data/about";
 import { getContactDetails } from "@/lib/data/contact";
+import {
+  bankRailUsable,
+  getBankDetails,
+  getPaymentRails,
+  railStatuses,
+} from "@/lib/data/donate";
 import { getGivingTiers, getProgrammes } from "@/lib/data/home";
 import { getFinancialBreakdown, getTransparencyGaps } from "@/lib/data/transparency";
+import type { BankDetails, PaymentRails, RailStatus } from "@/lib/data/donate";
 import type { FinancialLine, TransparencyGap } from "@/lib/data/gaps";
+import type { PaymentRail } from "@/lib/donate/money";
 import {
   getAllImpactStats,
   getConsentCounts,
@@ -59,6 +67,13 @@ export type PreviewData = {
   measurementGaps?: TransparencyGap[];
   /** The published financial lines, for the transparency page. */
   financials?: FinancialLine[];
+  /** The payment rails and the bank details, for the ways-to-give page. */
+  rails?: PaymentRails;
+  bank?: BankDetails;
+  /** Whether a provider can complete a charge, per rail. */
+  railStatuses?: Record<PaymentRail, RailStatus>;
+  /** Whether the published bank details are complete enough to use. */
+  bankReady?: boolean;
   contact?: Awaited<ReturnType<typeof getContactDetails>>;
 };
 
@@ -119,7 +134,23 @@ export async function loadPreviewData(
         ]);
       break;
 
-    case "ways-to-give":
+    case "ways-to-give": {
+      const [tiers, rails, bank] = await Promise.all([
+        getGivingTiers(),
+        getPaymentRails(),
+        getBankDetails(),
+      ]);
+      data.tiers = tiers;
+      data.rails = rails;
+      data.bank = bank;
+      // The status is derived on the server: it combines the editorial switch
+      // with whether a provider can actually take the money, and the browser
+      // cannot know the second half.
+      data.railStatuses = railStatuses(rails);
+      data.bankReady = bankRailUsable(bank);
+      break;
+    }
+
     case "donate":
       data.tiers = await getGivingTiers();
       break;
