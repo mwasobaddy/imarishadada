@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ImageIcon, Search, X } from "lucide-react";
 
 import { getPublishableMedia } from "@/app/[locale]/admin/actions/media";
+import { Skeleton } from "@/components/ui/skeleton";
 import { STATIC_IMAGES, type StaticImage } from "@/lib/data/image-manifest";
 import type { MediaOption } from "@/lib/media/option";
 
@@ -86,17 +87,22 @@ export function MediaPicker({
    * month.
    */
   const [uploaded, setUploaded] = useState<MediaOption[]>([]);
+  /** Whether the uploaded files have arrived yet. */
+  const [uploadedLoaded, setUploadedLoaded] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
 
     void getPublishableMedia()
       .then((options) => {
-        if (!cancelled) setUploaded(options);
+        if (cancelled) return;
+        setUploaded(options);
+        setUploadedLoaded(true);
       })
       .catch(() => {
         // A staff member who may not read the library still gets the shipped
         // photographs. The list is a convenience, not the feature.
+        if (!cancelled) setUploadedLoaded(true);
       });
 
     return () => {
@@ -302,6 +308,20 @@ export function MediaPicker({
               </p>
             ) : (
               <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                {/*
+                  The uploaded files are on their way. The tile says so
+                  rather than the grid simply being shorter than it will be.
+                */}
+                {!uploadedLoaded ? (
+                  <li>
+                    <div className="overflow-hidden rounded-lg border border-border">
+                      <Skeleton className="block aspect-square w-full rounded-none" />
+                      <span className="block px-1.5 py-1 text-[10px] text-ink-muted">
+                        Loading…
+                      </span>
+                    </div>
+                  </li>
+                ) : null}
                 {results.map((option) => {
                   const active = option.path === value;
                   return (

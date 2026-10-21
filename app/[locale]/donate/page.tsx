@@ -4,6 +4,7 @@ import { Suspense } from "react";
 
 import { DonateFlow } from "@/components/donate/donate-flow";
 import { ImpactBand } from "@/components/donate/impact-band";
+import { GivingOptionsSkeleton } from "@/components/site/skeletons";
 import { MiniHeader } from "@/components/donate/mini-header";
 import { Container } from "@/components/site/container";
 import {
@@ -143,11 +144,9 @@ export default async function DonatePage({
               immediately so the donor sees the page, not a spinner. */}
           <div className="mt-12">
             <Suspense
-              fallback={
-                <p className="text-ink-muted" role="status">
-                  Loading giving options…
-                </p>
-              }
+              // The shape of the amount picker, so the form does not jump
+              // when the tiers arrive.
+              fallback={<GivingOptionsSkeleton />}
             >
               <DonateForm />
             </Suspense>

@@ -5,6 +5,7 @@ import { setRequestLocale } from "next-intl/server";
 
 import { PostCard } from "@/components/news/post-card";
 import { NewsEmpty } from "@/components/news/sections";
+import { NewsFeedSkeleton } from "@/components/site/skeletons";
 import { Container } from "@/components/site/container";
 import { PageHero } from "@/components/site/page-hero";
 import { getFeaturedPost, getNewsCategoriesInUse, getNewsPage, getNewsSections } from "@/lib/data/news";
@@ -101,13 +102,9 @@ export default async function NewsPage({ params, searchParams }: PageProps<"/[lo
         ) : null}
 
         <Suspense
-          fallback={
-            <section aria-busy="true" className="bg-surface py-section">
-              <Container>
-                <p className="text-sm text-ink-muted">Loading posts…</p>
-              </Container>
-            </section>
-          }
+          // The shape of the feed, not a line of text: the reader sees the
+          // grid they are about to get, so nothing moves when it arrives.
+          fallback={<NewsFeedSkeleton />}
         >
           <NewsFeed searchParams={searchParams} empty={empty} />
         </Suspense>

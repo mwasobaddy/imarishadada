@@ -12,6 +12,7 @@ import {
   replaceMediaAndDelete,
 } from "@/app/[locale]/admin/actions/media";
 import { MediaPicker } from "@/components/admin/media-picker";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { MediaReference } from "@/lib/media/references";
 
 type MediaItem = {
@@ -68,6 +69,14 @@ export function MediaLibrary({
    */
   const [signed, setSigned] = useState<Record<string, string>>({});
   /**
+   * Whether the previews have been signed yet.
+   *
+   * Until they are, the card shows a placeholder rather than "No preview" —
+   * which is what the card used to say while the file was simply on its way,
+   * and which reads as a broken file rather than a loading one.
+   */
+  const [signedLoaded, setSignedLoaded] = useState(false);
+  /**
    * Where each file is used on the site.
    *
    * A photograph that a page points at cannot be deleted: the page would keep
@@ -122,6 +131,7 @@ export function MediaLibrary({
           entries.filter((entry): entry is [string, string] => Boolean(entry[1])),
         ),
       );
+      setSignedLoaded(true);
     }
 
     void sign();
@@ -358,10 +368,15 @@ export function MediaLibrary({
                     alt={item.alt_text}
                     className="h-full w-full object-cover"
                   />
-                ) : (
+                ) : signedLoaded ? (
+                  // The preview has been asked for and did not come. That is a
+                  // broken file, and it should say so.
                   <div className="flex h-full items-center justify-center text-xs text-ink-muted">
                     No preview
                   </div>
+                ) : (
+                  // Still on its way.
+                  <Skeleton className="h-full w-full rounded-none" />
                 )}
               </div>
               <div className="p-3 space-y-1">

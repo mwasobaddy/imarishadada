@@ -10,6 +10,7 @@ import { ClosingCta } from "@/components/sections/closing-cta";
 import { ConsentLedger, ConsentNote } from "@/components/stories/consent";
 import { StoriesFeatured } from "@/components/stories/sections";
 import { StoryGrid } from "@/components/stories/story-grid";
+import { StoriesFeedSkeleton } from "@/components/site/skeletons";
 import { getConsentCounts, getStories, getStoriesSections } from "@/lib/data/impact";
 import { getProgrammes } from "@/lib/data/home";
 import { getSocialLinks } from "@/lib/data/social";
@@ -213,16 +214,9 @@ export default async function StoriesPage({
         ) : null}
 
         <Suspense
-          // Neutral: the page exists, the filter is being applied.
-          fallback={
-            <div className="bg-surface py-section">
-              <Container>
-                <p className="text-ink-muted" role="status">
-                  Loading stories…
-                </p>
-              </Container>
-            </div>
-          }
+          // The shape of the feed, not a line of text: the reader sees the
+          // grid they are about to get, so nothing moves when it arrives.
+          fallback={<StoriesFeedSkeleton />}
         >
           <StoriesFeed
             searchParams={searchParams}
