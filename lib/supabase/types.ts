@@ -1606,6 +1606,7 @@ export type Database = {
           replied_at: string | null
           role_id: string | null
           skills: string[]
+          skills_detail: string | null
           status: string
         }
         Insert: {
@@ -1623,6 +1624,7 @@ export type Database = {
           replied_at?: string | null
           role_id?: string | null
           skills?: string[]
+          skills_detail?: string | null
           status?: string
         }
         Update: {
@@ -1640,6 +1642,7 @@ export type Database = {
           replied_at?: string | null
           role_id?: string | null
           skills?: string[]
+          skills_detail?: string | null
           status?: string
         }
         Relationships: [

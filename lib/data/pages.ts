@@ -88,50 +88,20 @@ export const PARTNER_PAGE: ProsePage = {
   ],
 };
 
-export const VOLUNTEER_PAGE: ProsePage = {
-  slug: "volunteer",
-  title: "Volunteer with us",
-  eyebrow: "Volunteer",
-  lede: "Most of what we do cannot be done from a distance, and that is the point. Volunteers here work alongside participants, not on their behalf.",
-  draft: true,
-  cta: { label: "Ask about volunteering", href: "/contact" },
-  sections: [
-    {
-      id: "roles",
-      heading: "Where help is genuinely useful",
-      paragraphs: [
-        "We list roles only when we have a real need and someone able to supervise. A vague volunteering offer wastes your time and ours.",
-      ],
-      bullets: [
-        "Mentorship for women who have been through re-entry or run a business.",
-        "Grant writing and institutional fundraising.",
-        "Bookkeeping and data admin.",
-        "Photography, design and translation with consent training first.",
-        "Professional services: legal, finance, safeguarding training.",
-      ],
-    },
-    {
-      id: "safeguarding",
-      heading: "Safeguarding applies to volunteers too",
-      paragraphs: [
-        "Anyone working directly with participants completes reference checks and safeguarding training before their first session, signs a code of conduct, and works under the two-adult rule.",
-        "We are not able to accept volunteers for one-off visits to sessions involving minors.",
-      ],
-    },
-    {
-      id: "commitment",
-      heading: "What we ask of you",
-      paragraphs: [
-        "Reliability matters more than enthusiasm. A mentor who stops attending damages a girl's trust more than never starting.",
-      ],
-      bullets: [
-        "Commit to at least six months if you are mentoring.",
-        "Tell us early if you need to step away, so we can hand over properly.",
-        "Accept that safeguarding concerns are handled by our policy, not by informal agreement.",
-      ],
-    },
-  ],
-};
+/*
+ * VOLUNTEER_PAGE used to live here.
+ *
+ * Removed when /volunteer left `ProseRoute` (migration 0026). Two tables had
+ * been wired on the admin side and unreachable from the public site:
+ * `volunteer_roles` was read only by /admin/volunteer-roles, and
+ * `volunteer_applications` had an inbox, status transitions and a dashboard
+ * count with nothing public that ever wrote a row.
+ *
+ * The remaining prose pages are partner, annual-report and news. When one of
+ * them needs a database row, move it out the same way rather than adding the
+ * row to this file.
+ */
+
 
 /*
  * TRANSPARENCY_PAGE used to live here.
@@ -214,7 +184,6 @@ export const NEWS_PAGE: ProsePage = {
 /** Look up a prose page by slug. */
 export const PROSE_PAGES: Record<string, ProsePage> = {
   partner: PARTNER_PAGE,
-  volunteer: VOLUNTEER_PAGE,
   "annual-report": ANNUAL_REPORT_PAGE,
   news: NEWS_PAGE,
 };

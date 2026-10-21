@@ -185,9 +185,14 @@ export type RateLimitResult = { allowed: boolean; retryAfterMinutes: number };
  * Backed by a database table rather than an in-memory counter: a serverless
  * function's memory is not shared between instances, so an in-memory limiter
  * is effectively no limiter under load.
+ *
+ * `bucket` separates unrelated forms. Contact enquiries and volunteer
+ * applications are different things from different people, and one shared
+ * counter would let a busy volunteer applicant lock a donor out of writing.
  */
 export async function checkRateLimit(
   headers: Headers,
+  bucket: "contact" | "volunteer" = "contact",
 ): Promise<RateLimitResult> {
   // Without a configured database there is nothing to limit against, and the
   // form is unusable in development if we hard-fail.
@@ -204,7 +209,7 @@ export async function checkRateLimit(
   const { count, error } = await supabase
     .from("rate_limits")
     .select("id", { count: "exact", head: true })
-    .eq("bucket", "contact")
+    .eq("bucket", bucket)
     .eq("identifier", identifier)
     .gte("created_at", windowStart);
 
@@ -220,7 +225,7 @@ export async function checkRateLimit(
   }
 
   await supabase.from("rate_limits").insert({
-    bucket: "contact",
+    bucket,
     identifier,
   });
 
