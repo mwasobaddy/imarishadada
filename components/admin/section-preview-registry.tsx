@@ -13,6 +13,13 @@ import { GivingWays } from "@/components/sections/giving-ways";
 import { Hero } from "@/components/sections/hero";
 import { PartnerStrip } from "@/components/sections/partner-strip";
 import { StatCounter } from "@/components/sections/stat-counter";
+import { ProseSection } from "@/components/transparency/prose-section";
+import {
+  TransparencyGaps,
+  TransparencyMeasure,
+  TransparencyMoney,
+  TransparencyMoneyStatus,
+} from "@/components/transparency/sections";
 import { Programmes } from "@/components/sections/programmes";
 import { PageHero } from "@/components/site/page-hero";
 import { ConsentLedger, ConsentNote } from "@/components/stories/consent";
@@ -193,6 +200,33 @@ export function ExactSectionPreview({
     case "impact-reports":
       return <ImpactReports section={section} />;
 
+    /* ---- Transparency ---- */
+
+    case "transparency-gaps":
+      return (
+        <TransparencyGaps section={section} gaps={data.governanceGaps ?? []} />
+      );
+
+    case "transparency-measure":
+      return (
+        <TransparencyMeasure section={section} gaps={data.measurementGaps ?? []} />
+      );
+
+    case "transparency-money":
+      return <TransparencyMoney section={section} lines={data.financials ?? []} />;
+
+    case "transparency-money-status":
+      return <TransparencyMoneyStatus section={section} />;
+
+    case "transparency-governance":
+      return <ProseSection id="governance" section={section} />;
+
+    case "transparency-safeguarding":
+      return <ProseSection id="safeguarding" section={section} />;
+
+    case "transparency-complaints":
+      return <ProseSection id="complaints" section={section} />;
+
     /* ---- Ways to give ---- */
 
     case "ways-ladder":
@@ -251,6 +285,13 @@ export const EXACT_SECTION_KEYS = new Set([
   "impact-methodology",
   "impact-gaps",
   "impact-reports",
+  "transparency-gaps",
+  "transparency-measure",
+  "transparency-money",
+  "transparency-money-status",
+  "transparency-governance",
+  "transparency-safeguarding",
+  "transparency-complaints",
 ]);
 
 /**

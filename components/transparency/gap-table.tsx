@@ -2,7 +2,7 @@ import {
   gapIsClosed,
   gapStatusLabel,
   type TransparencyGap,
-} from "@/lib/data/transparency";
+} from "@/lib/data/gaps";
 
 /**
  * The gaps table.

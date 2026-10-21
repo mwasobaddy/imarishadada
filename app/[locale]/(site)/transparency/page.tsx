@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
-import Link from "next/link";
 
 import { PageHero } from "@/components/site/page-hero";
 import { Container } from "@/components/site/container";
-import { FinancialTables } from "@/components/transparency/financial-tables";
-import { GapTable } from "@/components/transparency/gap-table";
+import { ProseSection } from "@/components/transparency/prose-section";
+import {
+  TransparencyGaps,
+  TransparencyMeasure,
+  TransparencyMoney,
+  TransparencyMoneyStatus,
+} from "@/components/transparency/sections";
 import {
   getFinancialBreakdown,
   getTransparencyGaps,
@@ -13,7 +17,6 @@ import {
 } from "@/lib/data/transparency";
 import { isVisible } from "@/lib/data/sections";
 import { breadcrumbJsonLd, jsonLdScript, absoluteUrl } from "@/lib/seo";
-import type { SiteSection } from "@/lib/data/types";
 
 /**
  * Transparency — `/transparency`.
@@ -72,42 +75,6 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
   },
 };
-
-/** A prose section with a heading, body and optional second paragraph. */
-function ProseSection({
-  id,
-  section,
-  children,
-}: {
-  id: string;
-  section: SiteSection;
-  children?: React.ReactNode;
-}) {
-  return (
-    <section id={id} className="scroll-mt-24">
-      <h2 className="text-2xl font-semibold tracking-tight text-brand-600 sm:text-3xl">
-        {section.heading}
-      </h2>
-      {section.body ? (
-        <p className="measure mt-4 leading-relaxed text-ink-muted">{section.body}</p>
-      ) : null}
-      {children}
-      {section.bodySecondary ? (
-        <p className="measure mt-6 border-l-2 border-brand-600/30 pl-5 text-sm leading-relaxed text-ink-muted">
-          {section.bodySecondary}
-        </p>
-      ) : null}
-      {section.ctaLabel && section.ctaHref ? (
-        <Link
-          href={section.ctaHref}
-          className="mt-6 inline-flex min-h-11 items-center text-sm font-medium text-brand-600 underline decoration-brand-600/40 underline-offset-4 hover:decoration-brand-700 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-700"
-        >
-          {section.ctaLabel} →
-        </Link>
-      ) : null}
-    </section>
-  );
-}
 
 export default async function TransparencyPage({
   params,
@@ -187,48 +154,25 @@ export default async function TransparencyPage({
             <div className="max-w-2xl space-y-14">
               {/* ---- What we have not yet done ------------------------- */}
               {isVisible(gaps) ? (
-                <ProseSection id="gaps" section={gaps}>
-                  <GapTable
-                    gaps={governance}
-                    caption="Things Imarisha Dada has not yet put in place, with their current status."
-                    itemHeading="Not yet in place"
-                  />
-                </ProseSection>
+                <TransparencyGaps id="gaps" section={gaps} gaps={governance} />
               ) : null}
 
               {/* ---- What we cannot yet measure ------------------------ */}
               {isVisible(measure) ? (
-                <ProseSection id="measure" section={measure}>
-                  <GapTable
-                    gaps={measurement}
-                    caption="Things about Imarisha Dada's work that cannot yet be measured, with their current status."
-                    itemHeading="Not yet measured"
-                  />
-                </ProseSection>
+                <TransparencyMeasure
+                  id="measure"
+                  section={measure}
+                  gaps={measurement}
+                />
               ) : null}
 
               {/* ---- Where the money goes ------------------------------ */}
               {isVisible(money) ? (
-                <ProseSection id="money" section={money}>
-                  {/* Renders nothing while `financial_breakdown` is empty. */}
-                  <FinancialTables lines={financials} />
-                </ProseSection>
+                <TransparencyMoney id="money" section={money} lines={financials} />
               ) : null}
 
               {isVisible(moneyStatus) ? (
-                <section aria-labelledby="money-status-heading">
-                  <h3
-                    id="money-status-heading"
-                    className="text-lg font-semibold text-brand-600"
-                  >
-                    {moneyStatus.heading}
-                  </h3>
-                  {moneyStatus.body ? (
-                    <p className="measure mt-3 leading-relaxed text-ink-muted">
-                      {moneyStatus.body}
-                    </p>
-                  ) : null}
-                </section>
+                <TransparencyMoneyStatus section={moneyStatus} />
               ) : null}
 
               {/* ---- Governance ---------------------------------------- */}

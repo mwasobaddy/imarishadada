@@ -20,63 +20,30 @@ import type { SiteSection } from "@/lib/data/types";
  * gaps, in different words from the ones `/impact` rendered.
  */
 
-export type GapKind = "measurement" | "governance";
-
-export type GapStatus = "outstanding" | "in_progress" | "done" | "published";
-
-export type TransparencyGap = {
-  id: string;
-  item: string;
-  kind: GapKind;
-  status: GapStatus;
-  /** "FY2026/27", "2026" — an editorial label, because a date cannot hold these. */
-  targetLabel: string | null;
-  notes: string | null;
-  sortOrder: number;
-};
-
-export type FinancialLine = {
-  id: string;
-  fiscalYear: string;
-  direction: "income" | "expenditure";
-  category: string;
-  amount: number;
-  currency: string;
-  sharePct: number | null;
-  sortOrder: number;
-};
-
 /**
- * The status label a reader sees.
+ * The gap types and the two pure helpers live in `lib/data/gaps.ts`.
  *
- * Exported and pure so the mapping can be tested without a database. The words
- * matter here more than anywhere else on the site: "published" and "done" are
- * different promises, and a gap that is merely in progress must not read as
- * closed.
+ * They are re-exported here because everything else has always imported them
+ * from this module, and because the admin's live preview needs them from a
+ * module that does not read the database.
  */
-export function gapStatusLabel(status: GapStatus): string {
-  switch (status) {
-    case "outstanding":
-      return "Not yet in place";
-    case "in_progress":
-      return "In progress";
-    case "done":
-      return "Done";
-    case "published":
-      return "Published";
-  }
-}
+import {
+  gapIsClosed,
+  gapStatusLabel,
+  type FinancialLine,
+  type GapKind,
+  type GapStatus,
+  type TransparencyGap,
+} from "@/lib/data/gaps";
 
-/**
- * Whether a gap is closed.
- *
- * Used to decide whether the row is shown as resolved. A closed gap stays in the
- * table — the roadmap is explicit that the list is meant to shrink *visibly*,
- * and a deleted row shrinks it invisibly.
- */
-export function gapIsClosed(status: GapStatus): boolean {
-  return status === "done" || status === "published";
-}
+export {
+  gapIsClosed,
+  gapStatusLabel,
+  type FinancialLine,
+  type GapKind,
+  type GapStatus,
+  type TransparencyGap,
+};
 
 export async function getTransparencyGaps(
   kind?: GapKind,

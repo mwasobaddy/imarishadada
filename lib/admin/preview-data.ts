@@ -1,6 +1,8 @@
 import { getCoreValues, getTeamMembers } from "@/lib/data/about";
 import { getContactDetails } from "@/lib/data/contact";
 import { getGivingTiers, getProgrammes } from "@/lib/data/home";
+import { getFinancialBreakdown, getTransparencyGaps } from "@/lib/data/transparency";
+import type { FinancialLine, TransparencyGap } from "@/lib/data/gaps";
 import {
   getAllImpactStats,
   getConsentCounts,
@@ -52,6 +54,11 @@ export type PreviewData = {
   stats?: ImpactStat[];
   /** The things we do not yet measure, for the impact page. */
   gaps?: string[];
+  /** The transparency page's two gap lists. */
+  governanceGaps?: TransparencyGap[];
+  measurementGaps?: TransparencyGap[];
+  /** The published financial lines, for the transparency page. */
+  financials?: FinancialLine[];
   contact?: Awaited<ReturnType<typeof getContactDetails>>;
 };
 
@@ -101,6 +108,15 @@ export async function loadPreviewData(
         getMeasurementGaps(),
         getProgrammes(),
       ]);
+      break;
+
+    case "transparency":
+      [data.governanceGaps, data.measurementGaps, data.financials] =
+        await Promise.all([
+          getTransparencyGaps("governance"),
+          getTransparencyGaps("measurement"),
+          getFinancialBreakdown(),
+        ]);
       break;
 
     case "ways-to-give":
