@@ -4,7 +4,11 @@ import { PageHeader } from "@/components/admin/page-header";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
-import { updateSetting, approveSettingChange } from "@/app/[locale]/admin/actions/settings";
+import {
+  updateSetting,
+  approveSettingChange,
+  rejectSettingChange,
+} from "@/app/[locale]/admin/actions/settings";
 
 type Setting = {
   key: string;
@@ -13,20 +17,34 @@ type Setting = {
   updated_at: string;
 };
 
+/**
+ * A staged change, and how it was decided.
+ *
+ * `status` is the whole point of the column: pending, approved, rejected or
+ * superseded. A change can only be decided once, and the decision says who
+ * made it.
+ */
 type PendingChange = {
   id: string;
   key: string;
   value: unknown;
   change_note: string | null;
   changed_at: string;
+  status: string;
+  changed_by: string | null;
+  decided_at: string | null;
+  decided_by: string | null;
 };
 
 export function SettingsEditor({
   settings,
   pendingChanges,
+  decidedChanges = [],
 }: {
   settings: Setting[];
   pendingChanges: PendingChange[];
+  /** The changes that have been decided, and the ones a newer one replaced. */
+  decidedChanges?: PendingChange[];
 }) {
   const [editing, setEditing] = useState<string | null>(null);
   const [jsonText, setJsonText] = useState("");
@@ -93,6 +111,17 @@ export function SettingsEditor({
     });
   }
 
+  async function reject(versionId: string) {
+    startTransition(async () => {
+      try {
+        await rejectSettingChange(versionId);
+        toast.success("Change rejected. The setting is unchanged.");
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Rejection failed");
+      }
+    });
+  }
+
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <PageHeader
@@ -105,20 +134,53 @@ export function SettingsEditor({
       {pendingChanges.length > 0 && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
           <h2 className="text-sm font-semibold text-amber-800">Pending approval</h2>
-          <ul className="mt-2 space-y-2">
+          <p className="mt-1 text-xs text-amber-700">
+            A financial setting needs two people. The person who staged a change
+            cannot approve it, and a change can only be decided once.
+          </p>
+          <ul className="mt-3 space-y-2">
             {pendingChanges.map((pc) => (
-              <li key={pc.id} className="flex items-center justify-between text-sm">
+              <li key={pc.id} className="flex items-center justify-between gap-3 text-sm">
                 <span className="text-amber-700">
                   <strong>{pc.key}</strong> — {pc.change_note}
                 </span>
-                <button
-                  type="button"
-                  onClick={() => approve(pc.id)}
-                  disabled={pending}
-                  className="rounded-lg bg-amber-600 px-3 py-1 text-xs font-medium text-white hover:bg-amber-700"
-                >
-                  Approve
-                </button>
+                <span className="flex shrink-0 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => reject(pc.id)}
+                    disabled={pending}
+                    className="rounded-lg border border-amber-300 bg-card px-3 py-1 text-xs font-medium text-amber-700 hover:bg-amber-100"
+                  >
+                    Reject
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => approve(pc.id)}
+                    disabled={pending}
+                    className="rounded-lg bg-amber-600 px-3 py-1 text-xs font-medium text-white hover:bg-amber-700"
+                  >
+                    Approve
+                  </button>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Decided changes */}
+      {decidedChanges.length > 0 && (
+        <div className="rounded-xl border border-border bg-card p-4">
+          <h2 className="text-sm font-semibold text-ink">Decided changes</h2>
+          <ul className="mt-2 space-y-1">
+            {decidedChanges.map((pc) => (
+              <li key={pc.id} className="flex items-center justify-between gap-3 text-xs">
+                <span className="text-ink-muted">
+                  <strong className="text-ink">{pc.key}</strong> — {pc.change_note}
+                </span>
+                <span className="shrink-0 rounded-full bg-surface-lilac px-2 py-0.5 text-[11px] font-medium text-ink-muted">
+                  {pc.status}
+                </span>
               </li>
             ))}
           </ul>

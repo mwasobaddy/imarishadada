@@ -1167,30 +1167,46 @@ export type Database = {
           change_note: string | null
           changed_at: string
           changed_by: string | null
+          decided_at: string | null
+          decided_by: string | null
           id: string
           key: string
+          status: string
           value: Json
         }
         Insert: {
           change_note?: string | null
           changed_at?: string
           changed_by?: string | null
+          decided_at?: string | null
+          decided_by?: string | null
           id?: string
-          key: string
+          key?: string
+          status?: string
           value: Json
         }
         Update: {
           change_note?: string | null
           changed_at?: string
           changed_by?: string | null
+          decided_at?: string | null
+          decided_by?: string | null
           id?: string
           key?: string
-          value?: Json
+          status?: string
+          value: Json
         }
         Relationships: [
           {
             foreignKeyName: "settings_versions_changed_by_fkey"
             columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "settings_versions_decided_by_fkey"
+            columns: ["decided_by"]
             isOneToOne: false
             referencedRelation: "staff"
             referencedColumns: ["id"]
@@ -1739,6 +1755,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      approve_setting_version: {
+        Args: { p_decided_by: string; p_version_id: string }
+        Returns: Json
+      }
       downgrade_expired_consents: { Args: never; Returns: number }
       exec_sql: { Args: { p_sql: string }; Returns: undefined }
       has_permission: {
