@@ -286,7 +286,7 @@ export async function getFeaturedStory(): Promise<FeaturedStory | null> {
 
   const { data, error } = await createClient()
     .from("stories")
-    .select("slug, quote, attribution, consent_tier, consent_expires_at, image_path")
+    .select("slug, title, quote, attribution, consent_tier, consent_expires_at, image_path")
     .eq("published", true)
     .eq("featured", true)
     // The "not future-dated" guard lives in RLS, not here. The
@@ -306,6 +306,7 @@ export async function getFeaturedStory(): Promise<FeaturedStory | null> {
 
   return {
     slug: row.slug as string,
+    title: ((row.title as string | null) ?? "").trim(),
     quote: row.quote as string,
     attribution: (row.attribution as string | null) ?? null,
     consentTier: tier,

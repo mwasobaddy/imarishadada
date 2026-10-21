@@ -1344,6 +1344,7 @@ export type Database = {
           excerpt: string
           featured: boolean
           id: string
+          image_alt: string | null
           image_path: string | null
           programme_id: string | null
           published: boolean
@@ -1364,6 +1365,7 @@ export type Database = {
           excerpt?: string
           featured?: boolean
           id?: string
+          image_alt?: string | null
           image_path?: string | null
           programme_id?: string | null
           published?: boolean
@@ -1384,6 +1386,7 @@ export type Database = {
           excerpt?: string
           featured?: boolean
           id?: string
+          image_alt?: string | null
           image_path?: string | null
           programme_id?: string | null
           published?: boolean

@@ -32,6 +32,7 @@ export default async function EditStoryPage({
         consent_tier: story.consent_tier,
         consent_expires_at: story.consent_expires_at ?? "",
         image_path: story.image_path ?? "",
+        image_alt: story.image_alt ?? "",
         reading_minutes: story.reading_minutes?.toString() ?? "",
         featured: story.featured,
         published: story.published,

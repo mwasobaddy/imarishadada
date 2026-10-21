@@ -28,7 +28,7 @@ export function FeaturedStory({ story }: { story: FeaturedStory | null }) {
               id="story-heading"
               className="mt-3 text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
             >
-              {anonymised ? "A story we can only tell partly" : story.slug.replace(/-/g, " ")}
+              {anonymised ? "A story we can only tell partly" : story.title || "A story from Kibera"}
             </h2>
             <p className="measure mt-4 text-lg text-ink-muted">
               Every figure on this site came from a person. Here is one of them.

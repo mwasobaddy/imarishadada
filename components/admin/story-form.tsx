@@ -25,6 +25,7 @@ type Story = {
   consent_tier: string;
   consent_expires_at: string;
   image_path: string;
+  image_alt: string;
   reading_minutes: string;
   featured: boolean;
   published: boolean;
@@ -57,6 +58,7 @@ export function StoryForm({
       consent_tier: "anonymised",
       consent_expires_at: "",
       image_path: "",
+      image_alt: "",
       reading_minutes: "",
       featured: false,
       published: false,
@@ -81,6 +83,7 @@ export function StoryForm({
           consent_tier: form.consent_tier,
           consent_expires_at: form.consent_expires_at || null,
           image_path: form.image_path || null,
+          image_alt: form.image_alt || null,
           reading_minutes: form.reading_minutes ? parseInt(form.reading_minutes) : null,
           featured: form.featured,
           published: form.published,
@@ -301,7 +304,33 @@ export function StoryForm({
             hint="Only shown when consent allows a face"
             value={form.image_path}
             onChange={(path) => set("image_path", path)}
+            onUseAlt={(alt) => set("image_alt", alt)}
           />
+
+          <div>
+            <label
+              htmlFor="story-image-alt"
+              className="block text-sm font-medium text-ink"
+            >
+              Alt text
+              {form.image_path && !form.image_alt.trim() ? (
+                <span className="ml-2 text-xs font-normal text-amber-600">
+                  Required with an image
+                </span>
+              ) : null}
+            </label>
+            <input
+              id="story-image-alt"
+              value={form.image_alt}
+              onChange={(e) => set("image_alt", e.target.value)}
+              placeholder="What the photograph shows"
+              className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-ink focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600"
+            />
+            <p className="mt-1 text-xs text-ink-muted">
+              Describe what is in the photograph, for someone who cannot see it. Not
+              the filename, and not the participant&rsquo;s name.
+            </p>
+          </div>
 
           <div>
             <label className="block text-sm font-medium text-ink">Reading minutes</label>

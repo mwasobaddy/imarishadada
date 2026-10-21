@@ -375,8 +375,17 @@ export async function getProgrammeStories(programmeSlug: string): Promise<Featur
 
     const { data, error } = await createClient()
       .from("stories")
+      // `programmes(slug,title)` is in the select because the filter below uses
+      // `programmes.slug`. PostgREST rejects a filter on an embedded resource
+      // that is not also selected — "programmes is not an embedded resource in
+      // this request" — and the `return []` below turned that rejection into an
+      // empty section rather than an error.
+      //
+      // This was live: the programme pages' "In their words" block has never
+      // rendered a story, and never logged anything a reader would notice. Same
+      // bug as `getPartnerSchools`, which was fixed and this one was missed.
       .select(
-        "slug, quote, attribution, consent_tier, consent_expires_at, image_path, published_at",
+        "slug, title, quote, attribution, consent_tier, consent_expires_at, image_path, published_at, programmes(slug,title)",
       )
       .eq("published", true)
       .eq("programmes.slug", programmeSlug)
@@ -398,6 +407,7 @@ export async function getProgrammeStories(programmeSlug: string): Promise<Featur
       return [
         {
           slug: r.slug as string,
+          title: ((r.title as string | null) ?? "").trim(),
           quote: r.quote as string,
           // Anonymised must not leak a name into the attribution.
           attribution:

@@ -3,6 +3,7 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { hasPermission } from "@/lib/admin/permissions";
 import { createServiceClient } from "@/lib/supabase/client";
+import { titleLeaksName } from "@/lib/stories/copy";
 import type { AuditSnapshot, Insert, Update, WithOptionalSlug } from "@/lib/supabase/row-types";
 
 
@@ -12,9 +13,53 @@ async function requirePermission(resource: string, action: string) {
   }
 }
 
+/**
+ * Refuse an anonymised story whose title repeats the participant's name.
+ *
+ * ## The gap this closes
+ *
+ * The consent tier withholds the *attribution* — `getStories` nulls it for
+ * `anonymised` so no card and no page can render a name. But it knows nothing
+ * about the **title**, and the roadmap requires that an anonymised story
+ * *"never exposes the name in `<title>`, `<meta description>`, OG tags, or
+ * JSON-LD"*.
+ *
+ * So this was reachable, and nothing stopped it: set the tier to `anonymised`,
+ * leave the title as "Amina's story", publish. The story's entire promise is
+ * that Amina cannot be identified, and her name is in the search result.
+ *
+ * ## A gate, not a warning
+ *
+ * The project's rule for safeguards is that they are gates. A warning on a form
+ * is dismissed; a rejected write is not. The message names the field and the
+ * reason, so it is actionable rather than mysterious.
+ *
+ * The runtime defence is separate and stronger — `generateMetadata` never uses
+ * an anonymised story's title at all — so this is the second layer, not the
+ * only one.
+ */
+function assertAnonymisedTitleSafe(data: {
+  consent_tier?: string | null;
+  title?: string | null;
+  attribution?: string | null;
+}) {
+  if (data.consent_tier !== "anonymised") return;
+  if (!data.title) return;
+
+  if (titleLeaksName(data.title, data.attribution ?? null)) {
+    throw new Error(
+      "This story is anonymised, but the title contains the participant's name. " +
+        "Change the title so it does not identify her, or record her consent to be named " +
+        "and move the story to a named tier.",
+    );
+  }
+}
+
 export async function createStory(data: WithOptionalSlug<"stories">) {
   await requirePermission("stories", "create");
   const supabase = createServiceClient();
+
+  assertAnonymisedTitleSafe(data);
 
   // The slug is NOT NULL in the database, but the editor may leave it blank
   // and expect one to be derived from the title.
@@ -56,6 +101,16 @@ export async function updateStory(id: string, data: Update<"stories">) {
     .select("*")
     .eq("id", id)
     .single();
+
+  // The patch may carry only some fields, so the check runs against the merged
+  // row. Checking the patch alone would let an editor anonymise a story by
+  // changing only `consent_tier`, and the title it was already carrying would
+  // never be examined.
+  assertAnonymisedTitleSafe({
+    consent_tier: (data.consent_tier ?? before?.consent_tier) as string | null,
+    title: (data.title ?? before?.title) as string | null,
+    attribution: (data.attribution ?? before?.attribution) as string | null,
+  });
 
   const { data: story, error } = await supabase
     .from("stories")

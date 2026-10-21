@@ -16,6 +16,7 @@ describe("FeaturedStory consent behaviour", () => {
       <FeaturedStory
         story={{
           slug: "an-inspiring-slug",
+          title: "A story we can only tell partly",
           quote: "I am in school again.",
           attribution: "Amina, 19",
           consentTier: "anonymised",
@@ -34,6 +35,7 @@ describe("FeaturedStory consent behaviour", () => {
       <FeaturedStory
         story={{
           slug: "aminas-story",
+          title: "She went back at nineteen",
           quote: "I am in school again.",
           attribution: "Amina, 19",
           consentTier: "named_full",
@@ -51,6 +53,7 @@ describe("FeaturedStory consent behaviour", () => {
       <FeaturedStory
         story={{
           slug: "aminas-story",
+          title: "She went back at nineteen",
           quote: "I am in school again.",
           attribution: "Amina, 19",
           consentTier: "named_no_face",

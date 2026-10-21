@@ -78,6 +78,14 @@ export type ConsentTier = "named_full" | "named_no_face" | "anonymised";
 
 export type FeaturedStory = {
   slug: string;
+  /**
+   * The story's own headline.
+   *
+   * Added because the homepage featured block was deriving its heading from the
+   * slug — `"she-went-back-at-nineteen"` rendered as "she went back at
+   * nineteen" on the live site, which is a placeholder that reads like a bug.
+   */
+  title: string;
   quote: string;
   attribution: string | null;
   consentTier: ConsentTier;
