@@ -3,21 +3,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ImageIcon, Search, X } from "lucide-react";
 
+import { getPublishableMedia } from "@/app/[locale]/admin/actions/media";
 import { STATIC_IMAGES, type StaticImage } from "@/lib/data/image-manifest";
+import type { MediaOption } from "@/lib/media/option";
 
-export type MediaOption = {
-  path: string;
-  label: string;
-  group: string;
-  width: number;
-  height: number;
-  /** Alt text if we have it. Static images do not carry one; uploaded media does. */
-  alt?: string;
-  /** Present only for uploaded media. */
-  consentTier?: string;
-  /** `static` = shipped in the repo, `uploaded` = in the media table. */
-  source: "static" | "uploaded";
-};
+export type { MediaOption };
 
 /**
  * Image picker.
@@ -52,7 +42,6 @@ export function MediaPicker({
   onChange,
   label = "Image",
   hint,
-  uploaded = [],
   id,
   onUseAlt,
   compact = false,
@@ -61,8 +50,6 @@ export function MediaPicker({
   onChange: (path: string) => void;
   label?: string;
   hint?: string;
-  /** Rows from the `media` table, passed down from the server. */
-  uploaded?: MediaOption[];
   id?: string;
   /**
    * Called when the editor accepts the selected image's alt text.
@@ -85,6 +72,37 @@ export function MediaPicker({
   const [group, setGroup] = useState<string>("all");
   const wrapRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  /**
+   * The uploaded files, fetched here rather than passed down.
+   *
+   * Every editor with a picture field needs them — a post cover, a partner
+   * logo, a story photograph, a programme photograph — and threading a list
+   * through every page that renders an editor was plumbing with no end. The
+   * list is the same everywhere, so the picker asks for it.
+   *
+   * Only the public bucket is offered: a file in a private one is reached
+   * through a signed URL that expires, and a page pointing at it breaks next
+   * month.
+   */
+  const [uploaded, setUploaded] = useState<MediaOption[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    void getPublishableMedia()
+      .then((options) => {
+        if (!cancelled) setUploaded(options);
+      })
+      .catch(() => {
+        // A staff member who may not read the library still gets the shipped
+        // photographs. The list is a convenience, not the feature.
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const all = useMemo<MediaOption[]>(
     () => [
@@ -254,7 +272,7 @@ export function MediaPicker({
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search 48 photographs…"
+              placeholder={`Search ${all.length} photographs…`}
               className="w-full bg-transparent text-sm text-ink placeholder:text-ink-muted/60 focus:outline-none"
             />
           </div>

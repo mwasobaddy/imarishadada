@@ -9,6 +9,8 @@ import { createMediaRecord, deleteMedia, getSignedUrl } from "@/app/[locale]/adm
 type MediaItem = {
   id: string;
   file_path: string;
+  /** Which storage bucket the file is in. */
+  bucket: string;
   file_name: string;
   mime_type: string;
   size_bytes: number;
@@ -51,9 +53,12 @@ export function MediaLibrary({ media: initial }: { media: MediaItem[] }) {
     let cancelled = false;
 
     async function sign() {
+      // Each file is signed against the bucket it is in. Signing every file
+      // against the upload form's current bucket produced a broken thumbnail
+      // for anything not uploaded to that one.
       const entries = await Promise.all(
         media.map(async (item) => {
-          const url = await getSignedUrl(bucket, item.file_path);
+          const url = await getSignedUrl(item.bucket || "public-media", item.file_path);
           return [item.id, url] as const;
         }),
       );
@@ -69,7 +74,7 @@ export function MediaLibrary({ media: initial }: { media: MediaItem[] }) {
     return () => {
       cancelled = true;
     };
-  }, [media, bucket]);
+  }, [media]);
 
   async function handleUpload(e: React.FormEvent) {
     e.preventDefault();
@@ -95,6 +100,7 @@ export function MediaLibrary({ media: initial }: { media: MediaItem[] }) {
       const dims = await getImageDimensions(stripped);
 
       const record = await createMediaRecord({
+        bucket,
         file_path: uploadData.path,
         file_name: file.name,
         mime_type: file.type,
@@ -124,7 +130,7 @@ export function MediaLibrary({ media: initial }: { media: MediaItem[] }) {
     if (!confirm("Delete this media file?")) return;
     startTransition(async () => {
       try {
-        await deleteMedia(item.id, item.file_path);
+        await deleteMedia(item.id);
         setMedia((prev) => prev.filter((m) => m.id !== item.id));
         toast.success("Media deleted");
       } catch (e) {
@@ -165,6 +171,11 @@ export function MediaLibrary({ media: initial }: { media: MediaItem[] }) {
               <option value="story-media">Story media (private)</option>
               <option value="documents">Documents (private)</option>
             </select>
+            <p className="mt-1 text-xs text-ink-muted">
+              {bucket === "public-media"
+                ? "Publicly readable, so the file can be used in a published image."
+                : "Staff-only. The file cannot be used in a page — a published image needs a URL that still works next month."}
+            </p>
           </div>
           <div className="sm:col-span-2">
             <label className="block text-sm font-medium text-ink">
@@ -252,6 +263,20 @@ export function MediaLibrary({ media: initial }: { media: MediaItem[] }) {
                     Delete
                   </button>
                 </div>
+                {/*
+                  The bucket decides whether the file can be used in a page.
+
+                  `public-media` is publicly readable, so its files can be
+                  pointed at by a published image. The other two are staff-only
+                  and are reached through a signed URL that expires, so a page
+                  pointing at one breaks later — the picker leaves them out.
+                */}
+                <p className="text-xs text-ink-muted">
+                  <span className="font-medium text-ink">{item.bucket || "public-media"}</span>
+                  {item.bucket && item.bucket !== "public-media"
+                    ? " — not usable in a page"
+                    : " — usable in a page"}
+                </p>
               </div>
             </div>
           ))}

@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { ShieldCheck, UserPlus } from "lucide-react";
 
 import { createTeamMember, updateTeamMember, deleteTeamMember } from "@/app/[locale]/admin/actions/team";
-import { MediaPicker, type MediaOption } from "@/components/admin/media-picker";
+import { MediaPicker } from "@/components/admin/media-picker";
 
 /**
  * The social platforms we render, in the order they appear on the card.
@@ -65,10 +65,8 @@ function blank(): Partial<Member> {
 
 export function TeamMembersEditor({
   members: initial,
-  media,
 }: {
   members: Member[];
-  media: MediaOption[];
 }) {
   const router = useRouter();
   const [members, setMembers] = useState<Member[]>(initial);
@@ -243,7 +241,6 @@ export function TeamMembersEditor({
                 hint="Square crops work best"
                 value={form.photo_path ?? ""}
                 onChange={(path) => set("photo_path", path)}
-                uploaded={media}
               />
             </div>
 

@@ -552,6 +552,7 @@ export type Database = {
       media: {
         Row: {
           alt_text: string
+          bucket: string
           consent_expires_at: string | null
           consent_tier: string
           created_at: string
@@ -568,6 +569,7 @@ export type Database = {
         }
         Insert: {
           alt_text: string
+          bucket?: string
           consent_expires_at?: string | null
           consent_tier?: string
           created_at?: string
@@ -584,6 +586,7 @@ export type Database = {
         }
         Update: {
           alt_text?: string
+          bucket?: string
           consent_expires_at?: string | null
           consent_tier?: string
           created_at?: string

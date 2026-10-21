@@ -4,7 +4,6 @@ import { useCallback, useState } from "react";
 import { ExternalLink, Eye, EyeOff, RefreshCw, Smartphone, Monitor, X } from "lucide-react";
 
 import { SectionEditor } from "@/components/admin/section-editor";
-import type { MediaOption } from "@/components/admin/media-picker";
 import { sectionLabel, type SectionForm } from "@/lib/admin/section-form";
 import type { PreviewData } from "@/lib/admin/preview-data";
 
@@ -28,12 +27,10 @@ import type { PreviewData } from "@/lib/admin/preview-data";
 export function PagesEditor({
   page,
   sections,
-  media,
   previewData,
 }: {
   page: { label: string; route: string };
   sections: SectionForm[];
-  media: MediaOption[];
   /** The published data the exact previews render alongside the copy. */
   previewData: PreviewData;
 }) {
@@ -177,7 +174,6 @@ export function PagesEditor({
               index={index + 1}
               section={section}
               route={page.route}
-              media={media}
               previewData={previewData}
               open={openKey === section.section_key}
               onToggle={() =>

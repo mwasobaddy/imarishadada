@@ -3,29 +3,8 @@ import { notFound } from "next/navigation";
 import { getPageWithSections } from "@/app/[locale]/admin/actions/pages";
 import { EmptyState, PageHeader } from "@/components/admin/page-header";
 import { PagesEditor } from "@/components/admin/pages-editor";
-import type { MediaOption } from "@/components/admin/media-picker";
 import { loadPreviewData } from "@/lib/admin/preview-data";
 import { toPreviewSection, toSectionForm } from "@/lib/admin/section-form";
-import { createAuthServerClient } from "@/lib/supabase/auth-server";
-
-/** Uploaded media for the picker. Empty is fine — the 48 shipped photographs still list. */
-async function loadUploadedMedia(): Promise<MediaOption[]> {
-  const supabase = await createAuthServerClient();
-  const { data } = await supabase
-    .from("media")
-    .select("file_path, file_name, alt_text, consent_tier, width, height")
-    .order("created_at", { ascending: false });
-  return (data ?? []).map((m) => ({
-    path: m.file_path,
-    label: m.file_name,
-    group: "uploaded",
-    width: m.width ?? 0,
-    height: m.height ?? 0,
-    alt: m.alt_text,
-    consentTier: m.consent_tier,
-    source: "uploaded" as const,
-  }));
-}
 
 export default async function PageSectionsPage({
   params,
@@ -33,10 +12,7 @@ export default async function PageSectionsPage({
   params: Promise<{ pageKey: string }>;
 }) {
   const { pageKey } = await params;
-  const [{ page, sections }, media] = await Promise.all([
-    getPageWithSections(pageKey),
-    loadUploadedMedia(),
-  ]);
+  const { page, sections } = await getPageWithSections(pageKey);
 
   if (!page) notFound();
 
@@ -77,7 +53,6 @@ export default async function PageSectionsPage({
           <PagesEditor
             page={{ label: page.label, route: page.route }}
             sections={forms}
-            media={media}
             previewData={previewData}
           />
         </>

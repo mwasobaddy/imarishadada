@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 
 import { toggleSection, updateSection } from "@/app/[locale]/admin/actions/pages";
-import { MediaPicker, type MediaOption } from "@/components/admin/media-picker";
+import { MediaPicker } from "@/components/admin/media-picker";
 import { SectionPreview } from "@/components/admin/section-preview";
 import { SECTIONS_WITH_IMAGE } from "@/components/admin/section-preview-registry";
 import type { PreviewData } from "@/lib/admin/preview-data";
@@ -54,7 +54,6 @@ import {
 export function SectionEditor({
   section,
   route,
-  media,
   previewData,
   index,
   open,
@@ -64,7 +63,6 @@ export function SectionEditor({
 }: {
   section: SectionForm;
   route: string;
-  media: MediaOption[];
   /** The published data the exact previews render alongside the copy. */
   previewData: PreviewData;
   /** Where this section sits on the page, counting from one. */
@@ -342,7 +340,6 @@ export function SectionEditor({
                       value={form.image_path}
                       onChange={(path) => set("image_path", path)}
                       onUseAlt={(alt) => set("image_alt", alt)}
-                      uploaded={media}
                     />
                     <Field
                       id={`${idPrefix}-image-alt`}
@@ -383,7 +380,6 @@ export function SectionEditor({
                   <ImagesEditor
                     idPrefix={idPrefix}
                     images={form.images}
-                    media={media}
                     onChange={(images) => set("images", images)}
                   />
                 </Group>
@@ -568,12 +564,10 @@ function StepsEditor({
 function ImagesEditor({
   idPrefix,
   images,
-  media,
   onChange,
 }: {
   idPrefix: string;
   images: NonNullable<SectionForm["images"]>;
-  media: MediaOption[];
   onChange: (images: NonNullable<SectionForm["images"]>) => void;
 }) {
   function update(index: number, patch: Partial<{ path: string; alt: string; caption: string }>) {
@@ -628,7 +622,6 @@ function ImagesEditor({
                 value={image.path}
                 onChange={(path) => update(index, { path })}
                 onUseAlt={(alt) => update(index, { alt })}
-                uploaded={media}
               />
               <Field
                 id={`${idPrefix}-image-${index}-alt`}

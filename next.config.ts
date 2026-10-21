@@ -29,10 +29,20 @@ const nextConfig: NextConfig = {
     // implies a `**` wildcard, which is not recommended — it lets the optimiser
     // fetch URLs you did not intend.
     //
-    // Currently unused: the hero portrait is vendored under public/images so the
-    // optimiser reads from local disk. Add an entry here when a remote image
-    // bucket (e.g. Supabase Storage) becomes a source.
-    remotePatterns: [],
+    // The media library stores uploaded photographs in Supabase Storage, and
+    // the only publicly readable bucket is `public-media`. Without this the
+    // optimiser refuses every uploaded image, because the pathname, the search
+    // string and the port are all specified: a wildcard here would let any
+    // host serve an image into the site.
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "qbipjvbbpgggempnzfrp.supabase.co",
+        port: "",
+        pathname: "/storage/v1/object/public/public-media/**",
+        search: "",
+      },
+    ],
   },
   async redirects() {
     return [
