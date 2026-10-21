@@ -65,7 +65,7 @@ export function TranslationsEditor({ translations: initial }: { translations: Tr
       try {
         const updated = await reviewTranslation(id);
         setTranslations((prev) => prev.map((t) => (t.id === id ? (updated as Translation) : t)));
-        toast.success("Translation reviewed and approved");
+        toast.success("Translation marked as reviewed");
       } catch (e) {
         toast.error(e instanceof Error ? e.message : "Review failed");
       }

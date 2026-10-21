@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { EyeOff, ImageIcon, Monitor, Smartphone } from "lucide-react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { EyeOff, ImageIcon } from "lucide-react";
 
 import {
   previewHeading,
@@ -9,43 +10,49 @@ import {
   stepsAreQuestions,
   type SectionForm,
 } from "@/lib/admin/section-form";
-
-export type PreviewDevice = "desktop" | "mobile";
+import {
+  ExactSectionPreview,
+  EXACT_SECTION_KEYS,
+} from "@/components/admin/section-preview-registry";
+import type { PreviewData } from "@/lib/admin/preview-data";
 
 /**
  * The section being edited, drawn the way the page draws it.
  *
- * ## What this is, and what it is not
+ * ## Two kinds of preview, and the editor is told which
  *
- * It is a **live** preview: every keystroke in the form updates it, with no
- * request and no debounce, because it reads the same state the inputs do.
+ * **Exact.** Where the page renders a section through a component, the preview
+ * calls that same component with the words the editor has typed. The masthead
+ * is the real masthead; the programme cards are the real programme cards. When
+ * the page changes its layout, this changes with it, because there is only one
+ * implementation.
  *
- * It is not a screenshot of the real page. The page composes these sections
- * inline in twelve different files, and copying that composition into the admin
- * would be a second implementation that drifts the first time a page changes. So
- * this mirrors the site's own type scale, colours, spacing and button shapes, and
- * the note underneath says plainly that the surrounding layout may differ. The
- * page preview above the editor shows the real thing, from the saved data.
+ * **Approximate.** Several pages still compose parts of themselves inline.
+ * Those parts have no component to call, so the preview draws them from the
+ * section's own fields. The label under the frame says so, rather than
+ * letting an editor believe an impression is the page.
  *
- * ## Accessibility
+ * ## Why the frame is `inert`
  *
- * The preview is `aria-hidden`: every word in it is already in a labelled input
- * beside it, and announcing both would double every field for a screen reader.
- * Nothing in it is focusable or clickable for the same reason.
+ * The exact preview contains the real components, and those contain links,
+ * buttons and — in the contact section — a form. A preview must not be
+ * operable: a tab stop inside a picture of a page is a keyboard trap, and a
+ * link that looks clickable but navigates the admin away is worse.
+ * `inert` takes the whole frame out of the tab order and the accessibility
+ * tree, and `aria-hidden` keeps a screen reader from announcing a second copy
+ * of words that are already in the labelled fields beside it.
  */
 export function SectionPreview({
   form,
   active,
-  device,
-  onDeviceChange,
+  data,
 }: {
   form: SectionForm;
   /** Visibility comes from the server, not the form: it has its own action. */
   active: boolean;
-  device: PreviewDevice;
-  onDeviceChange: (device: PreviewDevice) => void;
+  data: PreviewData;
 }) {
-  const kind = previewKind(form);
+  const isExact = EXACT_SECTION_KEYS.has(form.section_key);
 
   return (
     <div>
@@ -53,113 +60,151 @@ export function SectionPreview({
         <p className="text-[10px] font-semibold uppercase tracking-widest text-ink-muted/60">
           Live preview
         </p>
-        <div
-          role="group"
-          aria-label="Preview width"
-          className="flex items-center gap-0.5 rounded-full border border-border bg-card p-0.5"
+        <p
+          className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
+            isExact
+              ? "bg-brand-50 text-brand-600"
+              : "bg-surface-lilac text-ink-muted"
+          }`}
         >
-          <DeviceButton
-            active={device === "desktop"}
-            label="Desktop width"
-            onClick={() => onDeviceChange("desktop")}
-          >
-            <Monitor className="h-3.5 w-3.5" />
-          </DeviceButton>
-          <DeviceButton
-            active={device === "mobile"}
-            label="Phone width"
-            onClick={() => onDeviceChange("mobile")}
-          >
-            <Smartphone className="h-3.5 w-3.5" />
-          </DeviceButton>
-        </div>
+          {isExact ? "The real section" : "Approximate"}
+        </p>
       </div>
 
       <div className="rounded-xl border border-border bg-surface-lilac/50 p-2">
-        <div className={device === "mobile" ? "mx-auto w-[390px] max-w-full" : "w-full"}>
-          <div
-            aria-hidden="true"
-            className="max-h-[560px] overflow-y-auto overscroll-contain rounded-lg bg-surface shadow-sm"
-          >
-            {!active && (
-              <p className="flex items-center gap-1.5 border-b border-amber-300 bg-amber-50 px-3 py-2 text-[11px] font-medium text-amber-800">
-                <EyeOff className="h-3.5 w-3.5" />
-                Hidden — readers will not see this section.
-              </p>
-            )}
+        <div
+          inert
+          aria-hidden="true"
+          className="max-h-[640px] overflow-y-auto overscroll-contain rounded-lg bg-surface shadow-sm"
+        >
+          {!active && (
+            <p className="flex items-center gap-1.5 border-b border-amber-300 bg-amber-50 px-3 py-2 text-[11px] font-medium text-amber-800">
+              <EyeOff className="h-3.5 w-3.5" />
+              Hidden — readers will not see this section.
+            </p>
+          )}
 
-            {kind === "hero" ? (
-              <HeroPreview form={form} />
-            ) : (
-              <CopyPreview form={form} />
-            )}
-          </div>
+          {isExact ? (
+            <PageWidthFrame>
+              <ExactSectionPreview form={form} data={data} />
+            </PageWidthFrame>
+          ) : (
+            <ApproximatePreview form={form} />
+          )}
         </div>
       </div>
 
       <p className="mt-2 text-[11px] leading-relaxed text-ink-muted/70">
-        The live page keeps its own width and spacing around these words.
+        {isExact
+          ? "This is the section as the page renders it, with the words you have typed. Use the page preview for the full page and for the phone layout."
+          : "This section is still composed inside the page, so this is an approximation of it. The words are exact."}
       </p>
     </div>
   );
 }
 
-function DeviceButton({
-  active,
-  label,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  label: string;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
+/**
+ * The page's width, scaled to fit the pane.
+ *
+ * ## Why the width matters
+ *
+ * Tailwind's breakpoints are the *viewport's*, not the container's. A section
+ * rendered into a 600px pane still gets the desktop layout — two columns,
+ * page-wide padding — and it looks squeezed rather than like the page. The
+ * editor would be judging a layout nobody sees.
+ *
+ * So the section is rendered at the width the page renders it at, and the
+ * result is scaled down to fit the pane. The proportions are the page's
+ * proportions: the same column widths, the same wrapping, the same line
+ * breaks. It is what a design tool shows you, and it is the only way to see
+ * the real layout in a pane this narrow.
+ *
+ * ## How the height is known
+ *
+ * A scaled element still occupies its unscaled height in layout, which would
+ * leave a large empty band under it. The inner box is measured with a
+ * `ResizeObserver` and the outer box is given the scaled height, so the
+ * frame fits the content exactly.
+ */
+const PAGE_WIDTH = 1280;
+
+function PageWidthFrame({ children }: { children: ReactNode }) {
+  const outer = useRef<HTMLDivElement>(null);
+  const inner = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+  const [height, setHeight] = useState<number | null>(null);
+
+  useEffect(() => {
+    const frame = outer.current;
+    const content = inner.current;
+    if (!frame || !content) return;
+
+    const measure = () => {
+      const width = frame.clientWidth;
+      if (!width) return;
+      const next = width / PAGE_WIDTH;
+      setScale(next);
+      setHeight(content.scrollHeight * next);
+    };
+
+    const observer = new ResizeObserver(measure);
+    observer.observe(frame);
+    observer.observe(content);
+    measure();
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      aria-label={label}
-      title={label}
-      className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 ${
-        active ? "bg-brand-600 text-brand-50" : "text-ink-muted hover:bg-surface-lilac"
-      }`}
+    <div
+      ref={outer}
+      className="overflow-hidden"
+      style={height === null ? undefined : { height: `${height}px` }}
     >
-      {children}
-    </button>
-  );
-}
-
-/** The masthead treatment, matching `components/site/page-hero.tsx`. */
-function HeroPreview({ form }: { form: SectionForm }) {
-  const gold = form.page_key === "home";
-
-  return (
-    <div className="relative overflow-hidden bg-surface-lilac px-6 py-10 sm:px-8 sm:py-14">
       <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_80%_at_15%_0%,var(--color-surface-pink)_0%,transparent_60%),radial-gradient(50%_70%_at_85%_20%,var(--color-brand-50)_0%,transparent_65%)]"
-      />
-      <div className="relative">
-        <Eyebrow text={form.eyebrow} />
-        <p
-          className={`mt-2 text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl ${
-            form.heading.trim() ? "text-brand-600" : "text-ink-muted/40"
-          }`}
-        >
-          {previewHeading(form)}
-        </p>
-        <Body form={form} />
-        <PreviewButtons form={form} gold={gold} />
-        <StatLine form={form} />
+        ref={inner}
+        style={{ width: `${PAGE_WIDTH}px`, transform: `scale(${scale})`, transformOrigin: "top left" }}
+      >
+        {children}
       </div>
     </div>
   );
 }
 
-/** The ordinary section: label, heading, paragraph, buttons, then its parts. */
-function CopyPreview({ form }: { form: SectionForm }) {
+/**
+ * The fallback drawing, for the sections the page still composes inline.
+ *
+ * It follows the site's own type scale, colours and spacing, and it shows a
+ * blank field as a blank field rather than hiding it — the editor needs to
+ * see that the heading is empty.
+ */
+function ApproximatePreview({ form }: { form: SectionForm }) {
+  const kind = previewKind(form);
+
+  if (kind === "hero") {
+    return (
+      <div className="relative overflow-hidden bg-surface-lilac px-6 py-10 sm:px-8 sm:py-14">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_80%_at_15%_0%,var(--color-surface-pink)_0%,transparent_60%),radial-gradient(50%_70%_at_85%_20%,var(--color-brand-50)_0%,transparent_65%)]"
+        />
+        <div className="relative">
+          <Eyebrow text={form.eyebrow} />
+          <p
+            className={`mt-2 text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl ${
+              form.heading.trim() ? "text-brand-600" : "text-ink-muted/40"
+            }`}
+          >
+            {previewHeading(form)}
+          </p>
+          <Body form={form} />
+          <PreviewButtons form={form} />
+          <StatLine form={form} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="px-6 py-8">
       <Eyebrow text={form.eyebrow} />
@@ -203,7 +248,7 @@ function Body({ form }: { form: SectionForm }) {
   );
 }
 
-function PreviewButtons({ form, gold = false }: { form: SectionForm; gold?: boolean }) {
+function PreviewButtons({ form }: { form: SectionForm }) {
   const primary = form.cta_label.trim();
   const secondary = form.cta_secondary_label.trim();
   if (!primary && !secondary) return null;
@@ -212,9 +257,9 @@ function PreviewButtons({ form, gold = false }: { form: SectionForm; gold?: bool
     <div className="mt-6 flex flex-wrap items-center gap-3">
       {primary ? (
         <span
-          className={`inline-flex min-h-10 items-center rounded-full px-5 text-sm font-semibold ${
-            gold ? "bg-gold text-gold-ink" : "bg-brand-600 text-brand-50"
-          } ${form.cta_href.trim() ? "" : "outline-2 outline-dashed outline-amber-500"}`}
+          className={`inline-flex min-h-10 items-center rounded-full bg-brand-600 px-5 text-sm font-semibold text-brand-50 ${
+            form.cta_href.trim() ? "" : "outline-2 outline-dashed outline-amber-500"
+          }`}
         >
           {primary}
         </span>

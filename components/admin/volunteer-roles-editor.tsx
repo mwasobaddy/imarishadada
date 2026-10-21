@@ -84,6 +84,7 @@ export function VolunteerRolesEditor({ roles: initial }: { roles: Role[] }) {
       try {
         await toggleVolunteerRole(id, active);
         setRoles((prev) => prev.map((r) => (r.id === id ? { ...r, active } : r)));
+        toast.success(active ? "Role open for applications" : "Role closed to applications");
       } catch (e) {
         toast.error(e instanceof Error ? e.message : "Toggle failed");
       }
@@ -95,7 +96,7 @@ export function VolunteerRolesEditor({ roles: initial }: { roles: Role[] }) {
       <PageHeader
         eyebrow="Content"
         title="Volunteer roles"
-        description="{roles.length} roles."
+        description={`${roles.length} roles.`}
         action={(
           <button
             type="button"

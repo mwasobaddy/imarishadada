@@ -5,7 +5,8 @@ import { EmptyState, PageHeader } from "@/components/admin/page-header";
 import { PagesEditor } from "@/components/admin/pages-editor";
 import type { MediaOption } from "@/components/admin/media-picker";
 import { hasPermission } from "@/lib/admin/permissions";
-import { toSectionForm } from "@/lib/admin/section-form";
+import { loadPreviewData } from "@/lib/admin/preview-data";
+import { toPreviewSection, toSectionForm } from "@/lib/admin/section-form";
 import { createAuthServerClient } from "@/lib/supabase/auth-server";
 
 /** Uploaded media for the picker. Empty is fine — the 48 shipped photographs still list. */
@@ -41,6 +42,15 @@ export default async function PageSectionsPage({
 
   if (!page) notFound();
 
+  // The exact previews render the page's own components, which need the
+  // published data beside the copy — the programme cards, the giving tiers,
+  // the partners. Only the pages that render those load them.
+  const forms = sections.map((section) => toSectionForm(section));
+  const previewData = await loadPreviewData(
+    pageKey,
+    forms.map((form) => toPreviewSection(form)),
+  );
+
   return (
     <div className="mx-auto max-w-[1500px]">
       <PageHeader
@@ -66,8 +76,9 @@ export default async function PageSectionsPage({
 
           <PagesEditor
             page={{ label: page.label, route: page.route }}
-            sections={sections.map((section) => toSectionForm(section))}
+            sections={forms}
             media={media}
+            previewData={previewData}
             canEditSeo={canEditSeo}
           />
         </>

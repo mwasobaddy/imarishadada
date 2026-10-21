@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Container } from "@/components/site/container";
 import { AboutPhotoCarousel } from "@/components/about/photo-carousel";
 import { Programmes } from "@/components/sections/programmes";
-import { isVisible } from "@/lib/data/sections";
+import { isVisible } from "@/lib/data/visibility";
 import type { Programme, SiteSection } from "@/lib/data/types";
 
 export function AboutStory({

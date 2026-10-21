@@ -73,7 +73,7 @@ export function PostForm({ initial }: { initial?: Post & { id: string; published
     startTransition(async () => {
       try {
         await (initial.published ? unpublishPost(initial.id!) : publishPost(initial.id!));
-        toast.success(initial.published ? "Unpublished" : "Published");
+        toast.success(initial.published ? "Post unpublished" : "Post published");
         router.refresh();
       } catch (e) {
         toast.error(e instanceof Error ? e.message : "Failed");

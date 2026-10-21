@@ -79,7 +79,7 @@ export function EventForm({ initial }: { initial?: Event & { id: string; publish
     startTransition(async () => {
       try {
         await (initial.published ? unpublishEvent(initial.id!) : publishEvent(initial.id!));
-        toast.success(initial.published ? "Unpublished" : "Published");
+        toast.success(initial.published ? "Event unpublished" : "Event published");
         router.refresh();
       } catch (e) {
         toast.error(e instanceof Error ? e.message : "Failed");

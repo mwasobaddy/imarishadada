@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { useState, useSyncExternalStore } from "react";
 import {
   BarChart3,
@@ -197,6 +198,7 @@ export function AdminShell({
     const { createAuthBrowserClient } = await import("@/lib/supabase/auth-browser");
     const supabase = createAuthBrowserClient();
     await supabase.auth.signOut();
+    toast.success("Signed out");
     router.push("/auth/login");
     router.refresh();
   }

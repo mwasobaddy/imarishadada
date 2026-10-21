@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { cache } from "react";
 
 import type { Database } from "./types";
 
@@ -53,3 +54,19 @@ export async function createAuthServerClient() {
     },
   });
 }
+
+/**
+ * The auth client, once per request.
+ *
+ * ## Why this is not just `createAuthServerClient()`
+ *
+ * A new client means a new JWT verifier, and a new verifier means another
+ * fetch of the signing keys. The admin layout asked for the session three
+ * times — once for the gate, once for the staff record, once for the
+ * permissions — and every one of them started a fresh verification.
+ *
+ * `cache()` from React scopes the memo to the request, so the three share one
+ * client and one verification. In a context React cannot scope — a plain
+ * route handler — it simply calls through, which is what happened before.
+ */
+export const getAuthServerClient = cache(createAuthServerClient);

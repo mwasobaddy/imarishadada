@@ -52,6 +52,20 @@ type VolunteerApp = {
 
 const STATUSES = ["new", "read", "replied", "archived"];
 
+/**
+ * A status, in the words the editor would use.
+ *
+ * "Status updated" was the toast for three different things — a contact
+ * enquiry, a partner enquiry and a volunteer application — so it told the
+ * editor nothing about what they had just done.
+ */
+const STATUS_WORDS: Record<string, string> = {
+  new: "new",
+  read: "read",
+  replied: "answered",
+  archived: "archived",
+};
+
 export function EnquiriesInbox({
   enquiries,
   partnerEnquiries,
@@ -70,12 +84,19 @@ export function EnquiriesInbox({
   const [tab, setTab] = useState<"contact" | "partner" | "volunteer">(initialTab);
   const [pending, startTransition] = useTransition();
 
+  // The count across all three channels. It was a literal string with the
+  // braces in it, so the header read "{newCount} new across all channels."
+  const newCount =
+    enquiries.filter((e) => e.status === "new").length +
+    partnerEnquiries.filter((e) => e.status === "new").length +
+    volunteerApplications.filter((e) => e.status === "new").length;
+
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <PageHeader
         eyebrow="Operations"
         title="Enquiries"
-        description={`{newCount} new across all channels.`}
+        description={`${newCount} new across all channels.`}
       />
 
       <div className="flex gap-2 border-b border-border">
@@ -111,7 +132,7 @@ export function EnquiriesInbox({
             startTransition(async () => {
               try {
                 await updateEnquiryStatus(id, status);
-                toast.success("Status updated");
+                toast.success(`Enquiry marked as ${STATUS_WORDS[status] ?? status}`);
               } catch (e) {
                 toast.error(e instanceof Error ? e.message : "Update failed");
               }
@@ -128,7 +149,9 @@ export function EnquiriesInbox({
             startTransition(async () => {
               try {
                 await updatePartnerEnquiryStatus(id, status);
-                toast.success("Status updated");
+                toast.success(
+                  `Partner enquiry marked as ${STATUS_WORDS[status] ?? status}`,
+                );
               } catch (e) {
                 toast.error(e instanceof Error ? e.message : "Update failed");
               }
@@ -145,7 +168,9 @@ export function EnquiriesInbox({
             startTransition(async () => {
               try {
                 await updateVolunteerApplicationStatus(id, status);
-                toast.success("Status updated");
+                toast.success(
+                  `Volunteer application marked as ${STATUS_WORDS[status] ?? status}`,
+                );
               } catch (e) {
                 toast.error(e instanceof Error ? e.message : "Update failed");
               }

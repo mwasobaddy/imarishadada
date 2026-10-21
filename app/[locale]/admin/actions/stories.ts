@@ -5,6 +5,7 @@ import { hasPermission } from "@/lib/admin/permissions";
 import { createServiceClient } from "@/lib/supabase/client";
 import { titleLeaksName } from "@/lib/stories/copy";
 import type { AuditSnapshot, Insert, Update, WithOptionalSlug } from "@/lib/supabase/row-types";
+import { recordAudit } from "@/lib/admin/audit";
 
 
 async function requirePermission(resource: string, action: string) {
@@ -79,10 +80,10 @@ export async function createStory(data: WithOptionalSlug<"stories">) {
   if (error) throw new Error(error.message);
 
   // Audit log
-  await supabase.from("audit_log").insert({
+  await recordAudit({
     action: "create",
-    table_name: "stories",
-    row_id: story.id,
+    tableName: "stories",
+    rowId: story.id,
     after: story as unknown as AuditSnapshot,
   });
 
@@ -121,10 +122,10 @@ export async function updateStory(id: string, data: Update<"stories">) {
 
   if (error) throw new Error(error.message);
 
-  await supabase.from("audit_log").insert({
+  await recordAudit({
     action: "update",
-    table_name: "stories",
-    row_id: id,
+    tableName: "stories",
+    rowId: id,
     before: before as unknown as AuditSnapshot,
     after: story as unknown as AuditSnapshot,
   });
@@ -150,10 +151,10 @@ export async function deleteStory(id: string) {
 
   if (error) throw new Error(error.message);
 
-  await supabase.from("audit_log").insert({
+  await recordAudit({
     action: "delete",
-    table_name: "stories",
-    row_id: id,
+    tableName: "stories",
+    rowId: id,
     before: before as unknown as AuditSnapshot,
   });
 
@@ -177,10 +178,10 @@ export async function publishStory(id: string) {
 
   if (error) throw new Error(error.message);
 
-  await supabase.from("audit_log").insert({
+  await recordAudit({
     action: "publish",
-    table_name: "stories",
-    row_id: id,
+    tableName: "stories",
+    rowId: id,
     after: story as unknown as AuditSnapshot,
   });
 
@@ -202,6 +203,8 @@ export async function unpublishStory(id: string) {
 
   if (error) throw new Error(error.message);
 
+  await recordAudit({ action: "update", tableName: "stories", rowId: id, after: story as unknown as AuditSnapshot, metadata: { published: false } as unknown as AuditSnapshot });
+
   revalidateTag("stories", "max");
   revalidatePath("/admin/content/stories");
   return story;
@@ -219,6 +222,8 @@ export async function scheduleStory(id: string, scheduledAt: string) {
     .single();
 
   if (error) throw new Error(error.message);
+
+  await recordAudit({ action: "update", tableName: "stories", rowId: id, after: story as unknown as AuditSnapshot, metadata: { scheduled_at: scheduledAt } as unknown as AuditSnapshot });
 
   revalidateTag("stories", "max");
   revalidatePath("/admin/content/stories");

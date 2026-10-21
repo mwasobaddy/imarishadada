@@ -16,7 +16,8 @@ import {
 
 import { toggleSection, updateSection } from "@/app/[locale]/admin/actions/pages";
 import { MediaPicker, type MediaOption } from "@/components/admin/media-picker";
-import { SectionPreview, type PreviewDevice } from "@/components/admin/section-preview";
+import { SectionPreview } from "@/components/admin/section-preview";
+import type { PreviewData } from "@/lib/admin/preview-data";
 import {
   discardChanges,
   isDirty,
@@ -58,6 +59,8 @@ export function SectionEditor({
   section,
   route,
   media,
+  previewData,
+  index,
   open,
   onToggle,
   onSaved,
@@ -67,6 +70,10 @@ export function SectionEditor({
   section: SectionForm;
   route: string;
   media: MediaOption[];
+  /** The published data the exact previews render alongside the copy. */
+  previewData: PreviewData;
+  /** Where this section sits on the page, counting from one. */
+  index: number;
   open: boolean;
   onToggle: () => void;
   onSaved: () => void;
@@ -76,7 +83,6 @@ export function SectionEditor({
   const router = useRouter();
   const [form, setForm] = useState<SectionForm>(section);
   const [pending, startTransition] = useTransition();
-  const [device, setDevice] = useState<PreviewDevice>("desktop");
 
   const dirty = isDirty(form, section);
   const warnings = sectionWarnings(form);
@@ -147,7 +153,7 @@ export function SectionEditor({
         className="flex w-full items-center gap-3 rounded-xl px-4 py-3.5 text-left transition-colors hover:bg-surface-lilac/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 sm:px-5"
       >
         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-surface-lilac font-mono text-[11px] text-ink-muted">
-          {String(section.sort_order).padStart(2, "0")}
+          {String(index).padStart(2, "0")}
         </span>
 
         <span className="min-w-0 flex-1">
@@ -177,7 +183,7 @@ export function SectionEditor({
 
       {open && (
         <div id={`${idPrefix}-fields`} className="border-t border-border px-4 py-5 sm:px-5">
-          <div className="grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
             {/* -------------------------------------------------------- */}
             {/* Fields                                                    */}
             {/* -------------------------------------------------------- */}
@@ -399,12 +405,7 @@ export function SectionEditor({
             {/* Preview                                                   */}
             {/* -------------------------------------------------------- */}
             <div className="min-w-0 lg:sticky lg:top-20 lg:self-start">
-              <SectionPreview
-                form={form}
-                active={section.active}
-                device={device}
-                onDeviceChange={setDevice}
-              />
+              <SectionPreview form={form} active={section.active} data={previewData} />
             </div>
           </div>
 

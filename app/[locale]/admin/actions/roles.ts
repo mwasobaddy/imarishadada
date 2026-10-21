@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/client";
 import type { AuditSnapshot, Row } from "@/lib/supabase/row-types";
 import { hasPermission } from "@/lib/admin/permissions";
+import { recordAudit } from "@/lib/admin/audit";
 
 async function requirePermission(resource: string, action: string) {
   if (!(await hasPermission(resource, action))) {
@@ -51,10 +52,10 @@ export async function createRole(name: string, description: string, permissionId
     if (rpErr) throw new Error(rpErr.message);
   }
 
-  await supabase.from("audit_log").insert({
+  await recordAudit({
     action: "create",
-    table_name: "roles",
-    row_id: role.id,
+    tableName: "roles",
+    rowId: role.id,
     after: { name, description, permission_count: permissionIds.length } as unknown as AuditSnapshot,
   });
 
@@ -84,10 +85,10 @@ export async function updateRolePermissions(roleId: string, permissionIds: strin
     if (error) throw new Error(error.message);
   }
 
-  await supabase.from("audit_log").insert({
+  await recordAudit({
     action: "update",
-    table_name: "roles",
-    row_id: roleId,
+    tableName: "roles",
+    rowId: roleId,
     before: {
       permission_ids: (before ?? []).map((r) => r.permission_id),
     } as unknown as AuditSnapshot,
@@ -112,10 +113,10 @@ export async function deleteRole(roleId: string) {
   const { error } = await supabase.from("roles").delete().eq("id", roleId);
   if (error) throw new Error(error.message);
 
-  await supabase.from("audit_log").insert({
+  await recordAudit({
     action: "delete",
-    table_name: "roles",
-    row_id: roleId,
+    tableName: "roles",
+    rowId: roleId,
   });
 
   revalidatePath("/admin/roles");
@@ -128,10 +129,10 @@ export async function assignRole(userId: string, roleId: string) {
   const { error } = await supabase.from("user_roles").insert({ user_id: userId, role_id: roleId });
   if (error) throw new Error(error.message);
 
-  await supabase.from("audit_log").insert({
+  await recordAudit({
     action: "update",
-    table_name: "user_roles",
-    row_id: null,
+    tableName: "user_roles",
+    rowId: null,
     after: { user_id: userId, role_id: roleId } as unknown as AuditSnapshot,
   });
 
@@ -145,10 +146,10 @@ export async function revokeRole(userId: string, roleId: string) {
   const { error } = await supabase.from("user_roles").delete().eq("user_id", userId).eq("role_id", roleId);
   if (error) throw new Error(error.message);
 
-  await supabase.from("audit_log").insert({
+  await recordAudit({
     action: "delete",
-    table_name: "user_roles",
-    row_id: null,
+    tableName: "user_roles",
+    rowId: null,
     after: { user_id: userId, role_id: roleId } as unknown as AuditSnapshot,
   });
 
@@ -250,10 +251,10 @@ export async function inviteUser(email: string, displayName: string, roleIds: st
     if (roleError) throw new Error(roleError.message);
   }
 
-  await supabase.from("audit_log").insert({
+  await recordAudit({
     action: "invite",
-    table_name: "staff",
-    row_id: userId,
+    tableName: "staff",
+    rowId: userId,
     after: { email, display_name: displayName, role_ids: roleIds } as unknown as AuditSnapshot,
   });
 

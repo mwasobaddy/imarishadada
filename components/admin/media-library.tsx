@@ -1,10 +1,10 @@
 "use client";
 
 import { PageHeader } from "@/components/admin/page-header";
-import { useState, useTransition, useRef } from "react";
+import { useEffect, useState, useTransition, useRef } from "react";
 import { toast } from "sonner";
 
-import { createMediaRecord, deleteMedia } from "@/app/[locale]/admin/actions/media";
+import { createMediaRecord, deleteMedia, getSignedUrl } from "@/app/[locale]/admin/actions/media";
 
 type MediaItem = {
   id: string;
@@ -35,8 +35,41 @@ export function MediaLibrary({ media: initial }: { media: MediaItem[] }) {
   const [consentTier, setConsentTier] = useState("none");
   const [consentExpires, setConsentExpires] = useState("");
   const [bucket, setBucket] = useState("public-media");
+  /**
+   * The preview URL for each item.
+   *
+   * The library used to point its thumbnails at `/api/media/...?bucket=…`,
+   * a route that does not exist, so every image in the library was broken.
+   * The buckets are private, so the browser needs a signed URL — which the
+   * admin action already knows how to mint.
+   */
+  const [signed, setSigned] = useState<Record<string, string>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pending, startTransition] = useTransition();
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function sign() {
+      const entries = await Promise.all(
+        media.map(async (item) => {
+          const url = await getSignedUrl(bucket, item.file_path);
+          return [item.id, url] as const;
+        }),
+      );
+      if (cancelled) return;
+      setSigned(
+        Object.fromEntries(
+          entries.filter((entry): entry is [string, string] => Boolean(entry[1])),
+        ),
+      );
+    }
+
+    void sign();
+    return () => {
+      cancelled = true;
+    };
+  }, [media, bucket]);
 
   async function handleUpload(e: React.FormEvent) {
     e.preventDefault();
@@ -75,7 +108,7 @@ export function MediaLibrary({ media: initial }: { media: MediaItem[] }) {
       });
 
       setMedia((prev) => [record as MediaItem, ...prev]);
-      toast.success("Media uploaded");
+      toast.success("Added to the media library");
       setAltText("");
       setConsentTier("none");
       setConsentExpires("");
@@ -173,7 +206,6 @@ export function MediaLibrary({ media: initial }: { media: MediaItem[] }) {
         </div>
         <button
           type="submit"
-          onClick={handleUpload}
           disabled={uploading}
           className="rounded-full bg-brand-600 px-6 py-2 text-sm font-medium text-brand-50 hover:bg-brand-700 disabled:opacity-50"
         >
@@ -191,12 +223,18 @@ export function MediaLibrary({ media: initial }: { media: MediaItem[] }) {
           {media.map((item) => (
             <div key={item.id} className="overflow-hidden rounded-xl border border-border bg-card">
               <div className="aspect-square bg-surface-lilac">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={`/api/media/${item.file_path}?bucket=${bucket}`}
-                  alt={item.alt_text}
-                  className="h-full w-full object-cover"
-                />
+                {signed[item.id] ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={signed[item.id]}
+                    alt={item.alt_text}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center text-xs text-ink-muted">
+                    No preview
+                  </div>
+                )}
               </div>
               <div className="p-3 space-y-1">
                 <p className="text-xs font-medium text-ink truncate">{item.file_name}</p>

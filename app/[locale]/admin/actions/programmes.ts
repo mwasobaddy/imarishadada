@@ -4,6 +4,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/client";
 import type { AuditSnapshot, Insert } from "@/lib/supabase/row-types";
 import { hasPermission } from "@/lib/admin/permissions";
+import { recordAudit } from "@/lib/admin/audit";
 
 async function requirePermission(resource: string, action: string) {
   if (!(await hasPermission(resource, action))) throw new Error(`Permission denied: ${resource}:${action}`);
@@ -51,7 +52,7 @@ export async function createProgramme(data: Insert<"programmes">) {
   }
   const { data: row, error } = await supabase.from("programmes").insert(data).select().single();
   if (error) throw new Error(error.message);
-  await supabase.from("audit_log").insert({ action: "create", table_name: "programmes", row_id: row.id, after: row as unknown as AuditSnapshot });
+  await recordAudit({ action: "create", tableName: "programmes", rowId: row.id, after: row as unknown as AuditSnapshot });
   revalidateTag("programmes", "max");
   revalidateTag("sections", "max");
   revalidatePath("/admin/content/programmes");
@@ -64,7 +65,7 @@ export async function updateProgramme(id: string, data: Insert<"programmes">) {
   const { data: before } = await supabase.from("programmes").select("*").eq("id", id).single();
   const { data: row, error } = await supabase.from("programmes").update(data).eq("id", id).select().single();
   if (error) throw new Error(error.message);
-  await supabase.from("audit_log").insert({ action: "update", table_name: "programmes", row_id: id, before: before as unknown as AuditSnapshot, after: row as unknown as AuditSnapshot });
+  await recordAudit({ action: "update", tableName: "programmes", rowId: id, before: before as unknown as AuditSnapshot, after: row as unknown as AuditSnapshot });
   revalidateTag("programmes", "max");
   revalidateTag("sections", "max");
   revalidatePath("/admin/content/programmes");
@@ -80,7 +81,7 @@ export async function deleteProgramme(id: string) {
   const { data: before } = await supabase.from("programmes").select("*").eq("id", id).single();
   const { error } = await supabase.from("programmes").delete().eq("id", id);
   if (error) throw new Error(error.message);
-  await supabase.from("audit_log").insert({ action: "delete", table_name: "programmes", row_id: id, before: before as unknown as AuditSnapshot });
+  await recordAudit({ action: "delete", tableName: "programmes", rowId: id, before: before as unknown as AuditSnapshot });
   revalidateTag("programmes", "max");
   revalidateTag("sections", "max");
   revalidatePath("/admin/content/programmes");
@@ -89,8 +90,10 @@ export async function deleteProgramme(id: string) {
 export async function toggleProgramme(id: string, active: boolean) {
   await requirePermission("programmes", "publish");
   const supabase = createServiceClient();
+  const { data: before } = await supabase.from("programmes").select("*").eq("id", id).maybeSingle();
   const { data: row, error } = await supabase.from("programmes").update({ active }).eq("id", id).select().single();
   if (error) throw new Error(error.message);
+  await recordAudit({ action: "update", tableName: "programmes", rowId: id, before: before as unknown as AuditSnapshot, after: row as unknown as AuditSnapshot });
   revalidateTag("programmes", "max");
   revalidateTag("sections", "max");
   revalidatePath("/admin/content/programmes");

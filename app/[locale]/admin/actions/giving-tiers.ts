@@ -4,6 +4,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/client";
 import type { AuditSnapshot, Update, WithOptionalSlug } from "@/lib/supabase/row-types";
 import { hasPermission } from "@/lib/admin/permissions";
+import { recordAudit } from "@/lib/admin/audit";
 
 async function requirePermission(resource: string, action: string) {
   if (!(await hasPermission(resource, action))) {
@@ -43,10 +44,10 @@ export async function createGivingTier(data: WithOptionalSlug<"giving_tiers">) {
     .select()
     .single();
   if (error) throw new Error(error.message);
-  await supabase.from("audit_log").insert({
+  await recordAudit({
     action: "create",
-    table_name: "giving_tiers",
-    row_id: tier.id,
+    tableName: "giving_tiers",
+    rowId: tier.id,
     after: tier as unknown as AuditSnapshot,
   });
   revalidateTag("giving-tiers", "max");
@@ -65,10 +66,10 @@ export async function updateGivingTier(id: string, data: Update<"giving_tiers">)
     .select()
     .single();
   if (error) throw new Error(error.message);
-  await supabase.from("audit_log").insert({
+  await recordAudit({
     action: "update",
-    table_name: "giving_tiers",
-    row_id: id,
+    tableName: "giving_tiers",
+    rowId: id,
     before: before as unknown as AuditSnapshot,
     after: tier as unknown as AuditSnapshot,
   });
@@ -83,10 +84,10 @@ export async function deleteGivingTier(id: string) {
   const { data: before } = await supabase.from("giving_tiers").select("*").eq("id", id).single();
   const { error } = await supabase.from("giving_tiers").delete().eq("id", id);
   if (error) throw new Error(error.message);
-  await supabase.from("audit_log").insert({
+  await recordAudit({
     action: "delete",
-    table_name: "giving_tiers",
-    row_id: id,
+    tableName: "giving_tiers",
+    rowId: id,
     before: before as unknown as AuditSnapshot,
   });
   revalidateTag("giving-tiers", "max");
@@ -96,6 +97,7 @@ export async function deleteGivingTier(id: string) {
 export async function toggleGivingTier(id: string, active: boolean) {
   await requirePermission("giving_tiers", "publish");
   const supabase = createServiceClient();
+  const { data: before } = await supabase.from("giving_tiers").select("*").eq("id", id).maybeSingle();
   const { data: tier, error } = await supabase
     .from("giving_tiers")
     .update({ active })
@@ -103,6 +105,7 @@ export async function toggleGivingTier(id: string, active: boolean) {
     .select()
     .single();
   if (error) throw new Error(error.message);
+  await recordAudit({ action: "update", tableName: "giving_tiers", rowId: id, before: before as unknown as AuditSnapshot, after: tier as unknown as AuditSnapshot });
   revalidateTag("giving-tiers", "max");
   revalidatePath("/admin/giving-tiers");
   return tier;

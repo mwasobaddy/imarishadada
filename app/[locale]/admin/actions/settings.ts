@@ -4,6 +4,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/client";
 import type { AuditSnapshot } from "@/lib/supabase/row-types";
 import { hasPermission } from "@/lib/admin/permissions";
+import { recordAudit } from "@/lib/admin/audit";
 
 async function requirePermission(resource: string, action: string) {
   if (!(await hasPermission(resource, action))) {
@@ -50,10 +51,10 @@ export async function updateSetting(key: string, value: unknown, changeNote?: st
       .single();
     if (vErr) throw new Error(vErr.message);
 
-    await supabase.from("audit_log").insert({
+    await recordAudit({
       action: "update",
-      table_name: "settings",
-      row_id: null,
+      tableName: "settings",
+      rowId: null,
       before: before as unknown as AuditSnapshot,
       after: { key, value, status: "pending_approval" } as unknown as AuditSnapshot,
     });
@@ -72,10 +73,10 @@ export async function updateSetting(key: string, value: unknown, changeNote?: st
 
   if (error) throw new Error(error.message);
 
-  await supabase.from("audit_log").insert({
+  await recordAudit({
     action: "update",
-    table_name: "settings",
-    row_id: null,
+    tableName: "settings",
+    rowId: null,
     before: before as unknown as AuditSnapshot,
     after: setting as unknown as AuditSnapshot,
   });
@@ -107,10 +108,10 @@ export async function approveSettingChange(versionId: string) {
 
   if (error) throw new Error(error.message);
 
-  await supabase.from("audit_log").insert({
+  await recordAudit({
     action: "approve",
-    table_name: "settings",
-    row_id: null,
+    tableName: "settings",
+    rowId: null,
     before: null,
     after: {
       key: version.key,

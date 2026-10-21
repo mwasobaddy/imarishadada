@@ -67,7 +67,7 @@ export function RolesManager({ roles: initialRoles, permissions }: { roles: Role
           toast.success("Role created");
         } else if (editing) {
           await updateRolePermissions(editing, Array.from(selectedPerms));
-          toast.success("Permissions updated");
+          toast.success("Role permissions updated. Check they were what you meant.");
         }
         cancel();
       } catch (e) {

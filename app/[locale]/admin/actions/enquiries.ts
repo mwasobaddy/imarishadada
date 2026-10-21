@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/client";
 import { hasPermission } from "@/lib/admin/permissions";
 import type { Update } from "@/lib/supabase/row-types";
+import { recordAudit } from "@/lib/admin/audit";
 
 async function requirePermission(resource: string, action: string) {
   if (!(await hasPermission(resource, action))) {
@@ -39,10 +40,10 @@ export async function updateEnquiryStatus(id: string, status: string, notes?: st
 
   if (error) throw new Error(error.message);
 
-  await supabase.from("audit_log").insert({
+  await recordAudit({
     action: "update",
-    table_name: "enquiries",
-    row_id: id,
+    tableName: "enquiries",
+    rowId: id,
     after: data,
   });
 
@@ -79,10 +80,10 @@ export async function updatePartnerEnquiryStatus(id: string, status: string, not
 
   if (error) throw new Error(error.message);
 
-  await supabase.from("audit_log").insert({
+  await recordAudit({
     action: "update",
-    table_name: "partner_enquiries",
-    row_id: id,
+    tableName: "partner_enquiries",
+    rowId: id,
     after: data,
   });
 
@@ -119,10 +120,10 @@ export async function updateVolunteerApplicationStatus(id: string, status: strin
 
   if (error) throw new Error(error.message);
 
-  await supabase.from("audit_log").insert({
+  await recordAudit({
     action: "update",
-    table_name: "volunteer_applications",
-    row_id: id,
+    tableName: "volunteer_applications",
+    rowId: id,
     after: data,
   });
 

@@ -6,6 +6,7 @@ import { createServiceClient } from "@/lib/supabase/client";
 import { hasPermission } from "@/lib/admin/permissions";
 import { SECTIONS_TAG, sectionTag } from "@/lib/data/sections";
 import type { AuditSnapshot, Update } from "@/lib/supabase/row-types";
+import { recordAudit } from "@/lib/admin/audit";
 
 /**
  * Page and section copy.
@@ -212,10 +213,10 @@ export async function updateSection(sectionKey: string, patch: SectionPatch) {
 
   if (error) throw new Error(error.message);
 
-  await supabase.from("audit_log").insert({
+  await recordAudit({
     action: "update",
-    table_name: "site_sections",
-    row_id: null,
+    tableName: "site_sections",
+    rowId: null,
     before: before as unknown as AuditSnapshot,
     after: after as unknown as AuditSnapshot,
   });
@@ -246,10 +247,10 @@ export async function toggleSection(sectionKey: string, active: boolean) {
 
   if (error) throw new Error(error.message);
 
-  await supabase.from("audit_log").insert({
+  await recordAudit({
     action: active ? "publish" : "update",
-    table_name: "site_sections",
-    row_id: null,
+    tableName: "site_sections",
+    rowId: null,
     after: { section_key: sectionKey, active } as unknown as AuditSnapshot,
   });
 

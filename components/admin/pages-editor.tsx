@@ -6,6 +6,7 @@ import { ExternalLink, Eye, EyeOff, RefreshCw, Smartphone, Monitor, X } from "lu
 import { SectionEditor } from "@/components/admin/section-editor";
 import type { MediaOption } from "@/components/admin/media-picker";
 import { sectionLabel, type SectionForm } from "@/lib/admin/section-form";
+import type { PreviewData } from "@/lib/admin/preview-data";
 
 /**
  * The page editor.
@@ -28,11 +29,14 @@ export function PagesEditor({
   page,
   sections,
   media,
+  previewData,
   canEditSeo,
 }: {
   page: { label: string; route: string };
   sections: SectionForm[];
   media: MediaOption[];
+  /** The published data the exact previews render alongside the copy. */
+  previewData: PreviewData;
   canEditSeo: boolean;
 }) {
   const [openKey, setOpenKey] = useState<string | null>(sections[0]?.section_key ?? null);
@@ -169,12 +173,14 @@ export function PagesEditor({
         </nav>
 
         <div className="min-w-0 space-y-3">
-          {sections.map((section) => (
+          {sections.map((section, index) => (
             <SectionEditor
               key={section.section_key}
+              index={index + 1}
               section={section}
               route={page.route}
               media={media}
+              previewData={previewData}
               open={openKey === section.section_key}
               onToggle={() =>
                 setOpenKey((current) =>

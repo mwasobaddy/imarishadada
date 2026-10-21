@@ -1,4 +1,4 @@
-import { createAuthServerClient } from "@/lib/supabase/auth-server";
+import { getAuthServerClient } from "@/lib/supabase/auth-server";
 import { createAuthBrowserClient } from "@/lib/supabase/auth-browser";
 
 export type Permission = { resource: string; action: string };
@@ -8,7 +8,7 @@ export type Permission = { resource: string; action: string };
  * Returns an empty array if not authenticated.
  */
 export async function getMyPermissions(): Promise<Permission[]> {
-  const supabase = await createAuthServerClient();
+  const supabase = await getAuthServerClient();
   const { data: claims } = await supabase.auth.getClaims();
   if (!claims?.claims?.sub) return [];
 
@@ -30,7 +30,7 @@ export async function hasPermission(resource: string, action: string): Promise<b
  * Returns null if not authenticated or not staff.
  */
 export async function getCurrentStaff() {
-  const supabase = await createAuthServerClient();
+  const supabase = await getAuthServerClient();
   const { data: claims } = await supabase.auth.getClaims();
   if (!claims?.claims?.sub) return null;
 
@@ -48,7 +48,7 @@ export async function getCurrentStaff() {
  * Server-side: get the current user's roles.
  */
 export async function getMyRoles(): Promise<{ id: string; name: string }[]> {
-  const supabase = await createAuthServerClient();
+  const supabase = await getAuthServerClient();
   const { data: claims } = await supabase.auth.getClaims();
   if (!claims?.claims?.sub) return [];
 
@@ -65,7 +65,7 @@ export async function getMyRoles(): Promise<{ id: string; name: string }[]> {
  * Check if the current user is a developer (stealth).
  */
 export async function isDeveloper(): Promise<boolean> {
-  const supabase = await createAuthServerClient();
+  const supabase = await getAuthServerClient();
   const { data: claims } = await supabase.auth.getClaims();
   if (!claims?.claims?.sub) return false;
 

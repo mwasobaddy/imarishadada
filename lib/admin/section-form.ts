@@ -1,4 +1,5 @@
 import type { SectionPatch } from "@/app/[locale]/admin/actions/pages";
+import type { SiteSection } from "@/lib/data/types";
 
 /**
  * The section form, and the rules it obeys.
@@ -181,6 +182,65 @@ export function toPatch(form: SectionForm): SectionPatch {
     image_alt: blankToNull(form.image_alt),
     seo_title: blankToNull(form.seo_title),
     seo_description: blankToNull(form.seo_description),
+  };
+}
+
+/**
+ * The other direction: a resolved section back into a form.
+ *
+ * Used where the page's copy is already resolved — the preview data loader
+ * hands the same sections to the preview, and a section that was read as a
+ * `SiteSection` still has to become a form to be edited.
+ */
+export function fromSiteSection(section: SiteSection): SectionForm {
+  return {
+    section_key: section.key,
+    page_key: null,
+    sort_order: 0,
+    active: section.active,
+    eyebrow: section.eyebrow ?? "",
+    heading: section.heading ?? "",
+    body: section.body ?? "",
+    body_secondary: section.bodySecondary ?? null,
+    stat_line: section.statLine ?? null,
+    cta_label: section.ctaLabel ?? "",
+    cta_href: section.ctaHref ?? "",
+    cta_secondary_label: section.ctaSecondaryLabel ?? "",
+    cta_secondary_href: section.ctaSecondaryHref ?? "",
+    steps: section.steps ?? null,
+    images: section.images ?? null,
+    image_path: section.imagePath ?? "",
+    image_alt: section.imageAlt ?? "",
+    seo_title: "",
+    seo_description: "",
+  };
+}
+
+/**
+ * The form as the page sees it.
+ *
+ * The public components take a `SiteSection` — the resolved shape, with
+ * `ctaLabel`, `statLine` and so on. The form holds the raw column names. This
+ * is the one place the two meet, and it is what lets the admin preview hand
+ * the *real* component the words the editor has just typed.
+ */
+export function toPreviewSection(form: SectionForm): SiteSection {
+  return {
+    key: form.section_key,
+    eyebrow: form.eyebrow || null,
+    heading: form.heading,
+    body: form.body || null,
+    ctaLabel: form.cta_label || null,
+    ctaHref: form.cta_href || null,
+    ctaSecondaryLabel: form.cta_secondary_label || null,
+    ctaSecondaryHref: form.cta_secondary_href || null,
+    statLine: form.stat_line,
+    bodySecondary: form.body_secondary,
+    steps: form.steps,
+    images: form.images,
+    imagePath: form.image_path || null,
+    imageAlt: form.image_alt || null,
+    active: form.active,
   };
 }
 

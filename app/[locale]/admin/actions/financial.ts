@@ -4,6 +4,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/client";
 import type { AuditSnapshot, Insert } from "@/lib/supabase/row-types";
 import { hasPermission } from "@/lib/admin/permissions";
+import { recordAudit } from "@/lib/admin/audit";
 
 async function requirePermission(resource: string, action: string) {
   if (!(await hasPermission(resource, action))) throw new Error(`Permission denied: ${resource}:${action}`);
@@ -23,7 +24,7 @@ export async function createFinancialBreakdown(data: Insert<"financial_breakdown
   const supabase = createServiceClient();
   const { data: row, error } = await supabase.from("financial_breakdown").insert(data).select().single();
   if (error) throw new Error(error.message);
-  await supabase.from("audit_log").insert({ action: "create", table_name: "financial_breakdown", row_id: row.id, after: row as unknown as AuditSnapshot });
+  await recordAudit({ action: "create", tableName: "financial_breakdown", rowId: row.id, after: row as unknown as AuditSnapshot });
   revalidateTag("financial-breakdown", "max");
   revalidateTag("transparency-gaps", "max");
   revalidatePath("/admin/financials");
@@ -33,8 +34,10 @@ export async function createFinancialBreakdown(data: Insert<"financial_breakdown
 export async function updateFinancialBreakdown(id: string, data: Insert<"financial_breakdown">) {
   await requirePermission("financial_breakdown", "update");
   const supabase = createServiceClient();
+  const { data: before } = await supabase.from("financial_breakdown").select("*").eq("id", id).maybeSingle();
   const { data: row, error } = await supabase.from("financial_breakdown").update(data).eq("id", id).select().single();
   if (error) throw new Error(error.message);
+  await recordAudit({ action: "update", tableName: "financial_breakdown", rowId: id, before: before as unknown as AuditSnapshot, after: row as unknown as AuditSnapshot });
   revalidateTag("financial-breakdown", "max");
   revalidateTag("transparency-gaps", "max");
   revalidatePath("/admin/financials");
@@ -44,8 +47,10 @@ export async function updateFinancialBreakdown(id: string, data: Insert<"financi
 export async function deleteFinancialBreakdown(id: string) {
   await requirePermission("financial_breakdown", "delete");
   const supabase = createServiceClient();
+  const { data: before } = await supabase.from("financial_breakdown").select("*").eq("id", id).maybeSingle();
   const { error } = await supabase.from("financial_breakdown").delete().eq("id", id);
   if (error) throw new Error(error.message);
+  await recordAudit({ action: "delete", tableName: "financial_breakdown", rowId: id, before: before as unknown as AuditSnapshot });
   revalidateTag("financial-breakdown", "max");
   revalidateTag("transparency-gaps", "max");
   revalidatePath("/admin/financials");
@@ -65,7 +70,7 @@ export async function createTransparencyGap(data: Insert<"transparency_gaps">) {
   const supabase = createServiceClient();
   const { data: row, error } = await supabase.from("transparency_gaps").insert(data).select().single();
   if (error) throw new Error(error.message);
-  await supabase.from("audit_log").insert({ action: "create", table_name: "transparency_gaps", row_id: row.id, after: row as unknown as AuditSnapshot });
+  await recordAudit({ action: "create", tableName: "transparency_gaps", rowId: row.id, after: row as unknown as AuditSnapshot });
   revalidateTag("financial-breakdown", "max");
   revalidateTag("transparency-gaps", "max");
   revalidatePath("/admin/transparency");
@@ -75,8 +80,10 @@ export async function createTransparencyGap(data: Insert<"transparency_gaps">) {
 export async function updateTransparencyGap(id: string, data: Insert<"transparency_gaps">) {
   await requirePermission("transparency_gaps", "update");
   const supabase = createServiceClient();
+  const { data: before } = await supabase.from("transparency_gaps").select("*").eq("id", id).maybeSingle();
   const { data: row, error } = await supabase.from("transparency_gaps").update(data).eq("id", id).select().single();
   if (error) throw new Error(error.message);
+  await recordAudit({ action: "update", tableName: "transparency_gaps", rowId: id, before: before as unknown as AuditSnapshot, after: row as unknown as AuditSnapshot });
   revalidateTag("financial-breakdown", "max");
   revalidateTag("transparency-gaps", "max");
   revalidatePath("/admin/transparency");
@@ -86,8 +93,10 @@ export async function updateTransparencyGap(id: string, data: Insert<"transparen
 export async function deleteTransparencyGap(id: string) {
   await requirePermission("transparency_gaps", "delete");
   const supabase = createServiceClient();
+  const { data: before } = await supabase.from("transparency_gaps").select("*").eq("id", id).maybeSingle();
   const { error } = await supabase.from("transparency_gaps").delete().eq("id", id);
   if (error) throw new Error(error.message);
+  await recordAudit({ action: "delete", tableName: "transparency_gaps", rowId: id, before: before as unknown as AuditSnapshot });
   revalidateTag("financial-breakdown", "max");
   revalidateTag("transparency-gaps", "max");
   revalidatePath("/admin/transparency");

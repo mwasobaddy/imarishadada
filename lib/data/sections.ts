@@ -77,16 +77,14 @@ function hidden(key: string): SiteSection {
 }
 
 /**
- * Whether a section should render.
+ * Re-exported from `lib/data/visibility.ts`.
  *
- * Every page that composes editor-managed sections guards with this. A hidden
- * section arrives as `hidden(key)` — an empty heading with `active: false` —
- * rather than being filtered out, so the caller decides what to omit and the
- * page's structure stays readable.
+ * The function moved out so that client components — the admin's live preview
+ * renders the real public components — can use it without pulling
+ * `next/cache` into the browser bundle. Server code keeps importing it from
+ * here, where it has always lived.
  */
-export function isVisible(section: SiteSection | undefined | null): boolean {
-  return section?.active === true;
-}
+export { isVisible } from "@/lib/data/visibility";
 
 /**
  * Fallbacks, used when Supabase is unreachable or not configured.

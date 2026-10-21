@@ -43,13 +43,17 @@ export default async function AuditLogPage() {
                 </StatusBadge>
               </td>
               <td className="px-4 py-3 text-ink-muted">{log.table_name}</td>
-              <td className="px-4 py-3 text-ink-muted">{log.actor_email ?? "system"}</td>
+              <td className="px-4 py-3 text-ink-muted">
+                {log.actor_email ?? "unknown"}
+              </td>
               <td className="max-w-xs truncate px-4 py-3 font-mono text-xs text-ink-muted">
-                {log.after
-                  ? JSON.stringify(log.after).slice(0, 80)
-                  : log.before
-                    ? JSON.stringify(log.before).slice(0, 80)
-                    : "—"}
+                {log.metadata
+                  ? JSON.stringify(log.metadata).slice(0, 80)
+                  : log.after
+                    ? JSON.stringify(log.after).slice(0, 80)
+                    : log.before
+                      ? JSON.stringify(log.before).slice(0, 80)
+                      : "—"}
               </td>
             </tr>
           ))}

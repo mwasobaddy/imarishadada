@@ -103,6 +103,7 @@ export function ProgrammesEditor({ programmes: initial }: { programmes: Programm
       try {
         await toggleProgramme(id, active);
         setProgrammes((prev) => prev.map((p) => (p.id === id ? { ...p, active } : p)));
+        toast.success(active ? "Programme shown" : "Programme hidden");
       } catch (e) {
         toast.error(e instanceof Error ? e.message : "Toggle failed");
       }
@@ -114,7 +115,7 @@ export function ProgrammesEditor({ programmes: initial }: { programmes: Programm
       <PageHeader
         eyebrow="Content"
         title="Programmes"
-        description="{programmes.length} programmes."
+        description={`${programmes.length} programmes.`}
         action={(
           <button
             type="button"

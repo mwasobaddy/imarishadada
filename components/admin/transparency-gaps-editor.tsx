@@ -100,7 +100,7 @@ export function TransparencyGapsEditor({ gaps: initial }: { gaps: Row[] }) {
     startTransition(async () => {
       try {
         await updateTransparencyGap(row.id, toPayload(row));
-        toast.success("Saved. The page updates within seconds.");
+        toast.success("Gap saved. The transparency page updates within seconds.");
       } catch (e) {
         toast.error(e instanceof Error ? e.message : "Save failed");
       }
@@ -138,7 +138,7 @@ export function TransparencyGapsEditor({ gaps: initial }: { gaps: Row[] }) {
       try {
         await deleteTransparencyGap(row.id);
         setRows((prev) => prev.filter((r) => r.id !== row.id));
-        toast.success("Deleted");
+        toast.success("Gap deleted");
       } catch (e) {
         toast.error(e instanceof Error ? e.message : "Delete failed");
       }

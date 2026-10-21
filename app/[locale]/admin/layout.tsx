@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Toaster } from "sonner";
 
-import { createAuthServerClient } from "@/lib/supabase/auth-server";
+import { getAuthServerClient } from "@/lib/supabase/auth-server";
 import { getMyPermissions, getCurrentStaff } from "@/lib/admin/permissions";
 import { createServiceClient } from "@/lib/supabase/client";
 
@@ -42,8 +42,7 @@ export const metadata: Metadata = {
  * and this is a database read. `null` means the caller cannot read pages, in
  * which case the nav item does not render at all.
  */
-async function loadPages(canReadPages: boolean) {
-  if (!canReadPages) return null;
+async function loadPages() {
   const { data } = await createServiceClient()
     .from("site_pages")
     .select("page_key, label, route, sort_order")
@@ -75,16 +74,30 @@ async function AdminGate({
   children: React.ReactNode;
   locale: string;
 }) {
-  const supabase = await createAuthServerClient();
+  const supabase = await getAuthServerClient();
   const { data: claims } = await supabase.auth.getClaims();
 
   if (!claims?.claims?.sub) {
     redirect(`/${locale}/auth/login?next=/admin`);
   }
 
-  const [staff, permissions] = await Promise.all([
+  /**
+   * The three reads run together.
+   *
+   * They used to run one after another — the staff record and the permissions
+   * together, then the page list, because the page list was only fetched for
+   * a staff member who may read pages. That last round trip was on the critical
+   * path of every admin screen, including the first one after signing in, and
+   * it was the slowest part of it.
+   *
+   * The page list is now fetched alongside the others and handed to the shell
+   * only if the permission is there, so it never reaches a staff member who
+   * may not see it.
+   */
+  const [staff, permissions, allPages] = await Promise.all([
     getCurrentStaff(),
     getMyPermissions(),
+    loadPages(),
   ]);
 
   if (!staff || !staff.is_active) {
@@ -98,7 +111,7 @@ async function AdminGate({
   const canReadPages = permissions.some(
     (p) => p.resource === "pages" && p.action === "read",
   );
-  const pages = await loadPages(canReadPages);
+  const pages = canReadPages ? allPages : null;
 
   return (
     <>

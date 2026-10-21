@@ -88,6 +88,7 @@ export function FaqsEditor({ faqs: initial }: { faqs: Faq[] }) {
       try {
         await toggleFaq(id, published);
         setFaqs((prev) => prev.map((f) => (f.id === id ? { ...f, published } : f)));
+        toast.success(published ? "FAQ published" : "FAQ hidden from the page");
       } catch (e) {
         toast.error(e instanceof Error ? e.message : "Toggle failed");
       }
@@ -99,7 +100,7 @@ export function FaqsEditor({ faqs: initial }: { faqs: Faq[] }) {
       <PageHeader
         eyebrow="Content"
         title="FAQs"
-        description="{faqs.length} entries."
+        description={`${faqs.length} entries.`}
         action={(
           <button
             type="button"

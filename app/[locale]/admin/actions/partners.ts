@@ -5,6 +5,7 @@ import { createServiceClient } from "@/lib/supabase/client";
 import type { AuditSnapshot, Insert } from "@/lib/supabase/row-types";
 import { hasPermission } from "@/lib/admin/permissions";
 import { activationBlocker } from "@/lib/partner/visibility";
+import { recordAudit } from "@/lib/admin/audit";
 
 async function requirePermission(resource: string, action: string) {
   if (!(await hasPermission(resource, action))) throw new Error(`Permission denied: ${resource}:${action}`);
@@ -46,7 +47,7 @@ export async function createPartner(data: Insert<"partners">) {
   const supabase = createServiceClient();
   const { data: row, error } = await supabase.from("partners").insert(data).select().single();
   if (error) throw new Error(error.message);
-  await supabase.from("audit_log").insert({ action: "create", table_name: "partners", row_id: row.id, after: row as unknown as AuditSnapshot });
+  await recordAudit({ action: "create", tableName: "partners", rowId: row.id, after: row as unknown as AuditSnapshot });
   revalidateTag("partners", "max");
   revalidatePath("/admin/content/partners");
   return row;
@@ -56,8 +57,10 @@ export async function updatePartner(id: string, data: Insert<"partners">) {
   await requirePermission("partners", "update");
   assertWritable(data);
   const supabase = createServiceClient();
+  const { data: before } = await supabase.from("partners").select("*").eq("id", id).maybeSingle();
   const { data: row, error } = await supabase.from("partners").update(data).eq("id", id).select().single();
   if (error) throw new Error(error.message);
+  await recordAudit({ action: "update", tableName: "partners", rowId: id, before: before as unknown as AuditSnapshot, after: row as unknown as AuditSnapshot });
   revalidateTag("partners", "max");
   revalidatePath("/admin/content/partners");
   return row;
@@ -66,8 +69,10 @@ export async function updatePartner(id: string, data: Insert<"partners">) {
 export async function deletePartner(id: string) {
   await requirePermission("partners", "delete");
   const supabase = createServiceClient();
+  const { data: before } = await supabase.from("partners").select("*").eq("id", id).maybeSingle();
   const { error } = await supabase.from("partners").delete().eq("id", id);
   if (error) throw new Error(error.message);
+  await recordAudit({ action: "delete", tableName: "partners", rowId: id, before: before as unknown as AuditSnapshot });
   revalidateTag("partners", "max");
   revalidatePath("/admin/content/partners");
 }
