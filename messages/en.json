@@ -78,11 +78,21 @@
     },
     "summary": {
       "heading": "Your gift",
-      "processingFee": "Processing fee",
-      "noFee": "No fee",
+      "amount": "Amount",
+      "monthlySuffix": "(monthly)",
       "total": "Total",
       "give": "Give {amount}",
-      "pending": "Opening secure payment…"
+      "pending": "Opening secure payment…",
+      "funds": "This funds",
+      "coverFeeLabel": "Add {fee} to cover the card processing fee,",
+      "coverFeeWhy": "so 100% of my {amount} reaches the girls.",
+      "coverFeeDeclined": "Unticked — we absorb the fee and you give the amount above."
+    },
+    "trust": {
+      "encrypted": "Encrypted payment. We never see or store your card details.",
+      "mpesa": "M-Pesa goes directly to Imarisha Dada. We never ask you to type a paybill number.",
+      "questions": "Questions?",
+      "fiscalSponsor": "Donations are received through {sponsor}, and are tax-deductible to the extent allowed by law."
     },
     "outcome": {
       "whereNeededMost": "Where it is needed most"
@@ -113,13 +123,15 @@
       "shareSubject": "My gift to Imarisha Dada",
       "shareBody": "I just gave to Imarisha Dada, a girl-led organisation in Kibera, Nairobi.",
       "backToSite": "Back to the site",
+      "readStory": "Read why one of them went back to school →",
       "sisterhood": "You are now part of the sisterhood.",
       "reference": "Reference {reference}. Your receipt is on its way by email."
     },
     "failure": {
       "title": "Your gift did not go through",
       "body": "Nothing has been charged, and no money has left your account. You can try again, or reach us directly and we will take your gift another way.",
-      "tryAgain": "Try again"
+      "tryAgain": "Try again",
+      "mpesaNote": "If M-Pesa sent you a prompt you did not expect, you can ignore it — it will expire on its own and nothing will be taken. We never ask you to type a paybill number, and we never ask you to approve a payment you did not start."
     }
   },
   "errors": {

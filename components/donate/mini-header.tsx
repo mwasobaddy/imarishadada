@@ -35,7 +35,22 @@ export function MiniHeader() {
 
         <div className="flex items-center gap-4">
           <span className="hidden items-center gap-1.5 text-sm text-ink-muted sm:inline-flex">
-            <span aria-hidden="true">🔒</span>
+            {/* Inline SVG, not an emoji — the project's design rules forbid
+                emoji as UI icons, and a lock emoji renders differently on
+                every platform. */}
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              className="size-3.5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="3" y="11" width="18" height="11" rx="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
             Secure donation
           </span>
 

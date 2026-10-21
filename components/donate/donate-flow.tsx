@@ -16,7 +16,6 @@ import {
   convertAmount,
   DonationError,
   SETTLEMENT_CURRENCY,
-  totalCharge,
   validateDonorDetails,
   type Cadence,
   type CurrencyCode,
@@ -53,13 +52,29 @@ export function DonateFlow({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  const [cadence, setCadence] = useState<Cadence>("one_time");
+  const [cadence, setCadence] = useState<Cadence>("monthly");
   const [currency, setCurrency] = useState<CurrencyCode>("KES");
-  const [selectedSlug, setSelectedSlug] = useState<string>(tiers[0]?.slug ?? "");
+  // Defaults to the first tier of the default cadence, not simply the first
+  // tier — the two are different lists.
+  const [selectedSlug, setSelectedSlug] = useState<string>(
+    tiers.find((t) => t.cadence === "monthly")?.slug ?? tiers[0]?.slug ?? "",
+  );
   const [customAmount, setCustomAmount] = useState("");
   const [rail, setRail] = useState<PaymentRail | null>(
-    rails.card.enabled ? "card" : rails.bank.enabled ? "bank" : null,
+    rails.mpesa.enabled
+      ? "mpesa"
+      : rails.card.enabled
+        ? "card"
+        : rails.bank.enabled
+          ? "bank"
+          : null,
   );
+  /**
+   * Ticked by default. The card networks charge the organisation, so this is
+   * the donor being asked to cover our cost — and the research is that most
+   * say yes when asked rather than not being asked at all.
+   */
+  const [coverFee, setCoverFee] = useState(true);
 
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -84,6 +99,7 @@ export function DonateFlow({
       return {
         amount: 0,
         fee: 0,
+        feeIfCovered: 0,
         total: 0,
         outcomeLabel: "",
         valid: false,
@@ -92,10 +108,16 @@ export function DonateFlow({
 
     const amount = convertAmount(settlementAmount, SETTLEMENT_CURRENCY, currency);
     const effectiveRail = rail ?? "mpesa";
+    // The fee the donor *would* pay, so the checkbox can state a number before
+    // it is ticked. `fee` is what is actually in the total.
+    const feeIfCovered = calculateFee(amount, effectiveRail);
+    const fee = coverFee ? feeIfCovered : 0;
+
     return {
       amount,
-      fee: calculateFee(amount, effectiveRail),
-      total: totalCharge(amount, effectiveRail),
+      fee,
+      feeIfCovered,
+      total: Math.round((amount + fee) * 100) / 100,
       outcomeLabel:
         selectedSlug === "custom" ? t("outcome.whereNeededMost") : (tier?.outcomeLabel ?? ""),
       valid: true,
@@ -103,7 +125,7 @@ export function DonateFlow({
     // `t` is included: the outcome label is locale-dependent, so a
     // locale change must recompute the preview. `useTranslations` returns a
     // new function identity per locale, so this is not a spurious dependency.
-  }, [tiers, selectedSlug, customAmount, currency, rail, t]);
+  }, [tiers, selectedSlug, customAmount, currency, rail, coverFee, t]);
 
   const canPay = Boolean(rail) && preview.valid && preview.total > 0 && !isPending;
 
@@ -141,6 +163,7 @@ export function DonateFlow({
           cadence,
           currency,
           rail: rail!,
+          coverFee,
           email,
           name,
           phone,
@@ -276,11 +299,14 @@ export function DonateFlow({
         <OrderSummary
           amount={preview.amount}
           currency={currency}
-          fee={preview.fee}
+          feeIfCovered={preview.feeIfCovered}
+          coverFee={coverFee}
+          onCoverFeeChange={setCoverFee}
           total={preview.total}
           cadence={cadence}
           outcomeLabel={preview.outcomeLabel}
           rail={rail}
+          rails={rails}
           tax={tax}
           status={isPending ? "pending" : payError ? "error" : "idle"}
           pendingLabel={t("summary.pending")}

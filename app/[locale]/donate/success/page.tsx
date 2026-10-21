@@ -170,7 +170,21 @@ async function DonationOutcome({
       </div>
 
       <p className="mt-8 text-lg text-ink">{t("success.sisterhood")}</p>
-      <p className="mt-2 text-sm text-ink-muted">
+
+      {/*
+        The highest-emotion moment on the site, and the roadmap's point: this is
+        the best prompt for the next thing a donor does. Reading a story is the
+        cheapest next step and the one most likely to bring them back — it costs
+        nothing and it is what turns a one-off gift into a relationship.
+      */}
+      <Link
+        href="/stories"
+        className="mt-6 inline-flex min-h-11 items-center text-sm font-medium text-brand-600 underline decoration-brand-600/40 underline-offset-4 hover:decoration-brand-700 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-700"
+      >
+        {t("success.readStory")}
+      </Link>
+
+      <p className="mt-6 text-sm text-ink-muted">
         {t("success.reference", { reference: donation.reference })}
       </p>
     </div>

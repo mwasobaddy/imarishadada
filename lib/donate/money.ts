@@ -148,6 +148,13 @@ export function convertAmount(
  *
  * Rounded to 2dp and clamped at zero, so a small donation can never produce a
  * negative total.
+ *
+ * ## This is what the fee *would* be, not what the donor owes
+ *
+ * The card networks charge the organisation, not the donor. Whether the donor
+ * is asked to cover it is a product decision, and it is made in
+ * `resolveDonation` via `coverFee`. This function answers "how much is it"
+ * so the UI can state a number before asking.
  */
 export function calculateFee(
   amount: number,
@@ -177,8 +184,21 @@ export type ResolvedDonation = {
   currency: CurrencyCode;
   cadence: Cadence;
   outcomeLabel: string;
+  /**
+   * The processing fee **added to the donor's charge**.
+   *
+   * Zero when the donor declined to cover it. `total` is always
+   * `displayAmount + fee`, so the ledger invariant holds either way.
+   *
+   * Note this is not "the fee the organisation paid" — the organisation pays
+   * the network regardless. When `coverFee` is false the fee is absorbed
+   * outside the donor's row rather than recorded as zero-cost.
+   */
   fee: number;
+  /** What actually leaves the donor's account. */
   total: number;
+  /** Whether the donor agreed to cover the fee. Recorded so a receipt can say so. */
+  coverFee: boolean;
 };
 
 export class DonationError extends Error {
@@ -205,8 +225,23 @@ export class DonationError extends Error {
  * This is the single place a charge is decided. Callers must pass tiers that
  * came from the database — never from the request body.
  *
+ * ## `coverFee` is a donor choice, and it is server-validated like everything else
+ *
+ * The card networks charge the organisation, not the donor. Asking the donor to
+ * cover it is a legitimate and common practice — Fundraise Up reports 92% of
+ * donors agree when asked — but it must be an **asked** choice, and the flag
+ * arrives from the browser, so it is treated as untrusted input like the amount.
+ *
+ * It cannot be used to underpay: it only ever *removes* the fee from the total.
+ * A tampered POST that sends `coverFee: false` while the UI showed the fee
+ * results in the donor being charged less, never a receipt for more than was
+ * paid.
+ *
  * @param customAmount Only used when `tierSlug` is `"custom"`. Rounded and
  *   validated against `MINIMUM_CHARGE`.
+ * @param coverFee     Whether the donor agreed to cover the processing fee.
+ *   Defaults to **false** — the safe direction. A caller that forgets to pass
+ *   it under-charges the donor rather than adding a fee they did not agree to.
  */
 export function resolveDonation({
   tiers,
@@ -214,12 +249,14 @@ export function resolveDonation({
   customAmount,
   currency = SETTLEMENT_CURRENCY,
   rail,
+  coverFee = false,
 }: {
   tiers: Tier[];
   tierSlug: string;
   customAmount?: number;
   currency?: CurrencyCode;
   rail: PaymentRail;
+  coverFee?: boolean;
 }): ResolvedDonation {
   if (!SUPPORTED_CURRENCIES.includes(currency)) {
     throw new DonationError(
@@ -280,7 +317,10 @@ export function resolveDonation({
     SETTLEMENT_CURRENCY,
     currency,
   );
-  const fee = calculateFee(displayAmount, rail);
+
+  // The fee is only added when the donor asked to cover it. Clamped at zero so
+  // a rounding artefact can never produce a negative total.
+  const fee = coverFee ? calculateFee(displayAmount, rail) : 0;
   const total = Math.round((displayAmount + fee) * 100) / 100;
 
   return {
@@ -292,6 +332,7 @@ export function resolveDonation({
     outcomeLabel,
     fee,
     total,
+    coverFee,
   };
 }
 

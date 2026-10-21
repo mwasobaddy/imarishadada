@@ -1,17 +1,21 @@
 import type { Metadata } from "next";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 
 import { DonateFlow } from "@/components/donate/donate-flow";
+import { ImpactBand } from "@/components/donate/impact-band";
 import { MiniHeader } from "@/components/donate/mini-header";
 import { Container } from "@/components/site/container";
 import {
   bankRailUsable,
   getBankDetails,
+  getDonateSections,
   getPaymentRails,
   getTaxReceipt,
 } from "@/lib/data/donate";
 import { getGivingTiers } from "@/lib/data/home";
+import { getAllImpactStats } from "@/lib/data/impact";
+import { isVisible } from "@/lib/data/sections";
 import { breadcrumbJsonLd, jsonLdScript, absoluteUrl } from "@/lib/seo";
 
 /**
@@ -95,7 +99,17 @@ export default async function DonatePage({
   // page they wrap.
   setRequestLocale(locale);
 
-  const t = await getTranslations({ locale, namespace: "donate" });
+  const [sections, stats] = await Promise.all([
+    getDonateSections(),
+    getAllImpactStats(),
+  ]);
+
+  const hero = sections["donate-hero"];
+  const impact = sections["donate-impact"];
+
+  // The first active stat by `sort_order`. An editor chooses which figure leads
+  // by reordering at /admin/impact — see the note in migration 0020.
+  const headlineStat = stats[0] ?? null;
 
   return (
     <>
@@ -104,17 +118,26 @@ export default async function DonatePage({
       <main id="main" className="bg-surface py-section">
         <Container>
           <div className="max-w-2xl">
-            <p className="text-sm font-medium tracking-wide text-brand-600 uppercase">
-              Give
-            </p>
-            <h1 className="mt-3 text-4xl font-semibold tracking-tight text-brand-600 sm:text-5xl">
-              {t("title")}.
-            </h1>
-            <p className="measure mt-5 text-lg text-ink-muted">
-              Every amount below is tied to a specific outcome. Give monthly and a
-              mentor&rsquo;s continuity matters as much as a single emergency.
-            </p>
+            {isVisible(hero) ? (
+              <>
+                {hero.eyebrow ? (
+                  <p className="text-sm font-medium tracking-wide text-brand-600 uppercase">
+                    {hero.eyebrow}
+                  </p>
+                ) : null}
+                <h1 className="mt-3 text-4xl font-semibold tracking-tight text-brand-600 sm:text-5xl">
+                  {hero.heading}
+                </h1>
+                {hero.body ? (
+                  <p className="measure mt-5 text-lg text-ink-muted">{hero.body}</p>
+                ) : null}
+              </>
+            ) : null}
           </div>
+
+          {isVisible(impact) ? (
+            <ImpactBand stat={headlineStat} section={impact} />
+          ) : null}
 
           {/* Payment config can be slow while Supabase warms; the shell renders
               immediately so the donor sees the page, not a spinner. */}

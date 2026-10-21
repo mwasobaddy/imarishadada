@@ -2,6 +2,8 @@ import { cacheLife, cacheTag } from "next/cache";
 
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { getGivingTiers } from "@/lib/data/home";
+import { getSection } from "@/lib/data/sections";
+import type { SiteSection } from "@/lib/data/types";
 import type { PaymentRail } from "@/lib/donate/money";
 
 /**
@@ -75,16 +77,45 @@ const SEED_TAX: TaxReceipt = {
   fiscalSponsor: null,
 };
 
-function parseJson<T>(value: unknown, fallback: T): T {
-  if (typeof value !== "string") return fallback;
-  try {
-    const parsed = JSON.parse(value) as unknown;
-    return parsed && typeof parsed === "object" ? { ...fallback, ...(parsed as object) } as T : fallback;
-  } catch {
-    // A malformed settings row must not take the donate page down. Fall back
-    // and let an editor fix it.
-    return fallback;
+/**
+ * Merge a `settings` row over its fallback.
+ *
+ * ## The bug this had
+ *
+ * `settings.value` is `jsonb`, so PostgREST hands back a **parsed object**, not
+ * a string. The original version only handled a string and returned the
+ * fallback for everything else — which meant it *always* returned the fallback.
+ *
+ * The consequence was invisible and total: every rail label, every bank detail
+ * and the entire tax sentence on the public donate page came from the `SEED_*`
+ * constants in this file, and an editor changing them in `/admin/settings` saw
+ * nothing change on the page. The values were in the database the whole time.
+ *
+ * This is precisely the failure the donate spec names as the most common way
+ * charity sites ship stale payment details, so it is handled for both shapes and
+ * covered by a test.
+ *
+ * A malformed row still falls back rather than taking the donate page down.
+ */
+export function mergeSettings<T extends object>(value: unknown, fallback: T): T {
+  // jsonb: already an object.
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    return { ...fallback, ...(value as object) } as T;
   }
+
+  // A text column, or a value that arrived pre-serialised.
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value) as unknown;
+      return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+        ? ({ ...fallback, ...(parsed as object) } as T)
+        : fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  return fallback;
 }
 
 /**
@@ -109,7 +140,7 @@ export async function getPaymentRails(): Promise<PaymentRails> {
 
   if (error || !data) return SEED_RAILS;
 
-  const parsed = parseJson<Partial<PaymentRails>>(data.value, {});
+  const parsed = mergeSettings<Partial<PaymentRails>>(data.value, {});
   return {
     mpesa: { ...SEED_RAILS.mpesa, ...(parsed.mpesa ?? {}) },
     card: { ...SEED_RAILS.card, ...(parsed.card ?? {}) },
@@ -139,7 +170,7 @@ export async function getBankDetails(): Promise<BankDetails> {
 
   if (error || !data) return SEED_BANK;
 
-  return parseJson<Partial<BankDetails>>(data.value, {}) as BankDetails;
+  return mergeSettings<Partial<BankDetails>>(data.value, {}) as BankDetails;
 }
 
 export async function getTaxReceipt(): Promise<TaxReceipt> {
@@ -157,7 +188,7 @@ export async function getTaxReceipt(): Promise<TaxReceipt> {
 
   if (error || !data) return SEED_TAX;
 
-  return parseJson<Partial<TaxReceipt>>(data.value, {}) as TaxReceipt;
+  return mergeSettings<Partial<TaxReceipt>>(data.value, {}) as TaxReceipt;
 }
 
 /**
@@ -170,3 +201,24 @@ export function bankRailUsable(details: BankDetails): boolean {
 }
 
 export const getGivingTiersForDonate = getGivingTiers;
+
+/**
+ * The donate page's sections, keyed.
+ *
+ * Mirrors `getAboutSections()` and `getImpactSections()`. Note what is *not*
+ * here: no amounts, no paybill, no bank details. Those live in `giving_tiers`
+ * and `settings`, and they are financial settings rather than copy — an editor
+ * can reword the sentence around a figure, not the figure.
+ */
+export async function getDonateSections(): Promise<Record<string, SiteSection>> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("sections");
+
+  const keys = ["donate-hero", "donate-impact"];
+  return Object.fromEntries(
+    await Promise.all(
+      keys.map(async (key) => [key, await getSection(key)] as const),
+    ),
+  );
+}

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { bankRailUsable, mergeSettings } from "@/lib/data/donate";
 import {
   DonationError,
   MINIMUM_CHARGE,
@@ -256,6 +257,7 @@ describe("resolveDonation — server-side amount derivation", () => {
       tierSlug: "re-entry-package",
       currency: "USD",
       rail: "card",
+      coverFee: true,
     });
     expect(d.settlementAmount).toBe(50000);
     expect(d.currency).toBe("USD");
@@ -265,6 +267,68 @@ describe("resolveDonation — server-side amount derivation", () => {
 
   it("reports the minimum in the settlement currency", () => {
     expect(MINIMUM_CHARGE.KES).toBe(50);
+  });
+});
+
+/**
+ * The processing fee became a donor choice rather than a silent addition.
+ *
+ * The card networks charge the organisation, not the donor, so passing it on is
+ * legitimate — but it has to be asked for. These assert the three things that
+ * could go wrong: the default, the arithmetic in both directions, and that the
+ * flag cannot be used to produce a receipt for more than was paid.
+ */
+describe("resolveDonation — the processing fee is a choice", () => {
+  const base = { tiers: TIERS, tierSlug: "materials-one-term", rail: "card" as const };
+
+  it("adds no fee by default", () => {
+    // Defaulting to false is the safe direction: a caller that forgets the flag
+    // under-charges the donor rather than adding a fee they did not agree to.
+    const d = resolveDonation(base);
+    expect(d.fee).toBe(0);
+    expect(d.total).toBe(d.displayAmount);
+    expect(d.coverFee).toBe(false);
+  });
+
+  it("adds the fee when the donor asked to cover it", () => {
+    const d = resolveDonation({ ...base, coverFee: true });
+    expect(d.fee).toBeGreaterThan(0);
+    expect(d.total).toBeCloseTo(d.displayAmount + d.fee, 2);
+    expect(d.coverFee).toBe(true);
+  });
+
+  it("holds total = displayAmount + fee in both directions", () => {
+    for (const coverFee of [true, false]) {
+      const d = resolveDonation({ ...base, coverFee });
+      expect(d.total).toBeCloseTo(d.displayAmount + d.fee, 2);
+    }
+  });
+
+  it("cannot charge more than the donor agreed to", () => {
+    // `coverFee` is browser-supplied. The worst it can do is remove the fee —
+    // it can never inflate the charge above the tier amount plus the stated fee.
+    const withFee = resolveDonation({ ...base, coverFee: true });
+    const withoutFee = resolveDonation({ ...base, coverFee: false });
+    expect(withoutFee.total).toBeLessThan(withFee.total);
+    expect(withoutFee.total).toBe(withFee.displayAmount);
+  });
+
+  it("never adds a fee on a rail that has none", () => {
+    // M-Pesa and bank have no schedule, so the checkbox must not appear — the
+    // UI keys off `feeIfCovered > 0`, which is this number.
+    for (const rail of ["mpesa", "bank"] as const) {
+      const d = resolveDonation({ ...base, rail, coverFee: true });
+      expect(d.fee).toBe(0);
+      expect(d.total).toBe(d.displayAmount);
+    }
+  });
+
+  it("does not change the settlement amount either way", () => {
+    // The organisation's recorded income is the tier amount regardless of who
+    // pays the fee. Only the donor's total moves.
+    const a = resolveDonation({ ...base, coverFee: true });
+    const b = resolveDonation({ ...base, coverFee: false });
+    expect(a.settlementAmount).toBe(b.settlementAmount);
   });
 });
 
@@ -279,6 +343,89 @@ describe("formatMoney", () => {
 
   it("shows decimals when the amount is fractional, e.g. a card fee", () => {
     expect(formatMoney(29.8, "USD")).toMatch(/\d/);
+  });
+});
+
+describe("mergeSettings — the settings reader", () => {
+  /**
+   * This is the bug that made every setting on the donate page a lie.
+   *
+   * `settings.value` is `jsonb`, so PostgREST returns a parsed **object**. The
+   * reader only handled a string and therefore always returned its fallback —
+   * so the rail labels, the bank details and the whole tax sentence on the
+   * public donate page came from `SEED_*` constants in the data layer, and an
+   * editor changing them in /admin/settings saw nothing change.
+   *
+   * The donate spec names stale payment details as the most common way charity
+   * sites get this wrong, so both shapes are asserted.
+   */
+  const fallback = { hint: "seed hint", enabled: false };
+
+  it("reads a jsonb object, which is what the database actually returns", () => {
+    expect(mergeSettings({ hint: "from the database" }, fallback)).toEqual({
+      hint: "from the database",
+      enabled: false,
+    });
+  });
+
+  it("reads a JSON string", () => {
+    expect(mergeSettings('{"hint":"from a string"}', fallback)).toEqual({
+      hint: "from a string",
+      enabled: false,
+    });
+  });
+
+  it("keeps fallback keys the row does not mention", () => {
+    expect(mergeSettings({ hint: "partial" }, fallback).enabled).toBe(false);
+  });
+
+  it("lets the database win, including when it says null", () => {
+    // A cleared bank detail must stay cleared. Treating null as "missing" would
+    // resurrect a seed value the editor deliberately removed.
+    expect(
+      mergeSettings<{ account: string | null }>({ account: null }, { account: "seed" })
+        .account,
+    ).toBeNull();
+  });
+
+  it("falls back on a malformed string rather than taking the page down", () => {
+    expect(mergeSettings("{not json", fallback)).toEqual(fallback);
+  });
+
+  it("falls back on null, undefined and a scalar", () => {
+    expect(mergeSettings(null, fallback)).toEqual(fallback);
+    expect(mergeSettings(undefined, fallback)).toEqual(fallback);
+    expect(mergeSettings(42, fallback)).toEqual(fallback);
+  });
+
+  it("does not merge an array into an object", () => {
+    expect(mergeSettings(["a"], fallback)).toEqual(fallback);
+  });
+});
+
+describe("bankRailUsable", () => {
+  it("refuses the rail when the account number is missing", () => {
+    expect(
+      bankRailUsable({
+        accountName: "Imarisha Dada",
+        bankName: "Equity",
+        accountNumber: null,
+        branch: null,
+        instructions: null,
+      }),
+    ).toBe(false);
+  });
+
+  it("allows the rail only when it can actually be completed", () => {
+    expect(
+      bankRailUsable({
+        accountName: "Imarisha Dada",
+        bankName: "Equity",
+        accountNumber: "0123456789",
+        branch: null,
+        instructions: null,
+      }),
+    ).toBe(true);
   });
 });
 

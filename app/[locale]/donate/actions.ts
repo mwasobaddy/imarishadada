@@ -64,6 +64,14 @@ export async function submitDonation(input: {
   phone?: string;
   consentRecurring: boolean;
   consentUpdates: boolean;
+  /**
+   * Whether the donor agreed to cover the processing fee.
+   *
+   * Untrusted, like every other field here — but the only thing it can do is
+   * *reduce* the charge, so the worst case is that we absorb a fee the donor
+   * expected to pay. It cannot produce a receipt for more than was paid.
+   */
+  coverFee?: boolean;
   /** Echoed back to the failure page so a donor can retry without retyping. */
   failNextAttempt?: boolean;
 }): Promise<SubmitResult> {
@@ -100,6 +108,7 @@ export async function submitDonation(input: {
       customAmount: input.customAmount,
       currency,
       rail: input.rail,
+      coverFee: input.coverFee === true,
     });
   } catch (error) {
     if (error instanceof DonationError) {
@@ -244,10 +253,17 @@ export async function submitDonation(input: {
 
     // 'pending' means the provider has accepted it but not confirmed. The
     // donor must NOT be told it succeeded.
+    //
+    // This routes to `/donate/success`, which re-reads the ledger and renders
+    // "we are confirming your gift" for any status that is not `completed`. It
+    // used to route to `/donate/pending`, a route that does not exist — so the
+    // first real adapter to return `pending` would have sent a donor who had
+    // just been charged to a 404. Latent rather than live only because no
+    // adapter returns `pending` yet.
     return {
       status: "pending",
       reference,
-      redirectTo: `/donate/pending?ref=${encodeURIComponent(reference)}`,
+      redirectTo: `/donate/success?ref=${encodeURIComponent(reference)}`,
     };
   } catch (error) {
     const message =
