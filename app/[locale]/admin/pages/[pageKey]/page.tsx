@@ -1,11 +1,12 @@
 import { notFound } from "next/navigation";
-import { ExternalLink } from "lucide-react";
 
 import { getPageWithSections } from "@/app/[locale]/admin/actions/pages";
-import { createAuthServerClient } from "@/lib/supabase/auth-server";
-import type { MediaOption } from "@/components/admin/media-picker";
 import { EmptyState, PageHeader } from "@/components/admin/page-header";
-import { SectionEditor } from "@/components/admin/section-editor";
+import { PagesEditor } from "@/components/admin/pages-editor";
+import type { MediaOption } from "@/components/admin/media-picker";
+import { hasPermission } from "@/lib/admin/permissions";
+import { toSectionForm } from "@/lib/admin/section-form";
+import { createAuthServerClient } from "@/lib/supabase/auth-server";
 
 /** Uploaded media for the picker. Empty is fine — the 48 shipped photographs still list. */
 async function loadUploadedMedia(): Promise<MediaOption[]> {
@@ -32,31 +33,21 @@ export default async function PageSectionsPage({
   params: Promise<{ pageKey: string }>;
 }) {
   const { pageKey } = await params;
-  const [{ page, sections }, media] = await Promise.all([
+  const [{ page, sections }, media, canEditSeo] = await Promise.all([
     getPageWithSections(pageKey),
     loadUploadedMedia(),
+    hasPermission("pages", "seo"),
   ]);
 
   if (!page) notFound();
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-[1500px]">
       <PageHeader
         eyebrow="Pages"
         title={page.label}
         description={page.description ?? undefined}
         count={`${sections.length} ${sections.length === 1 ? "section" : "sections"}`}
-        action={
-          <a
-            href={page.route}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex min-h-10 items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-ink-muted transition-colors hover:border-brand-600 hover:text-brand-600"
-          >
-            <span className="font-mono text-xs">{page.route}</span>
-            <ExternalLink className="h-3.5 w-3.5" />
-          </a>
-        }
       />
 
       {sections.length === 0 ? (
@@ -66,28 +57,19 @@ export default async function PageSectionsPage({
         />
       ) : (
         <>
-          <div className="mb-5 rounded-xl border border-border bg-surface-lilac/40 px-5 py-4">
+          <div className="mb-5 rounded-xl border border-border bg-surface-lilac/40 px-5 py-3.5">
             <p className="text-sm leading-relaxed text-ink-muted">
-              You can change the words, the picture and the button labels. The
-              layout, the heading level and the page structure stay in code, so a
-              change here cannot break the page outline or its SEO.
+              Change the words, pictures and buttons. The layout and page structure stay in
+              code, so nothing here can break the page outline or its search metadata.
             </p>
           </div>
 
-          <div className="space-y-3">
-            {sections.map((section) => (
-              <SectionEditor
-                key={section.section_key}
-                section={{
-                  ...section,
-                  steps: (section.steps as { title: string; description: string }[] | null) ?? null,
-                  images: (section.images as { path: string; alt: string; caption?: string }[] | null) ?? null,
-                }}
-                route={page.route}
-                media={media}
-              />
-            ))}
-          </div>
+          <PagesEditor
+            page={{ label: page.label, route: page.route }}
+            sections={sections.map((section) => toSectionForm(section))}
+            media={media}
+            canEditSeo={canEditSeo}
+          />
         </>
       )}
     </div>

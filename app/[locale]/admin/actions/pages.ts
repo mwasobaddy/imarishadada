@@ -171,12 +171,6 @@ export async function updateSection(sectionKey: string, patch: SectionPatch) {
     );
   }
 
-  // Metadata is a separate permission — a careless title costs rankings.
-  const touchesSeo = patch.seo_title !== undefined || patch.seo_description !== undefined;
-  if (touchesSeo && !(await hasPermission("pages", "seo"))) {
-    throw new Error("Permission denied: pages:seo");
-  }
-
   const { data: before, error: readError } = await supabase
     .from("site_sections")
     .select(SELECT)
@@ -185,6 +179,29 @@ export async function updateSection(sectionKey: string, patch: SectionPatch) {
 
   if (readError) throw new Error(readError.message);
   if (!before) throw new Error(`No section named "${sectionKey}"`);
+
+  // Metadata is a separate permission — a careless title costs rankings.
+  //
+  // The form always sends both fields, so "the patch contains them" is not the
+  // same as "the editor changed them". Comparing with the stored row means an
+  // editor with `pages:update` but not `pages:seo` can still save a heading; the
+  // old check rejected every write because the keys were always present.
+  const seoChanged =
+    (patch.seo_title !== undefined && (patch.seo_title ?? null) !== before.seo_title) ||
+    (patch.seo_description !== undefined &&
+      (patch.seo_description ?? null) !== before.seo_description);
+
+  const canEditSeo = await hasPermission("pages", "seo");
+  if (seoChanged && !canEditSeo) {
+    throw new Error("Permission denied: pages:seo");
+  }
+
+  // And never write metadata the caller may not edit, even unchanged: a stale
+  // value from a tab left open must not overwrite a newer one.
+  if (!canEditSeo) {
+    delete patch.seo_title;
+    delete patch.seo_description;
+  }
 
   const { data: after, error } = await supabase
     .from("site_sections")
