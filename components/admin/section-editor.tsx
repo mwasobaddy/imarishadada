@@ -10,7 +10,6 @@ import {
   EyeOff,
   ExternalLink,
   Plus,
-  Search,
   X,
 } from "lucide-react";
 
@@ -19,17 +18,13 @@ import { MediaPicker, type MediaOption } from "@/components/admin/media-picker";
 import { SectionPreview } from "@/components/admin/section-preview";
 import { SECTIONS_WITH_IMAGE } from "@/components/admin/section-preview-registry";
 import type { PreviewData } from "@/lib/admin/preview-data";
+import { fieldsFor, type SectionField } from "@/lib/admin/section-fields";
 import {
   discardChanges,
   isDirty,
-  searchPreview,
   sectionLabel,
   sectionWarnings,
   toPatch,
-  SEO_DESCRIPTION_MAX,
-  SEO_DESCRIPTION_MIN,
-  SEO_TITLE_MAX,
-  SEO_TITLE_MIN,
   type SectionForm,
 } from "@/lib/admin/section-form";
 
@@ -66,7 +61,6 @@ export function SectionEditor({
   onToggle,
   onSaved,
   onDirtyChange,
-  canEditSeo,
 }: {
   section: SectionForm;
   route: string;
@@ -79,7 +73,6 @@ export function SectionEditor({
   onToggle: () => void;
   onSaved: () => void;
   onDirtyChange: (key: string, dirty: boolean) => void;
-  canEditSeo: boolean;
 }) {
   const router = useRouter();
   const [form, setForm] = useState<SectionForm>(section);
@@ -88,6 +81,16 @@ export function SectionEditor({
   const dirty = isDirty(form, section);
   const warnings = sectionWarnings(form);
   const idPrefix = `section-${section.section_key}`;
+
+  /**
+   * The fields this section's page reads.
+   *
+   * The editor used to offer every field to every section, which made half of
+   * them traps: a "figures line" on the About page went nowhere, and nothing
+   * said so. Now a section only shows the fields its own component reads.
+   */
+  const fields = fieldsFor(section.section_key);
+  const reads = (field: SectionField) => fields.includes(field);
 
   // Tell the rail about this section's state. The parent's handler is stable, so
   // this runs on the transition only, not on every keystroke.
@@ -132,9 +135,6 @@ export function SectionEditor({
   }
 
   const headingLength = form.heading.trim().length;
-  const seoTitleLength = form.seo_title.trim().length;
-  const seoDescriptionLength = form.seo_description.trim().length;
-  const search = searchPreview(form);
 
   return (
     <article
@@ -190,19 +190,21 @@ export function SectionEditor({
             {/* -------------------------------------------------------- */}
             <div className="min-w-0 space-y-4">
               <Group title="Words" hint="What readers see in this section.">
-                <Field
-                  id={`${idPrefix}-eyebrow`}
-                  label="Label above the heading"
-                  hint="Optional"
-                >
-                  <input
+                {reads("eyebrow") && (
+                  <Field
                     id={`${idPrefix}-eyebrow`}
-                    value={form.eyebrow}
-                    onChange={(event) => set("eyebrow", event.target.value)}
-                    placeholder="e.g. Our work"
-                    className={inputClass}
-                  />
-                </Field>
+                    label="Label above the heading"
+                    hint="Optional"
+                  >
+                    <input
+                      id={`${idPrefix}-eyebrow`}
+                      value={form.eyebrow}
+                      onChange={(event) => set("eyebrow", event.target.value)}
+                      placeholder="e.g. Our work"
+                      className={inputClass}
+                    />
+                  </Field>
+                )}
 
                 <Field
                   id={`${idPrefix}-heading`}
@@ -218,17 +220,19 @@ export function SectionEditor({
                   />
                 </Field>
 
-                <Field id={`${idPrefix}-body`} label="Paragraph" hint="Optional">
-                  <textarea
-                    id={`${idPrefix}-body`}
-                    value={form.body}
-                    onChange={(event) => set("body", event.target.value)}
-                    rows={3}
-                    className={`${inputClass} resize-y`}
-                  />
-                </Field>
+                {reads("body") && (
+                  <Field id={`${idPrefix}-body`} label="Paragraph" hint="Optional">
+                    <textarea
+                      id={`${idPrefix}-body`}
+                      value={form.body}
+                      onChange={(event) => set("body", event.target.value)}
+                      rows={3}
+                      className={`${inputClass} resize-y`}
+                    />
+                  </Field>
+                )}
 
-                {form.body_secondary !== null && (
+                {reads("body_secondary") && form.body_secondary !== null && (
                   <Field
                     id={`${idPrefix}-body-secondary`}
                     label="Second paragraph"
@@ -244,7 +248,7 @@ export function SectionEditor({
                   </Field>
                 )}
 
-                {form.stat_line !== null && (
+                {reads("stat_line") && form.stat_line !== null && (
                   <Field
                     id={`${idPrefix}-stat-line`}
                     label="Figures line"
@@ -260,49 +264,59 @@ export function SectionEditor({
                 )}
               </Group>
 
-              <Group
-                title="Buttons"
-                hint="Leave both fields blank to show no button. A button needs text and a link."
-              >
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <Field id={`${idPrefix}-cta-label`} label="Main button text">
-                    <input
-                      id={`${idPrefix}-cta-label`}
-                      value={form.cta_label}
-                      onChange={(event) => set("cta_label", event.target.value)}
-                      placeholder="Donate"
-                      className={inputClass}
-                    />
-                  </Field>
-                  <Field id={`${idPrefix}-cta-href`} label="Main button link">
-                    <input
-                      id={`${idPrefix}-cta-href`}
-                      value={form.cta_href}
-                      onChange={(event) => set("cta_href", event.target.value)}
-                      placeholder="/donate"
-                      className={inputClass}
-                    />
-                  </Field>
-                  <Field id={`${idPrefix}-cta2-label`} label="Second button text">
-                    <input
-                      id={`${idPrefix}-cta2-label`}
-                      value={form.cta_secondary_label}
-                      onChange={(event) => set("cta_secondary_label", event.target.value)}
-                      placeholder="See our impact"
-                      className={inputClass}
-                    />
-                  </Field>
-                  <Field id={`${idPrefix}-cta2-href`} label="Second button link">
-                    <input
-                      id={`${idPrefix}-cta2-href`}
-                      value={form.cta_secondary_href}
-                      onChange={(event) => set("cta_secondary_href", event.target.value)}
-                      placeholder="#impact"
-                      className={inputClass}
-                    />
-                  </Field>
-                </div>
-              </Group>
+              {(reads("cta") || reads("cta_secondary")) && (
+                <Group
+                  title="Buttons"
+                  hint="Leave both fields blank to show no button. A button needs text and a link."
+                >
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {reads("cta") && (
+                      <>
+                        <Field id={`${idPrefix}-cta-label`} label="Main button text">
+                          <input
+                            id={`${idPrefix}-cta-label`}
+                            value={form.cta_label}
+                            onChange={(event) => set("cta_label", event.target.value)}
+                            placeholder="Donate"
+                            className={inputClass}
+                          />
+                        </Field>
+                        <Field id={`${idPrefix}-cta-href`} label="Main button link">
+                          <input
+                            id={`${idPrefix}-cta-href`}
+                            value={form.cta_href}
+                            onChange={(event) => set("cta_href", event.target.value)}
+                            placeholder="/donate"
+                            className={inputClass}
+                          />
+                        </Field>
+                      </>
+                    )}
+                    {reads("cta_secondary") && (
+                      <>
+                        <Field id={`${idPrefix}-cta2-label`} label="Second button text">
+                          <input
+                            id={`${idPrefix}-cta2-label`}
+                            value={form.cta_secondary_label}
+                            onChange={(event) => set("cta_secondary_label", event.target.value)}
+                            placeholder="See our impact"
+                            className={inputClass}
+                          />
+                        </Field>
+                        <Field id={`${idPrefix}-cta2-href`} label="Second button link">
+                          <input
+                            id={`${idPrefix}-cta2-href`}
+                            value={form.cta_secondary_href}
+                            onChange={(event) => set("cta_secondary_href", event.target.value)}
+                            placeholder="#impact"
+                            className={inputClass}
+                          />
+                        </Field>
+                      </>
+                    )}
+                  </div>
+                </Group>
+              )}
 
               {/*
                 Shown when the section has a picture, or when its public
@@ -310,7 +324,8 @@ export function SectionEditor({
                 portrait an editor can now replace. For every other section an
                 empty picker would be a control that changes nothing.
               */}
-              {(form.image_path !== "" || SECTIONS_WITH_IMAGE.has(section.section_key)) && (
+              {reads("image") &&
+                (form.image_path !== "" || SECTIONS_WITH_IMAGE.has(section.section_key)) && (
                 <Group
                   title="Picture"
                   hint={
@@ -347,7 +362,7 @@ export function SectionEditor({
                 </Group>
               )}
 
-              {form.steps !== null && (
+              {reads("steps") && form.steps !== null && (
                 <Group
                   title={`Steps (${form.steps.length})`}
                   hint="One title and one sentence each, shown in this order."
@@ -360,7 +375,7 @@ export function SectionEditor({
                 </Group>
               )}
 
-              {form.images !== null && (
+              {reads("images") && form.images !== null && (
                 <Group
                   title={`Photographs (${form.images.length})`}
                   hint="Shown in this order. Every photograph needs a description."
@@ -373,16 +388,6 @@ export function SectionEditor({
                   />
                 </Group>
               )}
-
-              <SearchListing
-                form={form}
-                search={search}
-                canEditSeo={canEditSeo}
-                set={set}
-                seoTitleLength={seoTitleLength}
-                seoDescriptionLength={seoDescriptionLength}
-                idPrefix={idPrefix}
-              />
 
               {warnings.length > 0 && (
                 <div
@@ -671,109 +676,6 @@ function ImagesEditor({
 /* -------------------------------------------------------------------------- */
 /* Search listing                                                             */
 /* -------------------------------------------------------------------------- */
-
-function SearchListing({
-  form,
-  search,
-  canEditSeo,
-  set,
-  seoTitleLength,
-  seoDescriptionLength,
-  idPrefix,
-}: {
-  form: SectionForm;
-  search: { title: string; description: string };
-  canEditSeo: boolean;
-  set: <K extends keyof SectionForm>(key: K, value: SectionForm[K]) => void;
-  seoTitleLength: number;
-  seoDescriptionLength: number;
-  idPrefix: string;
-}) {
-  return (
-    <details className="group rounded-xl border border-border bg-card">
-      <summary className="flex cursor-pointer list-none items-center gap-2 rounded-xl px-4 py-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700">
-        <Search className="h-4 w-4 text-ink-muted" />
-        <span className="text-sm font-medium text-ink">Search listing</span>
-        <span className="text-xs text-ink-muted">
-          {form.seo_title.trim() || form.seo_description.trim()
-            ? "Customised"
-            : "Using the heading and paragraph"}
-        </span>
-        <ChevronDown
-          aria-hidden="true"
-          className="ml-auto h-4 w-4 text-ink-muted transition-transform group-open:rotate-180"
-        />
-      </summary>
-
-      <div className="border-t border-border px-4 py-4">
-        {!canEditSeo ? (
-          <p className="text-sm leading-relaxed text-ink-muted">
-            You do not have permission to change search metadata. It stays as it is.
-          </p>
-        ) : (
-          <div className="space-y-4">
-            <p className="text-xs leading-relaxed text-ink-muted">
-              Optional. Blank uses this section&apos;s heading and paragraph. A careless
-              title costs rankings, which is why it is a separate permission.
-            </p>
-
-            <Field
-              id={`${idPrefix}-seo-title`}
-              label="Search title"
-              hint={`${seoTitleLength} / ${SEO_TITLE_MAX} characters`}
-              warn={
-                seoTitleLength > 0 &&
-                (seoTitleLength < SEO_TITLE_MIN || seoTitleLength > SEO_TITLE_MAX)
-              }
-            >
-              <input
-                id={`${idPrefix}-seo-title`}
-                value={form.seo_title}
-                onChange={(event) => set("seo_title", event.target.value)}
-                placeholder="Leave blank to keep the code default"
-                className={inputClass}
-              />
-            </Field>
-
-            <Field
-              id={`${idPrefix}-seo-description`}
-              label="Search description"
-              hint={`${seoDescriptionLength} / ${SEO_DESCRIPTION_MAX} characters`}
-              warn={
-                seoDescriptionLength > 0 &&
-                (seoDescriptionLength < SEO_DESCRIPTION_MIN ||
-                  seoDescriptionLength > SEO_DESCRIPTION_MAX)
-              }
-            >
-              <textarea
-                id={`${idPrefix}-seo-description`}
-                value={form.seo_description}
-                onChange={(event) => set("seo_description", event.target.value)}
-                rows={2}
-                className={`${inputClass} resize-y`}
-              />
-            </Field>
-
-            <div className="rounded-lg border border-border bg-surface px-4 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-ink-muted/60">
-                How it may look in search
-              </p>
-              <p className="mt-2 truncate text-[13px] text-[#1a0dab] dark:text-blue-300">
-                {search.title || "Page title"}
-              </p>
-              <p className="text-[11px] text-[#006621] dark:text-emerald-400">
-                www.imarishadada.org
-              </p>
-              <p className="mt-1 line-clamp-2 text-[12px] leading-snug text-ink-muted">
-                {search.description || "No description yet."}
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
-    </details>
-  );
-}
 
 /* -------------------------------------------------------------------------- */
 /* Small pieces                                                               */

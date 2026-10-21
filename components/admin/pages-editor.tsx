@@ -30,14 +30,12 @@ export function PagesEditor({
   sections,
   media,
   previewData,
-  canEditSeo,
 }: {
   page: { label: string; route: string };
   sections: SectionForm[];
   media: MediaOption[];
   /** The published data the exact previews render alongside the copy. */
   previewData: PreviewData;
-  canEditSeo: boolean;
 }) {
   const [openKey, setOpenKey] = useState<string | null>(sections[0]?.section_key ?? null);
   const [dirty, setDirty] = useState<Record<string, boolean>>({});
@@ -189,7 +187,6 @@ export function PagesEditor({
               }
               onSaved={() => setVersion((value) => value + 1)}
               onDirtyChange={handleDirty}
-              canEditSeo={canEditSeo}
             />
           ))}
         </div>

@@ -4,7 +4,6 @@ import { getPageWithSections } from "@/app/[locale]/admin/actions/pages";
 import { EmptyState, PageHeader } from "@/components/admin/page-header";
 import { PagesEditor } from "@/components/admin/pages-editor";
 import type { MediaOption } from "@/components/admin/media-picker";
-import { hasPermission } from "@/lib/admin/permissions";
 import { loadPreviewData } from "@/lib/admin/preview-data";
 import { toPreviewSection, toSectionForm } from "@/lib/admin/section-form";
 import { createAuthServerClient } from "@/lib/supabase/auth-server";
@@ -34,10 +33,9 @@ export default async function PageSectionsPage({
   params: Promise<{ pageKey: string }>;
 }) {
   const { pageKey } = await params;
-  const [{ page, sections }, media, canEditSeo] = await Promise.all([
+  const [{ page, sections }, media] = await Promise.all([
     getPageWithSections(pageKey),
     loadUploadedMedia(),
-    hasPermission("pages", "seo"),
   ]);
 
   if (!page) notFound();
@@ -70,7 +68,9 @@ export default async function PageSectionsPage({
           <div className="mb-5 rounded-xl border border-border bg-surface-lilac/40 px-5 py-3.5">
             <p className="text-sm leading-relaxed text-ink-muted">
               Change the words, pictures and buttons. The layout and page structure stay in
-              code, so nothing here can break the page outline or its search metadata.
+              code, so nothing here can break the page outline. Each section shows only
+              the fields its own page reads, so there is nothing to type into that goes
+              nowhere. Search titles and descriptions are written page by page in code.
             </p>
           </div>
 
@@ -79,7 +79,6 @@ export default async function PageSectionsPage({
             sections={forms}
             media={media}
             previewData={previewData}
-            canEditSeo={canEditSeo}
           />
         </>
       )}
