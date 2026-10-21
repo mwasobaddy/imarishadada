@@ -8,7 +8,7 @@ import { ImpactGaps } from "@/components/impact/gaps";
 import { ImpactMethodology } from "@/components/impact/methodology";
 import { ImpactReports } from "@/components/impact/reports";
 import { AboutTeam } from "@/components/about/team";
-import { ContactFaqs, ContactMethods } from "@/components/sections/contact-methods";
+import { ContactFaqs } from "@/components/sections/contact-methods";
 import { GivingWays } from "@/components/sections/giving-ways";
 import { Hero } from "@/components/sections/hero";
 import { PartnerStrip } from "@/components/sections/partner-strip";
@@ -40,6 +40,11 @@ import { ProgrammeContent } from "@/components/sections/programme-content";
 import { ProgrammeNarrative } from "@/components/sections/programme-narrative";
 import { LadiesRoom } from "@/components/stories/sections";
 import { PullQuote } from "@/components/site/pull-quote";
+import {
+  ContactEnquiryBand,
+  ContactMethodsBlock,
+  ContactPartnerCard,
+} from "@/components/contact/sections";
 import {
   ProgrammesMeasure,
   ProgrammesPathway,
@@ -172,10 +177,10 @@ export function ExactSectionPreview({
 
     case "contact-methods":
       return (
-        <ContactMethods
+        <ContactMethodsBlock
           contact={data.contact ?? FALLBACK_CONTACT}
           section={section}
-          otherSection={find("contact-methods-other") ?? section}
+          otherSection={find("contact-methods-other")}
         />
       );
 
@@ -271,6 +276,34 @@ export function ExactSectionPreview({
 
     case "faq-contact":
       return <FaqContact section={section} />;
+
+    /* ---- Contact ---- */
+
+    case "contact-form":
+      // The heading, the answers and the partner note share a band with the
+      // form, so the preview is the band with this heading in place.
+      return (
+        <ContactEnquiryBand
+          form={section}
+          faqs={find("contact-faqs")}
+          partner={find("contact-partner")}
+          enquiryTypes={data.enquiryTypes ?? []}
+        />
+      );
+
+    case "contact-partner":
+      return <ContactPartnerCard section={section} />;
+
+    case "contact-methods-other":
+      // A heading inside the methods block rather than a section of its own,
+      // so its preview is the block with that heading in place.
+      return (
+        <ContactMethodsBlock
+          contact={data.contact ?? FALLBACK_CONTACT}
+          section={find("contact-methods") ?? section}
+          otherSection={section}
+        />
+      );
 
     /* ---- Programmes ---- */
 
@@ -503,6 +536,9 @@ export const EXACT_SECTION_KEYS = new Set([
   "hub-what",
   "faq-empty",
   "faq-contact",
+  "contact-form",
+  "contact-partner",
+  "contact-methods-other",
   "programmes-pathway",
   "programmes-measure",
   "programmes-unrestricted",

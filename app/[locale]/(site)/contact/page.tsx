@@ -1,14 +1,12 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
-import { ArrowRight, Clock, Heart, MapPin, ShieldCheck } from "lucide-react";
+import { Clock, Heart, MapPin, ShieldCheck } from "lucide-react";
 
 import { PageHero } from "@/components/site/page-hero";
-import { Container } from "@/components/site/container";
 import {
-  ContactFaqs,
-  ContactMethods,
-} from "@/components/sections/contact-methods";
-import { ContactForm } from "@/components/sections/contact-form";
+  ContactEnquiryBand,
+  ContactMethodsBlock,
+} from "@/components/contact/sections";
 import {
   getContactDetails,
   getContactSections,
@@ -197,7 +195,7 @@ export default async function ContactPage({
         ) : null}
 
         {isVisible(methods) && isVisible(methodsOther) ? (
-          <ContactMethods
+          <ContactMethodsBlock
             contact={contact}
             section={methods}
             otherSection={methodsOther}
@@ -207,58 +205,12 @@ export default async function ContactPage({
         {/* ---- The form, and the answers that stop a wasted enquiry ----
             The FAQ sits beside the form rather than below it, so a visitor can
             read both at once and check a question before writing it. */}
-        <section aria-labelledby="form-heading" className="bg-surface-lilac py-section">
-          <Container>
-            <div className="grid gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16">
-              <div className="max-w-2xl">
-                {isVisible(form) ? (
-                  <>
-                    <h2
-                      id="form-heading"
-                      className="text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
-                    >
-                      {form.heading}
-                    </h2>
-                    {form.body ? (
-                      <p className="measure mt-4 text-lg text-ink-muted">
-                        {form.body}
-                      </p>
-                    ) : null}
-                  </>
-                ) : null}
-
-                {isVisible(faqs) ? <ContactFaqs section={faqs} /> : null}
-
-                {/* Partnering gets a route, not a footnote. The enquiry-type
-                    dropdown already does the routing; this says so, and
-                    points at the page that actually helps. */}
-                {isVisible(partner) ? (
-                  <div className="mt-8 rounded-card border border-brand-600/30 bg-brand-50 p-6">
-                    <h3 className="text-base font-semibold text-brand-600">
-                      {partner.heading}
-                    </h3>
-                    {partner.body ? (
-                      <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-                        {partner.body}
-                      </p>
-                    ) : null}
-                    {partner.ctaLabel && partner.ctaHref ? (
-                      <Link
-                        href={partner.ctaHref}
-                        className="mt-3 inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-brand-600 underline decoration-brand-600/40 underline-offset-4 hover:decoration-brand-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
-                      >
-                        {partner.ctaLabel}
-                        <ArrowRight aria-hidden="true" className="size-4" />
-                      </Link>
-                    ) : null}
-                  </div>
-                ) : null}
-              </div>
-
-              <ContactForm enquiryTypes={enquiryTypes} />
-            </div>
-          </Container>
-        </section>
+        <ContactEnquiryBand
+          form={isVisible(form) ? form : null}
+          faqs={isVisible(faqs) ? faqs : null}
+          partner={isVisible(partner) ? partner : null}
+          enquiryTypes={enquiryTypes}
+        />
       </main>
 
       <script

@@ -1,5 +1,5 @@
 import { getCoreValues, getTeamMembers } from "@/lib/data/about";
-import { getContactDetails } from "@/lib/data/contact";
+import { getContactDetails, getEnquiryTypes } from "@/lib/data/contact";
 import {
   bankRailUsable,
   getBankDetails,
@@ -11,6 +11,7 @@ import { getProgramme } from "@/lib/data/programmes";
 import { getSocialLinks } from "@/lib/data/social";
 import { getVolunteerRoles } from "@/lib/data/volunteer";
 import { getFinancialBreakdown, getTransparencyGaps } from "@/lib/data/transparency";
+import type { EnquiryTypeOption } from "@/lib/data/contact";
 import type { BankDetails, PaymentRails, RailStatus } from "@/lib/data/donate";
 import type { FinancialLine, TransparencyGap } from "@/lib/data/gaps";
 import type { PaymentRail } from "@/lib/donate/money";
@@ -92,6 +93,8 @@ export type PreviewData = {
    */
   programmePages?: Record<string, { title: string; body: string }>;
   contact?: Awaited<ReturnType<typeof getContactDetails>>;
+  /** The enquiry types, for the contact form's dropdown. */
+  enquiryTypes?: EnquiryTypeOption[];
 };
 
 /**
@@ -124,7 +127,10 @@ export async function loadPreviewData(
       break;
 
     case "contact":
-      data.contact = await getContactDetails();
+      [data.contact, data.enquiryTypes] = await Promise.all([
+        getContactDetails(),
+        getEnquiryTypes(),
+      ]);
       break;
 
     case "stories":
