@@ -26,7 +26,7 @@ import { absoluteUrl, breadcrumbJsonLd, jsonLdScript } from "@/lib/seo";
 export const metadata: Metadata = {
   title: "Our programmes",
   description:
-    "Three programmes in Kibera, Nairobi: school re-entry for young mothers, economic empowerment, and safe spaces for girls aged 9–16.",
+    "Four programmes in Kibera, Nairobi: school re-entry for young mothers, economic empowerment, Dada Space for girls aged 9–16, and the Community Hub.",
   alternates: {
     canonical: "/programmes",
     languages: { "en-KE": "/programmes", "x-default": "/programmes" },
@@ -38,18 +38,18 @@ export const metadata: Metadata = {
       images: ["/opengraph-image"],
     title: "Our programmes | Imarisha Dada",
     description:
-      "Three programmes in Kibera, Nairobi: school re-entry for young mothers, economic empowerment, and safe spaces for girls aged 9–16.",
+      "Four programmes in Kibera, Nairobi: school re-entry for young mothers, economic empowerment, Dada Space for girls aged 9–16, and the Community Hub.",
   },
   twitter: {
     card: "summary_large_image",
     title: "Our programmes | Imarisha Dada",
     description:
-      "Three programmes in Kibera, Nairobi: school re-entry for young mothers, economic empowerment, and safe spaces for girls aged 9–16.",
+      "Four programmes in Kibera, Nairobi: school re-entry for young mothers, economic empowerment, Dada Space for girls aged 9–16, and the Community Hub.",
   },
 };
 
 /**
- * How the three programmes connect, presented as an intended pathway.
+ * How the four programmes connect, presented as an intended pathway.
  *
  * ⚠️ UNVERIFIED — needs programme staff sign-off before this is published.
  *

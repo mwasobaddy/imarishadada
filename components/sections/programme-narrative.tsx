@@ -10,10 +10,18 @@ import { useGSAP } from "@gsap/react";
 gsap.registerPlugin(ScrollTrigger);
 
 /**
- * Sticky-scroll "the problem" section.
+ * The programme's narrative: a framing column and a scroll of panels.
  *
  * GSAP, not Motion — this is scroll-linked. Per the project's animation policy:
  * if it moves in response to scroll, it is GSAP.
+ *
+ * ## Why the framing is a prop and not a string here
+ *
+ * This used to hardcode "The problem" and "She did not choose to leave." That
+ * was true of school re-entry and false of the other programmes: the economic
+ * empowerment page opened with a claim about barriers while its panels talked
+ * about money. The framing now comes from the page copy in the database, so
+ * each programme opens with the sentence that is true of it.
  *
  * ## Why the pinning is guarded
  *
@@ -28,7 +36,20 @@ gsap.registerPlugin(ScrollTrigger);
  * `gsap.matchMedia` handles both conditions in one place, so the desktop path
  * cannot accidentally run on a phone.
  */
-export function ProgrammeProblem({ paragraphs }: { paragraphs: string[] }) {
+export function ProgrammeNarrative({
+  paragraphs,
+  eyebrow,
+  heading,
+  intro,
+}: {
+  paragraphs: string[];
+  /** Small label above the heading, e.g. "The problem". */
+  eyebrow?: string | null;
+  /** The sentence the page opens with. */
+  heading?: string | null;
+  /** One or two sentences under the heading. */
+  intro?: string | null;
+}) {
   const container = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -101,29 +122,47 @@ export function ProgrammeProblem({ paragraphs }: { paragraphs: string[] }) {
     { scope: container, dependencies: [paragraphs], revertOnUpdate: true },
   );
 
+  const hasFrame = Boolean(heading?.trim());
+
   return (
-    <section ref={container} aria-labelledby="problem-heading" className="bg-surface py-section">
+    <section
+      ref={container}
+      aria-labelledby={hasFrame ? "narrative-heading" : undefined}
+      className="bg-surface py-section"
+    >
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-20">
+        {/*
+          Two columns when there is a framing sentence to pin, one when there
+          is not. A programme with no lead section should not leave an empty
+          column where the sentence would have been.
+        */}
+        <div
+          className={`grid gap-10 lg:gap-20 ${
+            hasFrame ? "lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]" : ""
+          }`}
+        >
           {/* Sticky on desktop only; the CSS below is the mobile fallback. */}
-          <div
-            data-problem-sticky
-            className="lg:sticky lg:top-24 lg:self-start"
-          >
-            <p className="text-sm font-medium tracking-wide text-brand-600 uppercase">
-              The problem
-            </p>
-            <h2
-              id="problem-heading"
-              className="mt-3 text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
+          {hasFrame ? (
+            <div
+              data-problem-sticky
+              className="lg:sticky lg:top-24 lg:self-start"
             >
-              She did not choose to leave.
-            </h2>
-            <p className="measure mt-4 text-lg text-ink-muted">
-              Every barrier below is structural. None of them are about how much a
-              young mother wants to learn.
-            </p>
-          </div>
+              {eyebrow?.trim() ? (
+                <p className="text-sm font-medium tracking-wide text-brand-600 uppercase">
+                  {eyebrow}
+                </p>
+              ) : null}
+              <h2
+                id="narrative-heading"
+                className="mt-3 text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
+              >
+                {heading}
+              </h2>
+              {intro?.trim() ? (
+                <p className="measure mt-4 text-lg text-ink-muted">{intro}</p>
+              ) : null}
+            </div>
+          ) : null}
 
           {/* The barriers are a genuine sequence — a girl meets them in this
               order — so they get a path, not a list. The pin carries the

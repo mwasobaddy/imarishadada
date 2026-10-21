@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import Link from "next/link";
 import { Suspense } from "react";
 
 import { PageHero } from "@/components/site/page-hero";
+import { SocialLinks } from "@/components/site/social-links";
 import { Container } from "@/components/site/container";
 import { ClosingCta } from "@/components/sections/closing-cta";
 import { ConsentLedger, ConsentNote } from "@/components/stories/consent";
@@ -194,6 +195,8 @@ export default async function StoriesPage({
 
   const hero = sections["stories-hero"];
   const consent = sections["stories-consent"];
+  const ladiesRoom = sections["stories-ladies-room"];
+  const t = await getTranslations({ locale, namespace: "common" });
 
   const collectionJsonLd = {
     "@context": "https://schema.org",
@@ -237,6 +240,42 @@ export default async function StoriesPage({
         </Suspense>
 
         {isVisible(consent) ? <ConsentNote counts={counts} section={consent} /> : null}
+
+        {/*
+          The storytelling programme. It sits after the consent note on
+          purpose: the podcast runs on the same rule as the written stories
+          — a young mother tells her own story, and the platform does not
+          decide what she is allowed to have said.
+        */}
+        {isVisible(ladiesRoom) ? (
+          <section aria-labelledby="ladies-room-heading" className="bg-surface-lilac py-section">
+            <Container>
+              {ladiesRoom.eyebrow ? (
+                <p className="text-sm font-medium tracking-wide text-brand-600 uppercase">
+                  {ladiesRoom.eyebrow}
+                </p>
+              ) : null}
+              <h2
+                id="ladies-room-heading"
+                className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
+              >
+                {ladiesRoom.heading}
+              </h2>
+              {ladiesRoom.body ? (
+                <p className="measure mt-4 text-lg leading-relaxed text-ink-muted">
+                  {ladiesRoom.body}
+                </p>
+              ) : null}
+
+              <div className="mt-8">
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-ink-muted/60">
+                  {t("findUs")}
+                </p>
+                <SocialLinks className="mt-1" />
+              </div>
+            </Container>
+          </section>
+        ) : null}
       </main>
 
       <ClosingCta />

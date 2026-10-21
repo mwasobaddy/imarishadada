@@ -68,6 +68,12 @@ const OUTCOMES_BY_SLUG: Record<string, ProgrammeOutcome[]> = {
     { title: "Peer network", description: "A cohort that keeps trading together, so the first year is not solved alone." },
     { title: "Business survival", description: "We measure how many are still trading at twelve months. Not how many were funded." },
   ],
+  "community-hub": [
+    { title: "Peer teaching", description: "The young mothers who went to technical school come back and teach, so the skills stay in the community that produced them." },
+    { title: "Beauty and fashion skills", description: "Practical training the young mothers asked for, and that other young mothers in the community can learn." },
+    { title: "A learning hub", description: "A community space where learning happens between peers, rather than as a service delivered to them." },
+    { title: "Technical school", description: "Young mothers are supported into technical school, and those who take it further come back to teach the hub." },
+  ],
   "dada-space": [
     { title: "After-school hours", description: "A structured afternoon so there is somewhere to be between the end of school and dinner." },
     { title: "Trained facilitators", description: "Women who are not afraid of a teenager's silence, because that silence is the usual reason girls stop attending." },
@@ -106,9 +112,13 @@ const FALLBACK_TITLE: Record<string, string> = {
   "school-reentry": "School Re-entry",
   "economic-empowerment": "Economic Empowerment",
   "dada-space": "Dada Space",
+  "community-hub": "Community Hub",
 };
 
 const FALLBACK_BODY: Record<string, string> = {
+  "community-hub": `A community HUB that creates a learning opportunity for other young moms to learn beauty and fashion skills.
+
+It works like a peer learning session. The young moms we took to technical school come to teach other young moms in the community, so the skills travel because the people who hold them are the ones teaching.`,
   "school-reentry": `A girl does not stop learning when she becomes a mother. She gets pushed out.
 
 The barriers are specific and they compound. Childcare falls on her. Stigma follows her to school. Re-enrolment costs land on a household that has less of it. And the assumption everyone makes, that a young mother has already chosen her path, is the one that does the most damage, because it is the one nobody argues with.
@@ -435,7 +445,7 @@ export async function getOtherProgrammes(currentSlug: string): Promise<Programme
       .eq("active", true)
       .neq("slug", currentSlug)
       .order("sort_order")
-      .limit(2);
+      .limit(3);
 
     if (error || !data?.length) return [];
 

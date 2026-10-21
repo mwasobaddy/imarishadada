@@ -440,6 +440,7 @@ export async function getStoriesSections(): Promise<Record<string, SiteSection>>
     "stories-grid",
     "stories-empty",
     "stories-consent",
+    "stories-ladies-room",
     "story-consent-banner",
     "story-anonymised",
     "story-cohort",

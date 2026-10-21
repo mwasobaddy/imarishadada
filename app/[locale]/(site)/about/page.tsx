@@ -10,6 +10,7 @@ import {
   AboutWork,
 } from "@/components/about/story";
 import { AboutTeam } from "@/components/about/team";
+import { PullQuote } from "@/components/site/pull-quote";
 import { PageHero } from "@/components/site/page-hero";
 import {
   getAboutSections,
@@ -22,7 +23,7 @@ import { breadcrumbJsonLd, jsonLdScript, absoluteUrl } from "@/lib/seo";
 
 const TITLE = "About us";
 const DESCRIPTION =
-  "Imarisha Dada is a girl-led organisation in Kibera, Nairobi. Our story, our vision and mission, our values, and the three programmes we run.";
+  "Imarisha Dada is a girl-led organisation in Kibera, Nairobi. Our story, our vision and mission, our values, and the four programmes we run.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -88,6 +89,17 @@ export default async function AboutPage({
             section={sections["about-story"]!}
             carousel={sections["about-carousel"]}
           />
+        ) : null}
+
+        {isVisible(sections["about-quote"]) ? (
+          <section className="bg-surface-lilac py-section">
+            <div className="mx-auto max-w-6xl px-5 sm:px-8">
+              <PullQuote
+                eyebrow={sections["about-quote"]!.eyebrow}
+                quote={sections["about-quote"]!.heading}
+              />
+            </div>
+          </section>
         ) : null}
 
         <AboutVisionMission

@@ -14,7 +14,9 @@
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
     "dismissMenu": "Dismiss menu",
-    "close": "Close"
+    "close": "Close",
+    "followUs": "Follow us",
+    "findUs": "Where to find us"
   },
   "nav": {
     "ourWork": "Our work",
@@ -34,7 +36,8 @@
       "heading": "Programmes",
       "schoolReentry": "School Re-entry",
       "economicEmpowerment": "Economic Empowerment",
-      "dadaSpace": "Dada Space"
+      "dadaSpace": "Dada Space",
+      "communityHub": "Community Hub"
     },
     "organisation": {
       "heading": "Organisation",

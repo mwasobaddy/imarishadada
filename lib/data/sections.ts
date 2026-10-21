@@ -106,7 +106,7 @@ const FALLBACKS: Record<string, Omit<SiteSection, "active">> = {
   "home-hero": {
     key: "home-hero",
     eyebrow: null,
-    heading: "Every girl in Kibera deserves to go back to school.",
+    heading: "Every girl deserves a safe space, a second chance and a seat at the table.",
     body: "Imarisha Dada is a girl-led organisation in Kibera, Nairobi. We support young mothers returning to education, girls finding safe spaces to grow, and young women building their own income.",
     ctaLabel: "Donate",
     ctaHref: "/donate",
@@ -117,8 +117,8 @@ const FALLBACKS: Record<string, Omit<SiteSection, "active">> = {
   "home-programmes": {
     key: "home-programmes",
     eyebrow: "Our work",
-    heading: "Three programmes, one aim: a girl in Kibera decides her own future",
-    body: "School re-entry, economic empowerment, and safe spaces — designed with girls and community leaders, not delivered to them.",
+    heading: "Four programmes, one aim: a girl in Kibera decides her own future",
+    body: "School re-entry, economic empowerment, Dada Space and the Community Hub — designed with girls and community leaders, not delivered to them.",
     ctaLabel: "All programmes",
     ctaHref: "/programmes",
   },
@@ -141,8 +141,8 @@ const FALLBACKS: Record<string, Omit<SiteSection, "active">> = {
   "about-story": {
     key: "about-story",
     eyebrow: "Our story",
-    heading: "We started with nineteen of them.",
-    body: "Imarisha Dada began in Kibera with a simple observation: the girls who fell out of school here were not girls who had stopped learning. They were girls who had been pushed out — by pregnancy, by cost, by stigma, and by the assumption that a young mother had already chosen her path.",
+    heading: "It started as a beauty parlour.",
+    body: "Imarisha Dada is a young women-led, community-based organisation founded in 2024. It started as a beauty parlour where girls and young women could have their hair and nails done. The parlour created a space where girls could share their stories, heal and cry together.\n\nFrom those stories we wanted to hear more, so we began reaching out to young mothers who were vulnerable and at risk of dropping out of school, or who had already dropped out.\n\nWe later recruited 24 young mothers into the organisation. We introduced a safe space where they could share their stories without being judged, support one another, and find solutions to the challenges they face. Through those conversations we realised that many of them were struggling with unresolved trauma, which led us to introduce psychosocial support.\n\nWe later introduced economic empowerment, where each young mother was given start-up capital to begin a small business. Most of them used the support to start businesses and become more economically independent. We also supported those who wanted to return to school. Many of them have since completed their studies, and we continue to recruit and support other young mothers through the organisation.\n\nToday, Imarisha Dada continues to create safe spaces, strengthen the voices of girls and young mothers, and support them to build better and more independent lives.",
     ctaLabel: null,
     ctaHref: null,
   },
@@ -157,7 +157,7 @@ const FALLBACKS: Record<string, Omit<SiteSection, "active">> = {
   "about-work": {
     key: "about-work",
     eyebrow: "What we do",
-    heading: "Three programmes, one aim: a girl in Kibera decides her own future.",
+    heading: "Four programmes, one aim: a girl in Kibera decides her own future.",
     body: null,
     ctaLabel: null,
     ctaHref: null,

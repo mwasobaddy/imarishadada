@@ -30,20 +30,42 @@ export function SettingsEditor({
 }) {
   const [editing, setEditing] = useState<string | null>(null);
   const [jsonText, setJsonText] = useState("");
+  const [channels, setChannels] = useState({ linkedin: "", facebook: "", spotify: "" });
   const [pending, startTransition] = useTransition();
 
   function startEdit(setting: Setting) {
     setEditing(setting.key);
     setJsonText(JSON.stringify(setting.value, null, 2));
+
+    // The social channels get real fields rather than a JSON textarea. A
+    // volunteer who has been asked to fix a Facebook link should not have to
+    // know what JSON is.
+    if (setting.key === "social_links") {
+      const value = (setting.value ?? {}) as Record<string, unknown>;
+      setChannels({
+        linkedin: typeof value.linkedin === "string" ? value.linkedin : "",
+        facebook: typeof value.facebook === "string" ? value.facebook : "",
+        spotify: typeof value.spotify === "string" ? value.spotify : "",
+      });
+    }
   }
 
   async function save(key: string) {
     let parsed: unknown;
-    try {
-      parsed = JSON.parse(jsonText);
-    } catch {
-      toast.error("Invalid JSON");
-      return;
+    if (key === "social_links") {
+      // An empty field is a channel we are not on, not a link to nowhere.
+      parsed = {
+        linkedin: channels.linkedin.trim() || null,
+        facebook: channels.facebook.trim() || null,
+        spotify: channels.spotify.trim() || null,
+      };
+    } else {
+      try {
+        parsed = JSON.parse(jsonText);
+      } catch {
+        toast.error("Invalid JSON");
+        return;
+      }
     }
     startTransition(async () => {
       try {
@@ -125,12 +147,50 @@ export function SettingsEditor({
 
             {editing === setting.key ? (
               <div className="mt-3 space-y-3">
-                <textarea
-                  value={jsonText}
-                  onChange={(e) => setJsonText(e.target.value)}
-                  rows={8}
-                  className="block w-full rounded-lg border border-border bg-surface px-3 py-2 font-mono text-xs text-ink focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600"
-                />
+                {setting.key === "social_links" ? (
+                  <div className="space-y-3">
+                    {(
+                      [
+                        ["linkedin", "LinkedIn"],
+                        ["facebook", "Facebook"],
+                        ["spotify", "Spotify"],
+                      ] as const
+                    ).map(([key, label]) => (
+                      <div key={key}>
+                        <label
+                          htmlFor={`social-${key}`}
+                          className="block text-sm font-medium text-ink"
+                        >
+                          {label}
+                        </label>
+                        <input
+                          id={`social-${key}`}
+                          type="url"
+                          inputMode="url"
+                          value={channels[key]}
+                          onChange={(e) =>
+                            setChannels((current) => ({
+                              ...current,
+                              [key]: e.target.value,
+                            }))
+                          }
+                          placeholder="https://…"
+                          className="mt-1.5 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-ink placeholder:text-ink-muted/50 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-600/20"
+                        />
+                      </div>
+                    ))}
+                    <p className="text-xs text-ink-muted">
+                      Leave a field empty to hide that channel from the site.
+                    </p>
+                  </div>
+                ) : (
+                  <textarea
+                    value={jsonText}
+                    onChange={(e) => setJsonText(e.target.value)}
+                    rows={8}
+                    className="block w-full rounded-lg border border-border bg-surface px-3 py-2 font-mono text-xs text-ink focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600"
+                  />
+                )}
                 <div className="flex gap-2">
                   <button
                     type="button"
@@ -149,6 +209,23 @@ export function SettingsEditor({
                   </button>
                 </div>
               </div>
+            ) : setting.key === "social_links" ? (
+              <ul className="mt-3 space-y-1 text-sm text-ink-muted">
+                {(["linkedin", "facebook", "spotify"] as const).map((key) => {
+                  const value = (setting.value as Record<string, unknown> | null)?.[key];
+                  const label = key.charAt(0).toUpperCase() + key.slice(1);
+                  return (
+                    <li key={key}>
+                      <span className="font-medium text-ink">{label}:</span>{" "}
+                      {typeof value === "string" && value.trim() ? (
+                        <span className="break-all">{value}</span>
+                      ) : (
+                        <span className="text-ink-muted/70">not listed</span>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
             ) : (
               <pre className="mt-3 max-h-40 overflow-auto rounded-lg bg-surface px-3 py-2 font-mono text-xs text-ink-muted">
                 {JSON.stringify(setting.value, null, 2)}

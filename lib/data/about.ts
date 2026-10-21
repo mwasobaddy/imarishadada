@@ -125,6 +125,7 @@ export async function getAboutSections(): Promise<Record<string, SiteSection>> {
   const keys = [
     "about-hero",
     "about-story",
+    "about-quote",
     "about-vision",
     "about-mission",
     "about-values",

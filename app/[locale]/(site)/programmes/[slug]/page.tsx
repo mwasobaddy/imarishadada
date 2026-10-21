@@ -10,9 +10,11 @@ import {
   ProgrammeImpact,
   ProgrammeOutcomes,
 } from "@/components/sections/programme-detail";
-import { ProgrammeProblem } from "@/components/sections/programme-problem";
+import { ProgrammeContent } from "@/components/sections/programme-content";
+import { ProgrammeNarrative } from "@/components/sections/programme-narrative";
 import { PartnerSchools } from "@/components/sections/partner-schools";
 import { ProgrammeStories } from "@/components/sections/programme-stories";
+import { getPageSections } from "@/lib/data/sections";
 import {
   getOtherProgrammes,
   getPartnerSchools,
@@ -91,13 +93,17 @@ export default async function ProgrammePage({
 
   const { slug } = rest;
 
-  const [programme, stats, tiers, stories, partners, others] = await Promise.all([
+  const [programme, stats, tiers, stories, partners, others, pageSections] = await Promise.all([
     getProgramme(slug),
     getProgrammeStats(slug),
     getProgrammeTiers(slug),
     getProgrammeStories(slug),
     getPartnerSchools(slug),
     getOtherProgrammes(slug),
+    // The narrative and the session content are editor-managed, in the same
+    // table as every other page. The first section frames the page; the rest
+    // render as blocks under it.
+    getPageSections(`programme-${slug}`),
   ]);
 
   // A slug that matches no active programme is a 404, not an empty page.
@@ -107,6 +113,9 @@ export default async function ProgrammePage({
     .split(/\n\s*\n/)
     .map((p) => p.trim())
     .filter(Boolean);
+
+  // The first section frames the page. The rest are blocks beneath it.
+  const [lead, ...restSections] = pageSections.filter((section) => section.active);
 
   const articleJsonLd = {
     "@context": "https://schema.org",
@@ -136,8 +145,23 @@ export default async function ProgrammePage({
           }
         />
 
-        {/* Body copy is the section that earns the donation. Skipped when empty. */}
-        {paragraphs.length > 0 ? <ProgrammeProblem paragraphs={paragraphs} /> : null}
+        {/*
+          The framing sentence is the page's first section, and the body copy
+          scrolls beside it. A programme with neither renders nothing here
+          rather than an empty band.
+        */}
+        {lead || paragraphs.length > 0 ? (
+          <ProgrammeNarrative
+            paragraphs={paragraphs}
+            eyebrow={lead?.eyebrow}
+            heading={lead?.heading}
+            intro={lead?.body}
+          />
+        ) : null}
+
+        {restSections.map((section) => (
+          <ProgrammeContent key={section.key} section={section} />
+        ))}
 
         <ProgrammeOutcomes
           title={`What ${programme.title.toLowerCase()} actually involves`}
