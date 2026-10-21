@@ -152,6 +152,28 @@ export function mockAllowed(): boolean {
 }
 
 /**
+ * Whether any rail can actually complete a charge right now.
+ *
+ * Distinct from `settings.payment_rails[rail].enabled`, which is an editorial
+ * switch meaning "we want to offer this". This answers "can we take the money".
+ *
+ * The distinction matters because the two disagree today: `card.enabled` is
+ * `true` in the database, so `/ways-to-give` printed **"Card — Available now"**
+ * on the live site — while `NEXT_PUBLIC_DONATE_MODE` is unset in production, so
+ * `getAdapter` returns the unconfigured adapter and every card payment fails
+ * with "Payments are not configured yet".
+ *
+ * That is a false claim on the page whose entire job is donor trust, so the
+ * status labels are now derived from this rather than written by hand. When a
+ * real adapter lands, this returns true and every label flips on its own.
+ */
+export function paymentsConfigured(): boolean {
+  // The mock simulates a provider, so it counts as "can complete" in the only
+  // environment where it is allowed to run at all.
+  return mockAllowed();
+}
+
+/**
  * Guard for the mock adapter. Called at the top of the Server Action so a
  * misconfigured deployment fails loudly at the first donation attempt rather
  * than silently issuing a receipt for money that was never collected.

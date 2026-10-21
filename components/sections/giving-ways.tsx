@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 
-import type { GivingTier } from "@/lib/data/types";
+import type { GivingTier, SiteSection } from "@/lib/data/types";
 
 function formatKsh(amount: number, locale = "en-KE"): string {
   return `KSh ${new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(amount)}`;
@@ -14,8 +14,35 @@ function formatKsh(amount: number, locale = "en-KE"): string {
  *
  * Amounts come from `giving_tiers`, never from this file. Editing a figure in
  * Supabase changes the page with no redeploy.
+ *
+ * ## The copy is passed in, because two pages share this component
+ *
+ * It used to hardcode its own eyebrow, heading and body — and those strings were
+ * character-for-character the `home-giving` section seeded in `site_sections`.
+ * So the section existed, `/admin/pages/home` showed it, and editing it changed
+ * nothing on the page, because the component never read it.
+ *
+ * The same trap has caught this codebase twice before (`PROGRAMME_IMAGE_FALLBACK`,
+ * `getProgrammeStories`): a component that carries its own copy silently wins
+ * over the database. Taking `section` as a prop makes the caller the only place
+ * the copy can come from, and `/ways-to-give` gets its own instead of the
+ * homepage's.
  */
-export function GivingWays({ tiers }: { tiers: GivingTier[] }) {
+export function GivingWays({
+  tiers,
+  section,
+  moreHref = "/ways-to-give",
+}: {
+  tiers: GivingTier[];
+  section: SiteSection;
+  /**
+   * Where "All ways to give" points.
+   *
+   * `null` omits it — `/ways-to-give` renders this component too, and linking a
+   * page to itself is a dead end that reads as a bug.
+   */
+  moreHref?: string | null;
+}) {
   // The query already filters `active = true`; the fallback seed has no flag.
   const active = tiers;
   if (active.length === 0) return null;
@@ -26,19 +53,20 @@ export function GivingWays({ tiers }: { tiers: GivingTier[] }) {
     <section aria-labelledby="giving-heading" className="bg-surface py-section">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <div className="max-w-2xl">
-          <p className="text-sm font-medium tracking-wide text-accent uppercase">
-            Ways to give
-          </p>
+          {section.eyebrow ? (
+            <p className="text-sm font-medium tracking-wide text-accent uppercase">
+              {section.eyebrow}
+            </p>
+          ) : null}
           <h2
             id="giving-heading"
             className="mt-3 text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
           >
-            What your gift actually does
+            {section.heading}
           </h2>
-          <p className="measure mt-4 text-lg text-ink-muted">
-            Every amount below is tied to a specific outcome. Give monthly and a
-            mentor’s continuity matters as much as a single emergency.
-          </p>
+          {section.body ? (
+            <p className="measure mt-4 text-lg text-ink-muted">{section.body}</p>
+          ) : null}
         </div>
 
         {/* Static list, not a marquee: this is conversion copy. A moving band
@@ -74,12 +102,14 @@ export function GivingWays({ tiers }: { tiers: GivingTier[] }) {
           >
             Donate
           </InteractiveHoverButton>
-          <Link
-            href="/ways-to-give"
-            className="inline-flex min-h-12 items-center rounded-lg px-2 text-base font-medium text-brand-600 underline decoration-brand-600/30 underline-offset-4 hover:decoration-brand-600 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-700"
-          >
-            All ways to give
-          </Link>
+          {moreHref ? (
+            <Link
+              href={moreHref}
+              className="inline-flex min-h-12 items-center rounded-lg px-2 text-base font-medium text-brand-600 underline decoration-brand-600/30 underline-offset-4 hover:decoration-brand-600 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-700"
+            >
+              All ways to give
+            </Link>
+          ) : null}
           {monthlyAvailable ? (
             <p className="text-sm text-ink-muted">
               Every amount above can be given monthly.

@@ -3,6 +3,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { getGivingTiers } from "@/lib/data/home";
 import { getSection } from "@/lib/data/sections";
+import { paymentsConfigured } from "@/lib/donate/adapter";
 import type { SiteSection } from "@/lib/data/types";
 import type { PaymentRail } from "@/lib/donate/money";
 
@@ -200,6 +201,39 @@ export function bankRailUsable(details: BankDetails): boolean {
   return Boolean(details.accountName && details.bankName && details.accountNumber);
 }
 
+/**
+ * What a rail's status label should say.
+ *
+ * Derived from two independent facts, never written by hand:
+ *
+ *   * `settings.payment_rails[rail].enabled` — the editorial switch.
+ *   * `paymentsConfigured()` — whether a provider can actually complete a charge.
+ *
+ * The second is why this exists. `/ways-to-give` used to hardcode
+ * "Card — Available now", which was false in production: the card rail is
+ * enabled in settings, but no payment adapter is implemented, so every card
+ * payment fails. A page that promises a working rail and then cannot take the
+ * money costs more trust than one that says "being set up".
+ *
+ * `bank` additionally needs real account details; `bankRailUsable` is the check
+ * for that, and the page applies it on top of this.
+ */
+export type RailStatus = "available" | "coming_soon";
+
+export function railStatuses(
+  rails: PaymentRails,
+): Record<PaymentRail, RailStatus> {
+  const live = paymentsConfigured();
+  const status = (enabled: boolean): RailStatus =>
+    enabled && live ? "available" : "coming_soon";
+
+  return {
+    mpesa: status(rails.mpesa.enabled),
+    card: status(rails.card.enabled),
+    bank: status(rails.bank.enabled),
+  };
+}
+
 export const getGivingTiersForDonate = getGivingTiers;
 
 /**
@@ -216,6 +250,35 @@ export async function getDonateSections(): Promise<Record<string, SiteSection>> 
   cacheTag("sections");
 
   const keys = ["donate-hero", "donate-impact"];
+  return Object.fromEntries(
+    await Promise.all(
+      keys.map(async (key) => [key, await getSection(key)] as const),
+    ),
+  );
+}
+
+/**
+ * The Ways to give page's sections, keyed.
+ *
+ * Separate keys from `donate-*` even where the wording is similar, because the
+ * two pages are read by different people: `/donate` is someone mid-decision
+ * with a card in hand, `/ways-to-give` is someone whose gift does not fit a
+ * card form — a large gift, an organisation, a bequest. Sharing copy between
+ * them would force one to speak for both.
+ */
+export async function getWaysToGiveSections(): Promise<Record<string, SiteSection>> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("sections");
+
+  const keys = [
+    "ways-hero",
+    "ways-ladder",
+    "ways-rails",
+    "ways-transparency",
+    "ways-organisation",
+    "ways-other",
+  ];
   return Object.fromEntries(
     await Promise.all(
       keys.map(async (key) => [key, await getSection(key)] as const),

@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { FeaturedStory } from "@/components/sections/featured-story";
 import { TrustStrip } from "@/components/site/trust-strip";
 import { GivingWays } from "@/components/sections/giving-ways";
+import type { SiteSection } from "@/lib/data/types";
 
 describe("FeaturedStory consent behaviour", () => {
   it("renders nothing when there is no eligible story", () => {
@@ -86,15 +87,33 @@ describe("TrustStrip", () => {
   });
 });
 
+
+/**
+ * The component takes its copy as a prop now. It used to hardcode its eyebrow,
+ * heading and body — character-for-character the `home-giving` section seeded
+ * in `site_sections` — so the section was editable in the admin and changing it
+ * did nothing on the page.
+ */
+const GIVING_SECTION: SiteSection = {
+  key: "home-giving",
+  eyebrow: "Ways to give",
+  heading: "What your gift actually does",
+  body: "Every amount below is tied to a specific outcome.",
+  ctaLabel: null,
+  ctaHref: null,
+  active: true,
+};
+
 describe("GivingWays", () => {
   it("renders nothing when there are no tiers", () => {
-    const { container } = render(<GivingWays tiers={[]} />);
+    const { container } = render(<GivingWays tiers={[]} section={GIVING_SECTION} />);
     expect(container).toBeEmptyDOMElement();
   });
 
   it("renders every tier amount and outcome from props", () => {
     render(
       <GivingWays
+        section={GIVING_SECTION}
         tiers={[
           {
             id: null,
@@ -119,6 +138,7 @@ describe("GivingWays", () => {
   it("flags tiers available monthly", () => {
     render(
       <GivingWays
+        section={GIVING_SECTION}
         tiers={[
           {
             id: null,

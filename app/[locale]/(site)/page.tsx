@@ -75,14 +75,19 @@ export default async function HomePage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [programmes, stats, tiers, story, programmesSection, hero] = await Promise.all([
-    getProgrammes(),
-    getImpactStats(),
-    getGivingTiers(),
-    getFeaturedStory(),
-    getSection("home-programmes"),
-    getSection("home-hero"),
-  ]);
+  const [programmes, stats, tiers, story, programmesSection, hero, givingSection] =
+    await Promise.all([
+      getProgrammes(),
+      getImpactStats(),
+      getGivingTiers(),
+      getFeaturedStory(),
+      getSection("home-programmes"),
+      getSection("home-hero"),
+      // `home-giving` has been seeded and editable since migration 0013 and was
+      // never read: `GivingWays` hardcoded the same strings. An editor changing
+      // it in /admin/pages/home saw nothing happen.
+      getSection("home-giving"),
+    ]);
 
   return (
     <main id="main" className="flex-1">
@@ -119,7 +124,9 @@ export default async function HomePage({
         <Programmes programmes={programmes} section={programmesSection} />
       ) : null}
       <FeaturedStory story={story} />
-      <GivingWays tiers={tiers} />
+      {isVisible(givingSection) ? (
+        <GivingWays tiers={tiers} section={givingSection} />
+      ) : null}
       <ClosingCta />
 
       <script
