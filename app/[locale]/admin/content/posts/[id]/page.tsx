@@ -19,6 +19,7 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
         category: post.category,
         tags: Array.isArray(post.tags) ? post.tags.join(", ") : (post.tags ?? ""),
         cover_path: post.cover_path ?? "",
+        cover_alt: post.cover_alt ?? "",
         reading_minutes: post.reading_minutes?.toString() ?? "",
         published: post.published,
       }}

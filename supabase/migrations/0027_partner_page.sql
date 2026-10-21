@@ -71,7 +71,7 @@ alter table public.partner_enquiries add constraint partner_enquiries_organisati
 -- 3. The page copy
 -- ===========================================================================
 -- Structure follows the live page: what we need, what we cannot offer yet, and
--- due diligence. The roadmap's \"ways to partner\" tabs and \"cohort costs\" are
+-- due diligence. The roadmap's "ways to partner" tabs and "cohort costs" are
 -- not seeded. The first would publish offers the organisation has not confirmed
 -- (matched giving, cause marketing). The second is omitted until programme staff
 -- verify the figures, as the roadmap's own acceptance criteria require.

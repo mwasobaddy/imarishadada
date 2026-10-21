@@ -937,6 +937,7 @@ export type Database = {
           author_id: string | null
           body: string
           category: string
+          cover_alt: string | null
           cover_path: string | null
           created_at: string
           excerpt: string
@@ -955,6 +956,7 @@ export type Database = {
           author_id?: string | null
           body?: string
           category?: string
+          cover_alt?: string | null
           cover_path?: string | null
           created_at?: string
           excerpt?: string
@@ -973,6 +975,7 @@ export type Database = {
           author_id?: string | null
           body?: string
           category?: string
+          cover_alt?: string | null
           cover_path?: string | null
           created_at?: string
           excerpt?: string

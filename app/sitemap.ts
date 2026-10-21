@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import { getProgrammeSlugs } from "@/lib/data/programmes";
+import { getPublishedPostSlugs } from "@/lib/data/news";
 import { PUBLISHED_LOCALES, localePath } from "@/lib/seo";
 
 /**
@@ -64,7 +65,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "monthly" as const,
   }));
 
-  return [...routes, ...programmeRoutes].map((route) => ({
+  // Published posts only. The same read policy that serves the pages decides which
+  // slugs exist here, so a draft or a future-dated post cannot be advertised.
+  const postRoutes = (await getPublishedPostSlugs()).map((slug) => ({
+    path: `/news/${slug}`,
+    priority: 0.5,
+    changeFrequency: "monthly" as const,
+  }));
+
+  return [...routes, ...programmeRoutes, ...postRoutes].map((route) => ({
     url: `${base}${localePath("en", route.path)}`,
     lastModified: LAST_MODIFIED,
     changeFrequency: route.changeFrequency,

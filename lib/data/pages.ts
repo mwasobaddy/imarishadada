@@ -59,7 +59,7 @@ export type ProsePage = {
  * `volunteer_applications` had an inbox, status transitions and a dashboard
  * count with nothing public that ever wrote a row.
  *
- * The remaining prose pages are annual-report and news. When one of
+ * The remaining prose page is annual-report. When one of
  * them needs a database row, move it out the same way rather than adding the
  * row to this file.
  */
@@ -115,36 +115,11 @@ export const ANNUAL_REPORT_PAGE: ProsePage = {
   ],
 };
 
-export const NEWS_PAGE: ProsePage = {
-  slug: "news",
-  title: "News",
-  eyebrow: "News",
-  lede: "Updates from the organisation: programme news, announcements, and what we are learning.",
-  draft: true,
-  sections: [
-    {
-      id: "nothing-yet",
-      heading: "Nothing published yet",
-      paragraphs: [
-        "We have not posted any news yet. Rather than fill this page with placeholder entries, it stays empty until there is something real to say.",
-        "If you want to hear from us, the fastest route is WhatsApp or the contact form, we do not run an email newsletter yet.",
-      ],
-    },
-    {
-      id: "what-belongs",
-      heading: "What will appear here",
-      bullets: [
-        "Programme announcements and changes.",
-        "Registration and governance milestones.",
-        "What we have learned from a reporting period.",
-        "Requests for volunteers or partners.",
-      ],
-    },
-  ],
-};
-
+/*
+ * NEWS_PAGE used to live here. Removed when /news left `ProseRoute` (migration
+ * 0029). The index and article pages read `posts` and `site_sections` directly.
+ */
 /** Look up a prose page by slug. */
 export const PROSE_PAGES: Record<string, ProsePage> = {
   "annual-report": ANNUAL_REPORT_PAGE,
-  news: NEWS_PAGE,
 };

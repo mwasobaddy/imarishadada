@@ -4,6 +4,7 @@ import { setRequestLocale } from "next-intl/server";
 import { ClosingCta } from "@/components/sections/closing-cta";
 import { FeaturedStory } from "@/components/sections/featured-story";
 import { GivingWays } from "@/components/sections/giving-ways";
+import { PartnerStrip } from "@/components/sections/partner-strip";
 import { Hero } from "@/components/sections/hero";
 import { Programmes } from "@/components/sections/programmes";
 import { StatCounter } from "@/components/sections/stat-counter";
@@ -14,6 +15,7 @@ import {
   getImpactStats,
   getProgrammes,
 } from "@/lib/data/home";
+import { getPublicPartners } from "@/lib/data/partner";
 import { getSection, isVisible } from "@/lib/data/sections";
 import { HERO_PORTRAIT } from "@/lib/data/hero-portrait";
 import { buildLanguageAlternates, jsonLdScript, webSiteJsonLd } from "@/lib/seo";
@@ -75,7 +77,7 @@ export default async function HomePage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [programmes, stats, tiers, story, programmesSection, hero, givingSection] =
+  const [programmes, stats, tiers, story, programmesSection, hero, givingSection, partners, partnersSection] =
     await Promise.all([
       getProgrammes(),
       getImpactStats(),
@@ -87,6 +89,10 @@ export default async function HomePage({
       // never read: `GivingWays` hardcoded the same strings. An editor changing
       // it in /admin/pages/home saw nothing happen.
       getSection("home-giving"),
+      // Only publishable partners: active, not a test, with written permission.
+      // The section is hidden while that list is empty. See lib/data/partner.ts.
+      getPublicPartners(),
+      getSection("home-partners"),
     ]);
 
   return (
@@ -115,6 +121,10 @@ export default async function HomePage({
       {/* Registration number is not published until issued — TrustStrip
           renders nothing rather than a placeholder. */}
       <TrustStrip registrationNumber={null} fiscalSponsor={null} />
+
+      {isVisible(partnersSection) && partners.length > 0 ? (
+        <PartnerStrip partners={partners} section={partnersSection} />
+      ) : null}
 
       <div id="impact">
         <StatCounter stats={stats} />

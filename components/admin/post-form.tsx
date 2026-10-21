@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { createPost, updatePost, publishPost, unpublishPost, deletePost } from "@/app/[locale]/admin/actions/posts";
+import { NEWS_CATEGORIES } from "@/lib/news/vocabulary";
 
 type Post = {
   id?: string;
@@ -18,18 +19,20 @@ type Post = {
   category: string;
   tags: string;
   cover_path: string;
+  cover_alt: string;
   reading_minutes: string;
 };
 
-const CATEGORIES = ["news", "story", "update", "press_release", "announcement", "event_recap"];
+/** The database's own list. Adding a category means changing the CHECK and this vocabulary together. */
+const CATEGORIES = NEWS_CATEGORIES.map((c) => c.value);
 
 export function PostForm({ initial }: { initial?: Post & { id: string; published: boolean } }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [form, setForm] = useState<Post>(
     initial
-      ? { slug: initial.slug, title: initial.title, excerpt: initial.excerpt ?? "", body: initial.body ?? "", category: initial.category, tags: initial.tags ?? "", cover_path: initial.cover_path ?? "", reading_minutes: initial.reading_minutes?.toString() ?? "" }
-      : { slug: "", title: "", excerpt: "", body: "", category: "news", tags: "", cover_path: "", reading_minutes: "" },
+      ? { slug: initial.slug, title: initial.title, excerpt: initial.excerpt ?? "", body: initial.body ?? "", category: initial.category, tags: initial.tags ?? "", cover_path: initial.cover_path ?? "", cover_alt: initial.cover_alt ?? "", reading_minutes: initial.reading_minutes?.toString() ?? "" }
+      : { slug: "", title: "", excerpt: "", body: "", category: "news", tags: "", cover_path: "", cover_alt: "", reading_minutes: "" },
   );
 
   function set<K extends keyof Post>(key: K, value: Post[K]) {
@@ -47,6 +50,7 @@ export function PostForm({ initial }: { initial?: Post & { id: string; published
           category: form.category,
           tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
           cover_path: form.cover_path || null,
+          cover_alt: form.cover_alt.trim() || null,
           reading_minutes: form.reading_minutes ? parseInt(form.reading_minutes) : null,
         };
         if (initial?.id) {
@@ -97,7 +101,7 @@ export function PostForm({ initial }: { initial?: Post & { id: string; published
       <PageHeader
         eyebrow="Content"
         title={initial?.id ? "Edit post" : "New post"}
-        description="News and announcements. A post can be scheduled to publish at a future date."
+        description="News and announcements. Publishing sets the publish date to now. Until then the post stays hidden, and the public site can take up to a few hours to show a newly published post."
         action={(
           <div className="flex flex-wrap gap-2">
             {initial?.id && (
@@ -155,7 +159,13 @@ export function PostForm({ initial }: { initial?: Post & { id: string; published
                 label="Cover image path"
                 value={form.cover_path ?? ""}
                 onChange={(path) => setForm((f) => ({ ...f, cover_path: path }))}
+                onUseAlt={(alt) => setForm((f) => ({ ...f, cover_alt: alt }))}
               />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-ink">Cover description (alt text)</label>
+            <input value={form.cover_alt} onChange={(e) => set("cover_alt", e.target.value)} className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-ink focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600" />
+            <p className="mt-1 text-xs text-ink-muted">Required whenever a cover is set.</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-ink">Reading minutes</label>
