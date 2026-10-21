@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
-import Link from "next/link";
 
+import { FaqContact, FaqEmpty } from "@/components/faq/sections";
 import { PageHero } from "@/components/site/page-hero";
 import { Container } from "@/components/site/container";
 import { getFaqGroups, getFaqSections } from "@/lib/data/faqs";
@@ -104,16 +104,7 @@ export default async function FaqPage({ params }: PageProps<"/[locale]/faq">) {
         <Container className="py-section">
           {groups.length === 0 ? (
             /* An empty shell would read as a broken page. This says why. */
-            isVisible(empty) ? (
-              <div className="measure mx-auto max-w-xl rounded-card border-2 border-dashed border-brand-600/30 bg-surface-lilac p-8 text-center">
-                <h2 className="text-xl font-semibold text-brand-600">
-                  {empty.heading}
-                </h2>
-                {empty.body ? (
-                  <p className="mt-3 text-ink-muted">{empty.body}</p>
-                ) : null}
-              </div>
-            ) : null
+            isVisible(empty) ? <FaqEmpty section={empty} /> : null
           ) : (
             <div className="grid gap-10 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-16">
               {/* The nav is built from the groups that actually have entries, so
@@ -161,24 +152,7 @@ export default async function FaqPage({ params }: PageProps<"/[locale]/faq">) {
                   </section>
                 ))}
 
-                {isVisible(contact) ? (
-                  <div className="rounded-2xl border border-brand-600/30 bg-brand-50 p-8">
-                    <h2 className="text-xl font-semibold text-brand-600">
-                      {contact.heading}
-                    </h2>
-                    {contact.body ? (
-                      <p className="measure mt-2 text-ink-muted">{contact.body}</p>
-                    ) : null}
-                    {contact.ctaLabel && contact.ctaHref ? (
-                      <Link
-                        href={contact.ctaHref}
-                        className="mt-6 inline-flex min-h-13 items-center justify-center rounded-lg bg-gold px-8 text-base font-semibold text-gold-ink transition-colors hover:bg-gold/90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-700"
-                      >
-                        {contact.ctaLabel}
-                      </Link>
-                    ) : null}
-                  </div>
-                ) : null}
+                {isVisible(contact) ? <FaqContact section={contact} /> : null}
               </div>
             </div>
           )}

@@ -34,6 +34,7 @@ import {
   TransparencyMoneyStatus,
 } from "@/components/transparency/sections";
 import { Programmes } from "@/components/sections/programmes";
+import { FaqContact, FaqEmpty } from "@/components/faq/sections";
 import {
   PartnerApply,
   PartnerCannot,
@@ -248,6 +249,14 @@ export function ExactSectionPreview({
     case "transparency-complaints":
       return <ProseSection id="complaints" section={section} />;
 
+    /* ---- FAQ ---- */
+
+    case "faq-empty":
+      return <FaqEmpty section={section} />;
+
+    case "faq-contact":
+      return <FaqContact section={section} />;
+
     /* ---- Partner ---- */
 
     case "partner-need":
@@ -388,6 +397,8 @@ export const EXACT_SECTION_KEYS = new Set([
   "volunteer-safeguarding",
   "volunteer-form",
   "volunteer-remote",
+  "faq-empty",
+  "faq-contact",
   "partner-need",
   "partner-cannot",
   "partner-dd",
