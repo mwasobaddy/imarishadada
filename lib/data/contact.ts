@@ -192,7 +192,7 @@ export type RateLimitResult = { allowed: boolean; retryAfterMinutes: number };
  */
 export async function checkRateLimit(
   headers: Headers,
-  bucket: "contact" | "volunteer" = "contact",
+  bucket: "contact" | "volunteer" | "partner" = "contact",
 ): Promise<RateLimitResult> {
   // Without a configured database there is nothing to limit against, and the
   // form is unusable in development if we hard-fail.

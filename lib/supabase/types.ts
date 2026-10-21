@@ -702,12 +702,16 @@ export type Database = {
         Row: {
           assigned_to: string | null
           contact_name: string
+          contact_role: string | null
           created_at: string
           email: string
           id: string
+          intended_amount: string | null
+          intended_programme: string | null
           message: string
           notes: string | null
           organisation: string
+          organisation_type: string | null
           partnership_type: string
           phone: string | null
           read_at: string | null
@@ -718,12 +722,16 @@ export type Database = {
         Insert: {
           assigned_to?: string | null
           contact_name: string
+          contact_role?: string | null
           created_at?: string
           email: string
           id?: string
+          intended_amount?: string | null
+          intended_programme?: string | null
           message: string
           notes?: string | null
           organisation: string
+          organisation_type?: string | null
           partnership_type?: string
           phone?: string | null
           read_at?: string | null
@@ -734,12 +742,16 @@ export type Database = {
         Update: {
           assigned_to?: string | null
           contact_name?: string
+          contact_role?: string | null
           created_at?: string
           email?: string
           id?: string
+          intended_amount?: string | null
+          intended_programme?: string | null
           message?: string
           notes?: string | null
           organisation?: string
+          organisation_type?: string | null
           partnership_type?: string
           phone?: string | null
           read_at?: string | null
@@ -814,8 +826,10 @@ export type Database = {
           description: string
           id: string
           is_test: boolean
+          logo_alt: string | null
           logo_path: string | null
           name: string
+          permission_confirmed_at: string | null
           sort_order: number
           tier: string
           updated_at: string
@@ -827,8 +841,10 @@ export type Database = {
           description?: string
           id?: string
           is_test?: boolean
+          logo_alt?: string | null
           logo_path?: string | null
           name: string
+          permission_confirmed_at?: string | null
           sort_order?: number
           tier?: string
           updated_at?: string
@@ -840,8 +856,10 @@ export type Database = {
           description?: string
           id?: string
           is_test?: boolean
+          logo_alt?: string | null
           logo_path?: string | null
           name?: string
+          permission_confirmed_at?: string | null
           sort_order?: number
           tier?: string
           updated_at?: string

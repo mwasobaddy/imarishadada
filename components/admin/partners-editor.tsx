@@ -19,6 +19,8 @@ type Partner = {
   is_test: boolean;
   sort_order: number;
   active: boolean;
+  logo_alt: string | null;
+  permission_confirmed_at: string | null;
 };
 
 const TIERS = ["community", "corporate", "institutional", "fiscal_sponsor"];
@@ -33,7 +35,9 @@ export function PartnersEditor({ partners: initial }: { partners: Partner[] }) {
   function startCreate() {
     setCreating(true);
     setEditing(null);
-    setForm({ name: "", description: "", logo_path: "", website_url: "", tier: "community", is_test: false, sort_order: partners.length + 1, active: true });
+    // Created inactive. A partner goes live only once permission is recorded, and
+    // the database refuses an active row without it, so the default is the safe one.
+    setForm({ name: "", description: "", logo_path: "", logo_alt: "", website_url: "", tier: "community", is_test: false, sort_order: partners.length + 1, active: false, permission_confirmed_at: null });
   }
 
   function startEdit(p: Partner) {
@@ -56,7 +60,9 @@ export function PartnersEditor({ partners: initial }: { partners: Partner[] }) {
           tier: form.tier ?? "community",
           is_test: form.is_test ?? false,
           sort_order: form.sort_order ?? 0,
-          active: form.active ?? true,
+          active: form.active ?? false,
+          logo_alt: form.logo_alt?.trim() || null,
+          permission_confirmed_at: form.permission_confirmed_at ?? null,
         };
         if (creating) {
           const created = await createPartner(payload);
@@ -132,7 +138,13 @@ export function PartnersEditor({ partners: initial }: { partners: Partner[] }) {
                 label="Logo path"
                 value={form.logo_path ?? ""}
                 onChange={(path) => setForm((f) => ({ ...f, logo_path: path }))}
+                onUseAlt={(alt) => setForm((f) => ({ ...f, logo_alt: alt }))}
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-ink">Logo description (alt text)</label>
+              <input value={form.logo_alt ?? ""} onChange={(e) => setForm((f) => ({ ...f, logo_alt: e.target.value }))} placeholder="For example: Partner name logo" className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-ink focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600" />
+              <p className="mt-1 text-xs text-ink-muted">Required whenever a logo is set.</p>
             </div>
             <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-ink">Description</label>
@@ -148,8 +160,32 @@ export function PartnersEditor({ partners: initial }: { partners: Partner[] }) {
                 Test partner
               </label>
               <label className="flex items-center gap-2 text-sm text-ink">
-                <input type="checkbox" checked={form.active ?? true} onChange={(e) => setForm((f) => ({ ...f, active: e.target.checked }))} className="h-4 w-4 rounded border-border text-brand-600 focus:ring-brand-600" />
+                <input type="checkbox" checked={form.active ?? false} onChange={(e) => setForm((f) => ({ ...f, active: e.target.checked }))} className="h-4 w-4 rounded border-border text-brand-600 focus:ring-brand-600" />
                 Active
+              </label>
+            </div>
+            <div className="sm:col-span-2">
+              <label className="flex items-start gap-2 text-sm text-ink">
+                <input
+                  type="checkbox"
+                  checked={!!form.permission_confirmed_at}
+                  onChange={(e) =>
+                    setForm((f) => ({
+                      ...f,
+                      permission_confirmed_at: e.target.checked
+                        ? (f.permission_confirmed_at ?? new Date().toISOString())
+                        : null,
+                    }))
+                  }
+                  className="mt-0.5 h-4 w-4 rounded border-border text-brand-600 focus:ring-brand-600"
+                />
+                <span>
+                  Written permission received to name this organisation and show its logo.
+                  <span className="mt-0.5 block text-xs text-ink-muted">
+                    Tick only once you hold the permission in writing. An active partner without it is refused.
+                    {form.permission_confirmed_at ? ` Recorded ${new Date(form.permission_confirmed_at).toLocaleDateString("en-KE")}.` : ""}
+                  </span>
+                </span>
               </label>
             </div>
           </div>

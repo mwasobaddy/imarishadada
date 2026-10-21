@@ -42,51 +42,13 @@ export type ProsePage = {
   sections: ProseSection[];
 };
 
-export const PARTNER_PAGE: ProsePage = {
-  slug: "partner",
-  title: "Partner with us",
-  eyebrow: "Partnership",
-  lede: "We are small, accountable and on the ground in Kibera. We say what we are good at, and we say what we are not.",
-  draft: false,
-  cta: { label: "Start a conversation", href: "/contact" },
-  sections: [
-    {
-      id: "what-we-need",
-      heading: "What we actually need",
-      paragraphs: [
-        "Unrestricted funding is the most useful thing a partner can give us. It lets a participant move between programmes as her needs change, rather than being shaped by whichever grant is easiest to apply for.",
-        "We are also open to institutional partners who can help with safeguarding training, legal or registration costs, or professional services we genuinely cannot afford.",
-      ],
-      bullets: [
-        "Multi-year unrestricted funding, which is what makes continuity possible.",
-        "Help with our BRS NGO registration and fiscal sponsorship.",
-        "Safeguarding, data-protection and fundraising training.",
-        "Pro bono legal and financial review.",
-      ],
-    },
-    {
-      id: "honest-position",
-      heading: "What we cannot offer yet",
-      paragraphs: [
-        "We would rather this page be useful than flattering. The following are real limitations, not modesty.",
-      ],
-      bullets: [
-        "We are not yet able to issue receipts that are tax deductible in every jurisdiction.",
-        "We cannot yet report cost-per-participant, because our overhead allocation is not settled.",
-        "We are not yet able to accept unrestricted gifts through every international platform.",
-        "We do not yet have formal partnerships with secondary schools, so we cannot name them.",
-      ],
-    },
-    {
-      id: "due-diligence",
-      heading: "Due diligence",
-      paragraphs: [
-        "Institutional funders and diaspora partners will want documentation before they commit. We would rather you ask for it early than discover a gap late.",
-        "What we can provide now: our safeguarding policy, our privacy notice, programme figures with the period each one covers, and our methodology for counting. What is still being prepared is marked as such rather than left out.",
-      ],
-    },
-  ],
-};
+/*
+ * PARTNER_PAGE used to live here.
+ *
+ * Removed when /partner left `ProseRoute` (migration 0027). The page had no form,
+ * and `partner_enquiries` had an inbox that nothing public wrote to. Its copy now
+ * lives in `site_sections` and the enquiry form writes through a Server Action.
+ */
 
 /*
  * VOLUNTEER_PAGE used to live here.
@@ -97,7 +59,7 @@ export const PARTNER_PAGE: ProsePage = {
  * `volunteer_applications` had an inbox, status transitions and a dashboard
  * count with nothing public that ever wrote a row.
  *
- * The remaining prose pages are partner, annual-report and news. When one of
+ * The remaining prose pages are annual-report and news. When one of
  * them needs a database row, move it out the same way rather than adding the
  * row to this file.
  */
@@ -183,7 +145,6 @@ export const NEWS_PAGE: ProsePage = {
 
 /** Look up a prose page by slug. */
 export const PROSE_PAGES: Record<string, ProsePage> = {
-  partner: PARTNER_PAGE,
   "annual-report": ANNUAL_REPORT_PAGE,
   news: NEWS_PAGE,
 };
