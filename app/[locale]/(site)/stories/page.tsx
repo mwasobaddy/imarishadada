@@ -8,7 +8,7 @@ import { LadiesRoom } from "@/components/stories/sections";
 import { Container } from "@/components/site/container";
 import { ClosingCta } from "@/components/sections/closing-cta";
 import { ConsentLedger, ConsentNote } from "@/components/stories/consent";
-import { FeaturedStoryCard } from "@/components/stories/featured-story";
+import { StoriesFeatured } from "@/components/stories/sections";
 import { StoryGrid } from "@/components/stories/story-grid";
 import { getConsentCounts, getStories, getStoriesSections } from "@/lib/data/impact";
 import { getProgrammes } from "@/lib/data/home";
@@ -153,19 +153,7 @@ async function StoriesFeed({
       </section>
 
       {featured && isVisible(featuredSection) ? (
-        <section aria-labelledby="featured-heading" className="py-section bg-surface">
-          <Container>
-            <h2
-              id="featured-heading"
-              className="text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
-            >
-              {featuredSection.heading}
-            </h2>
-            <div className="mt-8">
-              <FeaturedStoryCard story={featured} />
-            </div>
-          </Container>
-        </section>
+        <StoriesFeatured section={featuredSection} story={featured} />
       ) : null}
 
       <StoryGrid

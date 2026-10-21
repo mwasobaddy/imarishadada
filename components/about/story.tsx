@@ -24,6 +24,7 @@ export function AboutStory({
         <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16">
           <AboutPhotoCarousel
             images={isVisible(carousel) ? (carousel!.images ?? []) : []}
+            label={carousel?.heading}
             caption={carousel?.body}
             className="lg:order-1"
           />
@@ -157,6 +158,7 @@ export function AboutValues({
           */}
           <AboutPhotoCarousel
             images={isVisible(carousel) ? (carousel!.images ?? []) : []}
+            label={carousel?.heading}
             className="lg:order-last"
           />
         </div>

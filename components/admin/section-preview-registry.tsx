@@ -3,6 +3,8 @@
 import type { ReactNode } from "react";
 
 import { AboutApproach, AboutStory, AboutValues, AboutVisionMission, AboutWork } from "@/components/about/story";
+import { AboutPhotoCarousel } from "@/components/about/photo-carousel";
+import { ImpactBand } from "@/components/donate/impact-band";
 import { ImpactByProgramme } from "@/components/impact/by-programme";
 import { ImpactGaps } from "@/components/impact/gaps";
 import { ImpactMethodology } from "@/components/impact/methodology";
@@ -61,6 +63,7 @@ import {
 import { PageHero } from "@/components/site/page-hero";
 import { ConsentLedger, ConsentNote } from "@/components/stories/consent";
 import { StoryGrid } from "@/components/stories/story-grid";
+import { StoriesEmpty, StoriesFeatured } from "@/components/stories/sections";
 import { toPreviewSection, type SectionForm } from "@/lib/admin/section-form";
 import type { ContactDetails } from "@/lib/data/contact";
 import type { ConsentTierCounts } from "@/lib/data/impact";
@@ -189,6 +192,12 @@ export function ExactSectionPreview({
 
     /* ---- Stories ---- */
 
+    case "stories-featured":
+      return <StoriesFeatured section={section} story={data.featuredStory ?? null} />;
+
+    case "stories-empty":
+      return <StoriesEmpty section={section} />;
+
     case "stories-grid":
       return (
         <StoryGrid
@@ -203,6 +212,22 @@ export function ExactSectionPreview({
         <ConsentNote
           counts={data.consentCounts ?? EMPTY_COUNTS}
           section={section}
+        />
+      );
+
+    /* ---- Donate ---- */
+
+    case "donate-impact":
+      return <ImpactBand stat={data.stats?.[0] ?? null} section={section} />;
+
+    /* ---- About ---- */
+
+    case "about-carousel":
+      return (
+        <AboutPhotoCarousel
+          images={section.images ?? []}
+          caption={section.body}
+          label={section.heading}
         />
       );
 
@@ -560,6 +585,10 @@ export const EXACT_SECTION_KEYS = new Set([
   "transparency-governance",
   "transparency-safeguarding",
   "transparency-complaints",
+  "stories-featured",
+  "stories-empty",
+  "donate-impact",
+  "about-carousel",
 ]);
 
 /**

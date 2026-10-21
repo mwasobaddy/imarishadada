@@ -30,11 +30,20 @@ import DepthCarousel, { type DepthCarouselItem } from "@/components/ui/depth-car
 export function AboutPhotoCarousel({
   images,
   caption,
+  label,
   className,
 }: {
   images: { path: string; alt: string }[];
   /** Shown under the stage. Comes from the section's body. */
   caption?: string | null;
+  /**
+   * The accessible name of the gallery. Comes from the section's heading.
+   *
+   * The photographs carry their own alt text, so this is not a description of
+   * the pictures — it is the name of the group, which is what tells a screen
+   * reader what they have landed in.
+   */
+  label?: string | null;
   className?: string;
 }) {
   // An empty carousel is worse than no carousel: it is a grey box that reads as
@@ -47,7 +56,7 @@ export function AboutPhotoCarousel({
   }));
 
   return (
-    <div className={className}>
+    <div className={className} role="group" aria-label={label ?? undefined}>
       <DepthCarousel
         items={items}
         autoplay

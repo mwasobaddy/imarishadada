@@ -95,6 +95,8 @@ export type PreviewData = {
   contact?: Awaited<ReturnType<typeof getContactDetails>>;
   /** The enquiry types, for the contact form's dropdown. */
   enquiryTypes?: EnquiryTypeOption[];
+  /** The featured story, for the stories index. */
+  featuredStory?: StoryCard | null;
 };
 
 /**
@@ -133,13 +135,21 @@ export async function loadPreviewData(
       ]);
       break;
 
-    case "stories":
-      [data.stories, data.consentCounts, data.socialLinks] = await Promise.all([
+    case "stories": {
+      const [stories, consentCounts, socialLinks] = await Promise.all([
         getStories(),
         getConsentCounts(),
         getSocialLinks(),
       ]);
+      data.stories = stories;
+      data.consentCounts = consentCounts;
+      data.socialLinks = socialLinks;
+      // The same rule the page uses: the featured story leads, and is only
+      // featured when there is something left to show underneath it.
+      data.featuredStory =
+        stories.length > 1 ? (stories.find((s) => s.featured) ?? stories[0]!) : null;
       break;
+    }
 
     case "impact":
       [data.stats, data.gaps, data.programmes] = await Promise.all([
@@ -203,7 +213,10 @@ export async function loadPreviewData(
     }
 
     case "donate":
-      data.tiers = await getGivingTiers();
+      [data.tiers, data.stats] = await Promise.all([
+        getGivingTiers(),
+        getAllImpactStats(),
+      ]);
       break;
 
     case "programmes":

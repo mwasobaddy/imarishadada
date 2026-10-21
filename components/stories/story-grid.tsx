@@ -1,7 +1,6 @@
-import Link from "next/link";
-
 import { Container } from "@/components/site/container";
 import { StoryCardItem } from "@/components/stories/story-card";
+import { StoriesEmpty } from "@/components/stories/sections";
 import type { StoryCard } from "@/lib/data/impact";
 import type { SiteSection } from "@/lib/data/types";
 
@@ -28,31 +27,7 @@ export function StoryGrid({
   emptySection: SiteSection;
 }) {
   if (stories.length === 0) {
-    return (
-      <section aria-labelledby="stories-empty-heading" className="py-section bg-surface">
-        <Container>
-          <div className="rounded-card border-2 border-dashed border-brand-600/30 bg-surface-lilac p-8 text-center sm:p-12">
-            <h2
-              id="stories-empty-heading"
-              className="text-xl font-semibold text-brand-600 sm:text-2xl"
-            >
-              {emptySection.heading}
-            </h2>
-            {emptySection.body ? (
-              <p className="measure mx-auto mt-3 text-ink-muted">{emptySection.body}</p>
-            ) : null}
-            {emptySection.ctaLabel && emptySection.ctaHref ? (
-              <Link
-                href={emptySection.ctaHref}
-                className="mt-7 inline-flex min-h-11 items-center text-sm font-medium text-brand-600 underline decoration-brand-600/40 underline-offset-4 hover:decoration-brand-700"
-              >
-                {emptySection.ctaLabel}
-              </Link>
-            ) : null}
-          </div>
-        </Container>
-      </section>
-    );
+    return <StoriesEmpty section={emptySection} />;
   }
 
   return (
