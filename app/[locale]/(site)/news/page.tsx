@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { setRequestLocale } from "next-intl/server";
 
 import { PostCard } from "@/components/news/post-card";
+import { NewsEmpty } from "@/components/news/sections";
 import { Container } from "@/components/site/container";
 import { PageHero } from "@/components/site/page-hero";
 import { getFeaturedPost, getNewsCategoriesInUse, getNewsPage, getNewsSections } from "@/lib/data/news";
@@ -217,20 +218,7 @@ async function NewsFeed({
           ) : empty && isVisible(empty) ? (
             // Never an empty grid. Shown when nothing is published, and when a
             // filter or a page is pointed at nothing.
-            <div className="rounded-card border-2 border-dashed border-brand-600/30 bg-surface-lilac p-10 text-center">
-              <h2 className="text-2xl font-semibold text-brand-600">{empty.heading}</h2>
-              {empty.body ? (
-                <p className="measure mx-auto mt-3 leading-relaxed text-ink-muted">{empty.body}</p>
-              ) : null}
-              {empty.ctaLabel && empty.ctaHref ? (
-                <Link
-                  href={empty.ctaHref}
-                  className="mt-6 inline-flex min-h-11 items-center text-sm font-medium text-brand-600 underline decoration-brand-600/40 underline-offset-4 hover:decoration-brand-700 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-700"
-                >
-                  {empty.ctaLabel} →
-                </Link>
-              ) : null}
-            </div>
+            <NewsEmpty section={empty} />
           ) : null}
         </Container>
       </section>
