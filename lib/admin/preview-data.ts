@@ -7,10 +7,12 @@ import {
   railStatuses,
 } from "@/lib/data/donate";
 import { getGivingTiers, getProgrammes } from "@/lib/data/home";
+import { getVolunteerRoles } from "@/lib/data/volunteer";
 import { getFinancialBreakdown, getTransparencyGaps } from "@/lib/data/transparency";
 import type { BankDetails, PaymentRails, RailStatus } from "@/lib/data/donate";
 import type { FinancialLine, TransparencyGap } from "@/lib/data/gaps";
 import type { PaymentRail } from "@/lib/donate/money";
+import type { VolunteerRole } from "@/lib/volunteer/roles";
 import {
   getAllImpactStats,
   getConsentCounts,
@@ -74,6 +76,8 @@ export type PreviewData = {
   railStatuses?: Record<PaymentRail, RailStatus>;
   /** Whether the published bank details are complete enough to use. */
   bankReady?: boolean;
+  /** The open volunteer roles, for the volunteer page. */
+  volunteerRoles?: VolunteerRole[];
   contact?: Awaited<ReturnType<typeof getContactDetails>>;
 };
 
@@ -132,6 +136,10 @@ export async function loadPreviewData(
           getTransparencyGaps("measurement"),
           getFinancialBreakdown(),
         ]);
+      break;
+
+    case "volunteer":
+      data.volunteerRoles = await getVolunteerRoles();
       break;
 
     case "ways-to-give": {

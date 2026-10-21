@@ -2,6 +2,7 @@ import { cacheLife, cacheTag } from "next/cache";
 
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { getSection } from "@/lib/data/sections";
+import { type VolunteerRole } from "@/lib/volunteer/roles";
 import type { SiteSection } from "@/lib/data/types";
 
 /**
@@ -20,27 +21,14 @@ import type { SiteSection } from "@/lib/data/types";
  * persuasive sentence than "Mentor".
  */
 
-export type VolunteerRole = {
-  id: string;
-  title: string;
-  description: string;
-  commitment: string | null;
-  requirements: string | null;
-  location: string | null;
-  timeCommitment: string | null;
-  skillsNeeded: string[];
-  positionsAvailable: number;
-  positionsFilled: number;
-  sortOrder: number;
-};
-
-/** Places still open on a role. Never negative, whatever the database says. */
-export function placesRemaining(role: {
-  positionsAvailable: number;
-  positionsFilled: number;
-}): number {
-  return Math.max(0, role.positionsAvailable - role.positionsFilled);
-}
+/**
+ * The role type and `placesRemaining` live in `lib/volunteer/roles.ts`.
+ *
+ * They are re-exported here because everything has always imported them from
+ * this module, and because the admin's live preview needs them from a module
+ * that does not read the database.
+ */
+export { placesRemaining, type VolunteerRole } from "@/lib/volunteer/roles";
 
 /**
  * Open roles, in editorial order.

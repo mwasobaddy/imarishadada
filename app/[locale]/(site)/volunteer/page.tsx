@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
-import Link from "next/link";
 
 import { PageHero } from "@/components/site/page-hero";
-import { Container } from "@/components/site/container";
-import { VolunteerForm } from "@/components/volunteer/volunteer-form";
-import { getVolunteerRoles, getVolunteerSections, placesRemaining } from "@/lib/data/volunteer";
+import {
+  VolunteerApply,
+  VolunteerProcess,
+  VolunteerRemote,
+  VolunteerRoles,
+  VolunteerSafeguarding,
+} from "@/components/volunteer/sections";
+import { getVolunteerRoles, getVolunteerSections } from "@/lib/data/volunteer";
 import { isVisible } from "@/lib/data/sections";
 import { breadcrumbJsonLd, jsonLdScript, absoluteUrl } from "@/lib/seo";
 
@@ -67,29 +71,6 @@ export const metadata: Metadata = {
   },
 };
 
-function StepList({ steps }: { steps: { title: string; description: string }[] }) {
-  return (
-    <ol className="mt-8 space-y-5">
-      {steps.map((step, i) => (
-        <li key={step.title} className="flex gap-4">
-          <span
-            aria-hidden="true"
-            className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-brand-50 font-mono text-xs font-semibold text-brand-600"
-          >
-            {String(i + 1).padStart(2, "0")}
-          </span>
-          <div>
-            <p className="font-semibold text-ink">{step.title}</p>
-            <p className="measure mt-1 leading-relaxed text-ink-muted">
-              {step.description}
-            </p>
-          </div>
-        </li>
-      ))}
-    </ol>
-  );
-}
-
 export default async function VolunteerPage({
   params,
 }: PageProps<"/[locale]/volunteer">) {
@@ -133,219 +114,31 @@ export default async function VolunteerPage({
 
         {/* ---- Roles --------------------------------------------------- */}
         {isVisible(rolesSection) ? (
-          <section aria-labelledby="vol-roles-heading" className="py-section bg-surface">
-            <Container>
-              <div className="max-w-2xl">
-                <h2
-                  id="vol-roles-heading"
-                  className="text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
-                >
-                  {rolesSection.heading}
-                </h2>
-                {rolesSection.body ? (
-                  <p className="measure mt-4 text-lg text-ink-muted">
-                    {rolesSection.body}
-                  </p>
-                ) : null}
-              </div>
-
-              {roles.length === 0 ? (
-                isVisible(rolesEmpty) ? (
-                  <div className="mt-10 rounded-card border-2 border-dashed border-brand-600/30 bg-surface-lilac p-8">
-                    <h3 className="text-xl font-semibold text-brand-600">
-                      {rolesEmpty.heading}
-                    </h3>
-                    {rolesEmpty.body ? (
-                      <p className="measure mt-3 leading-relaxed text-ink-muted">
-                        {rolesEmpty.body}
-                      </p>
-                    ) : null}
-                    <Link
-                      href="#apply"
-                      className="mt-5 inline-flex min-h-11 items-center text-sm font-medium text-brand-600 underline decoration-brand-600/40 underline-offset-4 hover:decoration-brand-700"
-                    >
-                      Apply anyway →
-                    </Link>
-                  </div>
-                ) : null
-              ) : (
-                <ul className="mt-10 grid gap-5 sm:grid-cols-2">
-                  {roles.map((role) => {
-                    const remaining = placesRemaining(role);
-                    return (
-                      <li
-                        key={role.id}
-                        className="flex flex-col rounded-card border border-border bg-card p-6"
-                      >
-                        <h3 className="text-lg font-semibold text-brand-600">
-                          {role.title}
-                        </h3>
-                        {role.description ? (
-                          <p className="measure mt-2 flex-1 text-sm leading-relaxed text-ink-muted">
-                            {role.description}
-                          </p>
-                        ) : null}
-
-                        <dl className="mt-4 space-y-1 text-xs text-ink-muted">
-                          {role.timeCommitment ?? role.commitment ? (
-                            <div className="flex gap-2">
-                              <dt className="font-medium">Commitment</dt>
-                              <dd>{role.timeCommitment ?? role.commitment}</dd>
-                            </div>
-                          ) : null}
-                          {role.location ? (
-                            <div className="flex gap-2">
-                              <dt className="font-medium">Where</dt>
-                              <dd>{role.location}</dd>
-                            </div>
-                          ) : null}
-                          <div className="flex gap-2">
-                            <dt className="font-medium">Places</dt>
-                            {/* A full role stays listed. Filtering it out would
-                                make the list silently shorter and leave an
-                                applicant unable to tell "not needed" from
-                                "full". */}
-                            <dd>
-                              {remaining === 0
-                                ? "Full at the moment — apply and we will keep you on file"
-                                : `${remaining} open`}
-                            </dd>
-                          </div>
-                        </dl>
-
-                        {role.requirements ? (
-                          <p className="mt-3 border-t border-border pt-3 text-xs leading-relaxed text-ink-muted">
-                            {role.requirements}
-                          </p>
-                        ) : null}
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </Container>
-          </section>
+          <VolunteerRoles
+            section={rolesSection}
+            emptySection={rolesEmpty}
+            roles={roles}
+          />
         ) : null}
 
         {/* ---- Process ------------------------------------------------- */}
         {isVisible(process) ? (
-          <section aria-labelledby="vol-process-heading" className="bg-surface-lilac py-section">
-            <Container>
-              <div className="max-w-2xl">
-                <h2
-                  id="vol-process-heading"
-                  className="text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
-                >
-                  {process.heading}
-                </h2>
-                {process.body ? (
-                  <p className="measure mt-4 text-lg text-ink-muted">{process.body}</p>
-                ) : null}
-                <StepList steps={process.steps ?? []} />
-              </div>
-            </Container>
-          </section>
+          <VolunteerProcess section={process} />
         ) : null}
 
         {/* ---- Safeguarding -------------------------------------------- */}
         {isVisible(safeguarding) ? (
-          <section aria-labelledby="vol-safe-heading" className="py-section bg-surface">
-            <Container>
-              <div className="max-w-2xl">
-                <h2
-                  id="vol-safe-heading"
-                  className="text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
-                >
-                  {safeguarding.heading}
-                </h2>
-                {safeguarding.body ? (
-                  <p className="measure mt-4 text-lg text-ink-muted">
-                    {safeguarding.body}
-                  </p>
-                ) : null}
-
-                <StepList steps={safeguarding.steps ?? []} />
-
-                {/*
-                  Code-owned. An editor can reword the requirements above; they
-                  cannot remove the statement that nobody is placed before all of
-                  them are complete. The roadmap: "Never soften the screening
-                  step."
-                */}
-                <p
-                  role="note"
-                  className="mt-8 rounded-xl border-2 border-dashed border-brand-600/40 bg-surface-lilac p-5 text-sm leading-relaxed text-ink-muted"
-                >
-                  <span className="font-semibold text-brand-600">
-                    We do not place anyone with a child-facing role until every
-                    one of these is complete.
-                  </span>{" "}
-                  No exceptions, and no role is urgent enough to skip one. If that
-                  makes us slower to reply than another organisation, that is the
-                  trade we have chosen.
-                </p>
-
-                {safeguarding.ctaLabel && safeguarding.ctaHref ? (
-                  <Link
-                    href={safeguarding.ctaHref}
-                    className="mt-6 inline-flex min-h-11 items-center text-sm font-medium text-brand-600 underline decoration-brand-600/40 underline-offset-4 hover:decoration-brand-700 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-700"
-                  >
-                    {safeguarding.ctaLabel} →
-                  </Link>
-                ) : null}
-              </div>
-            </Container>
-          </section>
+          <VolunteerSafeguarding section={safeguarding} />
         ) : null}
 
         {/* ---- Application form ---------------------------------------- */}
         {isVisible(form) ? (
-          <section id="apply" aria-labelledby="vol-form-heading" className="bg-surface-lilac py-section">
-            <Container>
-              <div className="mx-auto max-w-3xl">
-                <h2
-                  id="vol-form-heading"
-                  className="text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
-                >
-                  {form.heading}
-                </h2>
-                {form.body ? (
-                  <p className="measure mt-4 text-lg text-ink-muted">{form.body}</p>
-                ) : null}
-
-                <div className="mt-8">
-                  <VolunteerForm roles={roles} />
-                </div>
-              </div>
-            </Container>
-          </section>
+          <VolunteerApply section={form} roles={roles} />
         ) : null}
 
         {/* ---- Remote -------------------------------------------------- */}
         {isVisible(remote) ? (
-          <section aria-labelledby="vol-remote-heading" className="bg-surface py-section">
-            <Container>
-              <div className="max-w-2xl">
-                <h2
-                  id="vol-remote-heading"
-                  className="text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
-                >
-                  {remote.heading}
-                </h2>
-                {remote.body ? (
-                  <p className="measure mt-4 text-lg text-ink-muted">{remote.body}</p>
-                ) : null}
-                {remote.ctaLabel && remote.ctaHref ? (
-                  <Link
-                    href={remote.ctaHref}
-                    className="mt-6 inline-flex min-h-11 items-center text-sm font-medium text-brand-600 underline decoration-brand-600/40 underline-offset-4 hover:decoration-brand-700 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-700"
-                  >
-                    {remote.ctaLabel} →
-                  </Link>
-                ) : null}
-              </div>
-            </Container>
-          </section>
+          <VolunteerRemote section={remote} />
         ) : null}
       </main>
 

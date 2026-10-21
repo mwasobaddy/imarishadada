@@ -14,6 +14,13 @@ import { Hero } from "@/components/sections/hero";
 import { PartnerStrip } from "@/components/sections/partner-strip";
 import { StatCounter } from "@/components/sections/stat-counter";
 import {
+  VolunteerApply,
+  VolunteerProcess,
+  VolunteerRemote,
+  VolunteerRoles,
+  VolunteerSafeguarding,
+} from "@/components/volunteer/sections";
+import {
   WaysOrganisation,
   WaysOther,
   WaysRails,
@@ -233,6 +240,41 @@ export function ExactSectionPreview({
     case "transparency-complaints":
       return <ProseSection id="complaints" section={section} />;
 
+    /* ---- Volunteer ---- */
+
+    case "volunteer-roles":
+      return (
+        <VolunteerRoles
+          section={section}
+          emptySection={find("volunteer-roles-empty")}
+          roles={data.volunteerRoles ?? []}
+        />
+      );
+
+    case "volunteer-roles-empty":
+      // The empty state is rendered inside the roles section, so on its own it
+      // is the card without the list.
+      return (
+        <div className="rounded-card border-2 border-dashed border-brand-600/30 bg-surface-lilac p-8">
+          <h3 className="text-xl font-semibold text-brand-600">{section.heading}</h3>
+          {section.body ? (
+            <p className="measure mt-3 leading-relaxed text-ink-muted">{section.body}</p>
+          ) : null}
+        </div>
+      );
+
+    case "volunteer-process":
+      return <VolunteerProcess section={section} />;
+
+    case "volunteer-safeguarding":
+      return <VolunteerSafeguarding section={section} />;
+
+    case "volunteer-form":
+      return <VolunteerApply section={section} roles={data.volunteerRoles ?? []} />;
+
+    case "volunteer-remote":
+      return <VolunteerRemote section={section} />;
+
     /* ---- Ways to give ---- */
 
     case "ways-ladder":
@@ -310,6 +352,12 @@ export const EXACT_SECTION_KEYS = new Set([
   "ways-transparency",
   "ways-organisation",
   "ways-other",
+  "volunteer-roles",
+  "volunteer-roles-empty",
+  "volunteer-process",
+  "volunteer-safeguarding",
+  "volunteer-form",
+  "volunteer-remote",
   "impact-headline",
   "impact-by-programme",
   "impact-methodology",
