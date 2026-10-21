@@ -4,7 +4,8 @@ import { PageHeader } from "@/components/admin/page-header";
 import { useEffect, useState, useTransition, useRef } from "react";
 import { toast } from "sonner";
 
-import { createMediaRecord, deleteMedia, getSignedUrl } from "@/app/[locale]/admin/actions/media";
+import { createMediaRecord, deleteMedia, getMediaUsage, getSignedUrl } from "@/app/[locale]/admin/actions/media";
+import type { MediaReference } from "@/lib/media/references";
 
 type MediaItem = {
   id: string;
@@ -46,8 +47,39 @@ export function MediaLibrary({ media: initial }: { media: MediaItem[] }) {
    * admin action already knows how to mint.
    */
   const [signed, setSigned] = useState<Record<string, string>>({});
+  /**
+   * Where each file is used on the site.
+   *
+   * A photograph that a page points at cannot be deleted: the page would keep
+   * the path and lose the picture. So the library says so on the file's own
+   * card, before the editor tries.
+   */
+  const [usage, setUsage] = useState<Record<string, MediaReference[]>>({});
+  /** The file whose delete was refused, and the places that use it. */
+  const [blocked, setBlocked] = useState<{
+    item: MediaItem;
+    references: MediaReference[];
+  } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pending, startTransition] = useTransition();
+
+  useEffect(() => {
+    let cancelled = false;
+
+    void getMediaUsage()
+      .then((map) => {
+        if (!cancelled) setUsage(map);
+      })
+      .catch(() => {
+        // The usage list is a warning, not a gate. The delete action checks
+        // it again on the server, so a failure here cannot let a file be
+        // deleted while it is in use.
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -127,6 +159,14 @@ export function MediaLibrary({ media: initial }: { media: MediaItem[] }) {
   }
 
   async function handleDelete(item: MediaItem) {
+    // The library knows where the file is used, so it says so before asking
+    // for a confirmation the editor cannot honour.
+    const references = usage[item.file_path] ?? [];
+    if (references.length > 0) {
+      setBlocked({ item, references });
+      return;
+    }
+
     if (!confirm("Delete this media file?")) return;
     startTransition(async () => {
       try {
@@ -231,7 +271,9 @@ export function MediaLibrary({ media: initial }: { media: MediaItem[] }) {
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {media.map((item) => (
+          {media.map((item) => {
+            const references = usage[item.file_path] ?? [];
+            return (
             <div key={item.id} className="overflow-hidden rounded-xl border border-border bg-card">
               <div className="aspect-square bg-surface-lilac">
                 {signed[item.id] ? (
@@ -277,11 +319,68 @@ export function MediaLibrary({ media: initial }: { media: MediaItem[] }) {
                     ? " — not usable in a page"
                     : " — usable in a page"}
                 </p>
+                {/*
+                  Where the file is used.
+
+                  A file that a page points at cannot be deleted, so the
+                  editor is told here rather than after a failed delete.
+                */}
+                {references.length > 0 ? (
+                  <p className="text-xs font-medium text-brand-600">
+                    Used in {references.length} place{references.length === 1 ? "" : "s"}
+                  </p>
+                ) : null}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
+
+      {/*
+        The delete was refused because the file is in use.
+
+        The places are listed with a link to each one, because the fix is to
+        go and change them — not to force the delete and leave a broken
+        photograph on a live page.
+      */}
+      {blocked ? (
+        <div
+          role="alertdialog"
+          aria-label="This file is in use"
+          className="rounded-xl border border-amber-300 bg-amber-50 p-5"
+        >
+          <h2 className="text-base font-semibold text-ink">
+            “{blocked.item.file_name}” is in use
+          </h2>
+          <p className="mt-1 text-sm text-ink-muted">
+            It cannot be deleted while these point at it. Change them first,
+            then delete the file.
+          </p>
+          <ul className="mt-3 space-y-1 text-sm text-ink">
+            {blocked.references.map((reference) => (
+              <li key={`${reference.table}-${reference.rowId}`}>
+                <a
+                  href={reference.href}
+                  className="font-medium text-brand-600 underline underline-offset-2"
+                >
+                  {reference.label}
+                </a>
+                {reference.live ? null : (
+                  <span className="ml-2 text-xs text-ink-muted">not published</span>
+                )}
+              </li>
+            ))}
+          </ul>
+          <button
+            type="button"
+            onClick={() => setBlocked(null)}
+            className="mt-4 rounded-full bg-brand-600 px-4 py-1.5 text-xs font-medium text-brand-50 hover:bg-brand-700"
+          >
+            Close
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }

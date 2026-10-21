@@ -11,6 +11,11 @@ import {
   PUBLIC_BUCKET,
 } from "@/lib/media/public-url";
 import type { MediaOption } from "@/lib/media/option";
+import {
+  describeReferences,
+  findMediaUsage,
+  type MediaReference,
+} from "@/lib/media/references";
 
 async function requirePermission(resource: string, action: string) {
   if (!(await hasPermission(resource, action))) throw new Error(`Permission denied: ${resource}:${action}`);
@@ -68,6 +73,21 @@ export async function deleteMedia(id: string) {
   const { data: before } = await supabase.from("media").select("*").eq("id", id).maybeSingle();
   if (!before) throw new Error("That file is no longer in the library.");
 
+  // A file that is in use is not deleted. The pages that point at it would
+  // keep the path and lose the photograph, and nothing would say so.
+  //
+  // The check is here rather than in the interface because the interface is
+  // not the boundary: the boundary is the action, and it has to hold whether
+  // the delete came from the library, a script or a future screen.
+  const usage = await findMediaUsage([before.file_path]);
+  const references = usage.get(before.file_path) ?? [];
+  if (references.length > 0) {
+    const places = describeReferences(references);
+    throw new Error(
+      `This file is used in ${references.length} place${references.length === 1 ? "" : "s"}: ${places}. Change ${references.length === 1 ? "it" : "those"} first, then delete the file.`,
+    );
+  }
+
   const bucket = isMediaBucket(before.bucket) ? before.bucket : PUBLIC_BUCKET;
   await supabase.storage.from(bucket).remove([before.file_path]);
 
@@ -76,6 +96,29 @@ export async function deleteMedia(id: string) {
   await recordAudit({ action: "delete", tableName: "media", rowId: id, before: before as unknown as AuditSnapshot });
   revalidateTag("media", "max");
   revalidatePath("/admin/media");
+}
+
+/**
+ * Where each file in the library is used.
+ *
+ * The library shows this on the file's own card, so an editor can see that a
+ * photograph is the one on the homepage before they try to remove it.
+ */
+export async function getMediaUsage(): Promise<Record<string, MediaReference[]>> {
+  await requirePermission("media", "read");
+
+  const supabase = createServiceClient();
+  // Every file, not only the publishable ones: a file in a private bucket
+  // can still be pointed at, and the editor deserves to know before deleting
+  // it.
+  const { data } = await supabase.from("media").select("file_path");
+
+  const paths = (data ?? []).map((row) => row.file_path);
+  const usage = await findMediaUsage(paths);
+
+  const result: Record<string, MediaReference[]> = {};
+  for (const [path, references] of usage) result[path] = references;
+  return result;
 }
 
 export async function getSignedUrl(bucket: string, path: string) {
