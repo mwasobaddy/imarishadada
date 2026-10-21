@@ -138,6 +138,13 @@ export async function loadPreviewData(
         ]);
       break;
 
+    case "partner":
+      [data.partners, data.contact] = await Promise.all([
+        getPublicPartners(),
+        getContactDetails(),
+      ]);
+      break;
+
     case "volunteer":
       data.volunteerRoles = await getVolunteerRoles();
       break;

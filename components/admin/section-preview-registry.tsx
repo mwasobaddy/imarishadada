@@ -34,6 +34,14 @@ import {
   TransparencyMoneyStatus,
 } from "@/components/transparency/sections";
 import { Programmes } from "@/components/sections/programmes";
+import {
+  PartnerApply,
+  PartnerCannot,
+  PartnerDirect,
+  PartnerDueDiligence,
+  PartnerList,
+  PartnerNeed,
+} from "@/components/partner/sections";
 import { PageHero } from "@/components/site/page-hero";
 import { ConsentLedger, ConsentNote } from "@/components/stories/consent";
 import { StoryGrid } from "@/components/stories/story-grid";
@@ -240,6 +248,28 @@ export function ExactSectionPreview({
     case "transparency-complaints":
       return <ProseSection id="complaints" section={section} />;
 
+    /* ---- Partner ---- */
+
+    case "partner-need":
+      return <PartnerNeed section={section} />;
+
+    case "partner-cannot":
+      return <PartnerCannot section={section} />;
+
+    case "partner-dd":
+      return <PartnerDueDiligence section={section} />;
+
+    case "partner-partners":
+      return <PartnerList section={section} partners={data.partners ?? []} />;
+
+    case "partner-form":
+      return <PartnerApply section={section} />;
+
+    case "partner-direct":
+      return (
+        <PartnerDirect section={section} contact={data.contact ?? FALLBACK_CONTACT} />
+      );
+
     /* ---- Volunteer ---- */
 
     case "volunteer-roles":
@@ -358,6 +388,12 @@ export const EXACT_SECTION_KEYS = new Set([
   "volunteer-safeguarding",
   "volunteer-form",
   "volunteer-remote",
+  "partner-need",
+  "partner-cannot",
+  "partner-dd",
+  "partner-partners",
+  "partner-form",
+  "partner-direct",
   "impact-headline",
   "impact-by-programme",
   "impact-methodology",

@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
 import { setRequestLocale } from "next-intl/server";
 
-import { Container } from "@/components/site/container";
 import { PageHero } from "@/components/site/page-hero";
-import { PartnerForm } from "@/components/partner/partner-form";
+import {
+  PartnerApply,
+  PartnerCannot,
+  PartnerDirect,
+  PartnerDueDiligence,
+  PartnerList,
+  PartnerNeed,
+} from "@/components/partner/sections";
 import { getContactDetails } from "@/lib/data/contact";
 import { getPartnerSections, getPublicPartners } from "@/lib/data/partner";
 import { isVisible } from "@/lib/data/sections";
@@ -60,19 +64,6 @@ export const metadata: Metadata = {
   },
 };
 
-function BulletList({ items }: { items: { title: string }[] }) {
-  return (
-    <ul className="mt-8 space-y-3">
-      {items.map((item) => (
-        <li key={item.title} className="flex gap-3 leading-relaxed text-ink">
-          <span aria-hidden="true" className="mt-2.5 size-1.5 shrink-0 rounded-full bg-brand-600" />
-          <span className="measure">{item.title}</span>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
 export default async function PartnerPage({ params }: PageProps<"/[locale]/partner">) {
   const { locale } = await params;
 
@@ -111,181 +102,21 @@ export default async function PartnerPage({ params }: PageProps<"/[locale]/partn
           <PageHero eyebrow={hero.eyebrow} heading={hero.heading} body={hero.body} />
         ) : null}
 
-        {isVisible(need) ? (
-          <section aria-labelledby="partner-need-heading" className="bg-surface py-section">
-            <Container>
-              <div className="max-w-2xl">
-                <h2
-                  id="partner-need-heading"
-                  className="text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
-                >
-                  {need.heading}
-                </h2>
-                {need.body ? <p className="measure mt-4 text-lg text-ink-muted">{need.body}</p> : null}
-                {need.bodySecondary ? (
-                  <p className="measure mt-4 leading-relaxed text-ink-muted">{need.bodySecondary}</p>
-                ) : null}
-                <BulletList items={need.steps ?? []} />
-              </div>
-            </Container>
-          </section>
-        ) : null}
+        {isVisible(need) ? <PartnerNeed section={need} /> : null}
 
-        {isVisible(cannot) ? (
-          <section aria-labelledby="partner-cannot-heading" className="bg-surface-lilac py-section">
-            <Container>
-              <div className="max-w-2xl">
-                <h2
-                  id="partner-cannot-heading"
-                  className="text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
-                >
-                  {cannot.heading}
-                </h2>
-                {cannot.body ? <p className="measure mt-4 text-lg text-ink-muted">{cannot.body}</p> : null}
-                <BulletList items={cannot.steps ?? []} />
-              </div>
-            </Container>
-          </section>
-        ) : null}
+        {isVisible(cannot) ? <PartnerCannot section={cannot} /> : null}
 
-        {isVisible(dd) ? (
-          <section aria-labelledby="partner-dd-heading" className="bg-surface py-section">
-            <Container>
-              <div className="max-w-2xl">
-                <h2
-                  id="partner-dd-heading"
-                  className="text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
-                >
-                  {dd.heading}
-                </h2>
-                {dd.body ? <p className="measure mt-4 text-lg text-ink-muted">{dd.body}</p> : null}
-                {dd.bodySecondary ? (
-                  <p className="measure mt-4 leading-relaxed text-ink-muted">{dd.bodySecondary}</p>
-                ) : null}
-                {dd.ctaLabel && dd.ctaHref ? (
-                  <Link
-                    href={dd.ctaHref}
-                    className="mt-6 inline-flex min-h-11 items-center text-sm font-medium text-brand-600 underline decoration-brand-600/40 underline-offset-4 hover:decoration-brand-700 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-700"
-                  >
-                    {dd.ctaLabel} →
-                  </Link>
-                ) : null}
-              </div>
-            </Container>
-          </section>
-        ) : null}
+        {isVisible(dd) ? <PartnerDueDiligence section={dd} /> : null}
 
         {/* Hidden entirely when no partner is publishable. See lib/data/partner.ts. */}
-        {isVisible(partnersSection) && partners.length > 0 ? (
-          <section aria-labelledby="partner-partners-heading" className="bg-surface-lilac py-section">
-            <Container>
-              <div className="max-w-2xl">
-                <h2
-                  id="partner-partners-heading"
-                  className="text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
-                >
-                  {partnersSection.heading}
-                </h2>
-                {partnersSection.body ? (
-                  <p className="measure mt-4 text-lg text-ink-muted">{partnersSection.body}</p>
-                ) : null}
-              </div>
-              <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {partners.map((partner) => (
-                  <li key={partner.id} className="flex flex-col rounded-card border border-border bg-card p-6">
-                    {partner.logoPath && partner.logoAlt ? (
-                      <div className="relative mb-5 h-16 w-full">
-                        <Image
-                          src={partner.logoPath}
-                          alt={partner.logoAlt}
-                          fill
-                          sizes="(min-width: 1024px) 300px, 50vw"
-                          className="object-contain object-left"
-                        />
-                      </div>
-                    ) : null}
-                    <h3 className="text-lg font-semibold text-ink">{partner.name}</h3>
-                    {partner.description ? (
-                      <p className="measure mt-2 flex-1 text-sm leading-relaxed text-ink-muted">
-                        {partner.description}
-                      </p>
-                    ) : null}
-                    {partner.websiteUrl ? (
-                      <a
-                        href={partner.websiteUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-4 inline-flex min-h-11 items-center text-sm font-medium text-brand-600 underline decoration-brand-600/40 underline-offset-4 hover:decoration-brand-700"
-                      >
-                        Visit {partner.name}
-                        <span className="sr-only"> (opens in a new tab)</span>
-                      </a>
-                    ) : null}
-                  </li>
-                ))}
-              </ul>
-            </Container>
-          </section>
+        {isVisible(partnersSection) ? (
+          <PartnerList section={partnersSection} partners={partners} />
         ) : null}
 
-        {isVisible(form) ? (
-          <section id="enquire" aria-labelledby="partner-form-heading" className="bg-surface py-section">
-            <Container>
-              <div className="mx-auto max-w-3xl">
-                <h2
-                  id="partner-form-heading"
-                  className="text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
-                >
-                  {form.heading}
-                </h2>
-                {form.body ? <p className="measure mt-4 text-lg text-ink-muted">{form.body}</p> : null}
-                <div className="mt-8">
-                  <PartnerForm />
-                </div>
-              </div>
-            </Container>
-          </section>
-        ) : null}
+        {isVisible(form) ? <PartnerApply section={form} /> : null}
 
         {isVisible(direct) ? (
-          <section aria-labelledby="partner-direct-heading" className="bg-surface-lilac py-section">
-            <Container>
-              <div className="max-w-2xl">
-                <h2
-                  id="partner-direct-heading"
-                  className="text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
-                >
-                  {direct.heading}
-                </h2>
-                {direct.body ? <p className="measure mt-4 text-lg text-ink-muted">{direct.body}</p> : null}
-                <ul className="mt-6 space-y-2 text-ink">
-                  {contact.email ? (
-                    <li>
-                      <a
-                        href={`mailto:${contact.email}`}
-                        className="font-medium text-brand-600 underline decoration-brand-600/40 underline-offset-4 hover:decoration-brand-700"
-                      >
-                        {contact.email}
-                      </a>
-                    </li>
-                  ) : null}
-                  {contact.whatsapp ? (
-                    <li>
-                      <a
-                        href={`https://wa.me/${contact.whatsapp}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-medium text-brand-600 underline decoration-brand-600/40 underline-offset-4 hover:decoration-brand-700"
-                      >
-                        WhatsApp us
-                        <span className="sr-only"> (opens in a new tab)</span>
-                      </a>
-                    </li>
-                  ) : null}
-                </ul>
-              </div>
-            </Container>
-          </section>
+          <PartnerDirect section={direct} contact={contact} />
         ) : null}
       </main>
 
