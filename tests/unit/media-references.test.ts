@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 
 import {
   MEDIA_REFERENCE_SOURCES,
@@ -102,5 +104,40 @@ describe("the places a photograph can be used", () => {
       expect(source.label(row, context)).toBeTruthy();
       expect(source.href(row, context)).toMatch(/^\/admin\//);
     }
+  });
+});
+
+describe("replacing a photograph", () => {
+  const migration = readFileSync(
+    fileURLToPath(
+      new URL(
+        "../../supabase/migrations/0034_replace_media_references.sql",
+        import.meta.url,
+      ),
+    ),
+    "utf8",
+  );
+
+  it("moves every table the reference check knows about", () => {
+    // The check that refuses the delete and the function that performs the
+    // replacement have to know about the same tables. If one of them is
+    // missing a table, a replacement leaves that table pointing at a file
+    // that is about to be deleted.
+    const tables = [...new Set(MEDIA_REFERENCE_SOURCES.map((s) => s.table))];
+    for (const table of tables) {
+      expect(migration).toContain(`public.${table}`);
+    }
+  });
+
+  it("is not callable by the public", () => {
+    // The function writes to tables that have no write policy for anybody.
+    // The execute grant is taken from anon and authenticated and given to
+    // the service role alone.
+    expect(migration).toMatch(
+      /revoke all on function public\.replace_media_references\(text, text\) from public, anon, authenticated;/,
+    );
+    expect(migration).toMatch(
+      /grant execute on function public\.replace_media_references\(text, text\) to service_role;/,
+    );
   });
 });

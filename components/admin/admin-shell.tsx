@@ -25,7 +25,6 @@ import {
   Mail,
   MessageCircle,
   Newspaper,
-  Search,
   Settings,
   Shield,
   UserCog,
@@ -34,6 +33,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+import { AdminSearch } from "@/components/admin/admin-search";
 import type { Permission } from "@/lib/admin/permissions";
 
 type Staff = { id: string; display_name: string; email: string; is_developer: boolean };
@@ -185,6 +185,21 @@ export function AdminShell({
     : null;
 
   const crumb = pagesCrumb ?? activeItem?.label ?? "Admin";
+
+  /**
+   * The admin's own pages, for the search palette.
+   *
+   * Only the pages this person can see. The palette with nothing typed shows
+   * them, so it has to show the same list as the sidebar — a search that
+   * offers a page the sidebar does not is a page they cannot open.
+   */
+  const searchPages = groups.flatMap((group) =>
+    group.items.map((item) => ({
+      href: item.href,
+      label: item.label,
+      group: group.label,
+    })),
+  );
 
   const initials = staff.display_name
     .split(" ")
@@ -630,16 +645,7 @@ export function AdminShell({
             Imarisha Dada
           </span>
           <div className="ml-auto flex items-center gap-2">
-            <button
-              type="button"
-              className="hidden h-9 items-center gap-2 rounded-lg border border-border bg-card px-3 text-sm text-ink-muted transition-colors hover:border-brand-600 hover:text-brand-600 sm:flex"
-            >
-              <Search className="h-4 w-4" />
-              <span className="hidden md:inline">Search</span>
-              <kbd className="hidden rounded border border-border bg-surface px-1.5 py-0.5 font-mono text-[10px] text-ink-muted lg:inline">
-                ⌘K
-              </kbd>
-            </button>
+            <AdminSearch pages={searchPages} />
             <Link
               href="/admin/chat"
               aria-label="Team chat"
