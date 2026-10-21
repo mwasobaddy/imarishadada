@@ -3,7 +3,7 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/client";
 import type { AuditSnapshot, Insert } from "@/lib/supabase/row-types";
-import { hasPermission } from "@/lib/admin/permissions";
+import { hasPermission, isDeveloper } from "@/lib/admin/permissions";
 import { recordAudit } from "@/lib/admin/audit";
 import {
   isMediaBucket,
@@ -63,7 +63,31 @@ export async function updateMedia(id: string, data: Insert<"media">) {
   return media;
 }
 
-export async function deleteMedia(id: string) {
+/**
+ * Delete a file from the library.
+ *
+ * ## A file in use is not deleted
+ *
+ * The pages that point at it would keep the path and lose the photograph, and
+ * nothing would say so. The check is here rather than in the interface
+ * because the interface is not the boundary: the boundary is the action, and
+ * it has to hold whether the delete came from the library, a script or a
+ * future screen.
+ *
+ * ## The way past it
+ *
+ * Two, and both are deliberate.
+ *
+ * `replaceMediaAndDelete` moves every reference onto another photograph and
+ * then deletes the file. That is the fix an editor wants nine times in ten.
+ *
+ * `force` deletes a file that is still in use and leaves the broken pages
+ * behind. It is for a developer, it says so in the audit trail, and it exists
+ * because there are moments — a subject withdrawing consent, a photograph
+ * that must not be published at all — where the right answer is to pull the
+ * file and repair the pages afterwards.
+ */
+export async function deleteMedia(id: string, options?: { force?: boolean }) {
   await requirePermission("media", "delete");
   const supabase = createServiceClient();
 
@@ -73,19 +97,21 @@ export async function deleteMedia(id: string) {
   const { data: before } = await supabase.from("media").select("*").eq("id", id).maybeSingle();
   if (!before) throw new Error("That file is no longer in the library.");
 
-  // A file that is in use is not deleted. The pages that point at it would
-  // keep the path and lose the photograph, and nothing would say so.
-  //
-  // The check is here rather than in the interface because the interface is
-  // not the boundary: the boundary is the action, and it has to hold whether
-  // the delete came from the library, a script or a future screen.
   const usage = await findMediaUsage([before.file_path]);
   const references = usage.get(before.file_path) ?? [];
   if (references.length > 0) {
-    const places = describeReferences(references);
-    throw new Error(
-      `This file is used in ${references.length} place${references.length === 1 ? "" : "s"}: ${places}. Change ${references.length === 1 ? "it" : "those"} first, then delete the file.`,
-    );
+    if (!options?.force) {
+      const places = describeReferences(references);
+      throw new Error(
+        `This file is used in ${references.length} place${references.length === 1 ? "" : "s"}: ${places}. Change ${references.length === 1 ? "it" : "those"} first, then delete the file.`,
+      );
+    }
+
+    // A forced delete is a developer acting over the rule, so it says who
+    // did it and what it left behind.
+    if (!(await isDeveloper())) {
+      throw new Error("Only a developer can delete a file that is still in use.");
+    }
   }
 
   const bucket = isMediaBucket(before.bucket) ? before.bucket : PUBLIC_BUCKET;
@@ -93,9 +119,90 @@ export async function deleteMedia(id: string) {
 
   const { error } = await supabase.from("media").delete().eq("id", id);
   if (error) throw new Error(error.message);
-  await recordAudit({ action: "delete", tableName: "media", rowId: id, before: before as unknown as AuditSnapshot });
+  await recordAudit({
+    action: "delete",
+    tableName: "media",
+    rowId: id,
+    before: before as unknown as AuditSnapshot,
+    metadata: {
+      forced: references.length > 0,
+      left_broken: references.map((reference) => ({
+        table: reference.table,
+        row_id: reference.rowId,
+        label: reference.label,
+      })),
+    } as unknown as AuditSnapshot,
+  });
   revalidateTag("media", "max");
   revalidatePath("/admin/media");
+}
+
+/**
+ * Point every reference at another photograph, then delete this one.
+ *
+ * The move happens in the database, in one transaction, across all nine
+ * columns that can hold a photograph. Nine separate updates would leave the
+ * site in a state nobody chose if one of them failed.
+ *
+ * The description of each photograph stays where it is. The editor is
+ * choosing the picture, and the words under it may describe the old one —
+ * so the interface says so rather than pretending the swap is complete.
+ */
+export async function replaceMediaAndDelete(id: string, newPath: string) {
+  await requirePermission("media", "delete");
+  const supabase = createServiceClient();
+
+  const { data: before } = await supabase.from("media").select("*").eq("id", id).maybeSingle();
+  if (!before) throw new Error("That file is no longer in the library.");
+
+  const replacement = newPath.trim();
+  if (!replacement) throw new Error("Choose the photograph that takes its place.");
+  if (replacement === before.file_path) {
+    throw new Error("That is the same photograph.");
+  }
+
+  const { data: changed, error } = await supabase.rpc("replace_media_references", {
+    old_path: before.file_path,
+    new_path: replacement,
+  });
+  if (error) throw new Error(error.message);
+
+  const rows = (changed ?? []) as { table: string; id: string }[];
+
+  // Every row that moved is written to the audit trail in its own right. A
+  // single "replaced a photograph" row would not say which pages changed.
+  for (const row of rows) {
+    await recordAudit({
+      action: "update",
+      tableName: row.table,
+      rowId: row.id,
+      metadata: {
+        image: { from: before.file_path, to: replacement },
+        reason: "media replaced",
+      } as unknown as AuditSnapshot,
+    });
+  }
+
+  const bucket = isMediaBucket(before.bucket) ? before.bucket : PUBLIC_BUCKET;
+  await supabase.storage.from(bucket).remove([before.file_path]);
+
+  const { error: deleteError } = await supabase.from("media").delete().eq("id", id);
+  if (deleteError) throw new Error(deleteError.message);
+
+  await recordAudit({
+    action: "delete",
+    tableName: "media",
+    rowId: id,
+    before: before as unknown as AuditSnapshot,
+    metadata: {
+      replaced_with: replacement,
+      references_updated: rows.length,
+    } as unknown as AuditSnapshot,
+  });
+
+  revalidateTag("media", "max");
+  revalidatePath("/admin/media");
+  return rows.length;
 }
 
 /**

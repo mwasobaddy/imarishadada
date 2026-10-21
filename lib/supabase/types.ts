@@ -1778,6 +1778,10 @@ export type Database = {
         }[]
       }
       prune_rate_limits: { Args: never; Returns: number }
+      replace_media_references: {
+        Args: { new_path: string; old_path: string }
+        Returns: Json
+      }
       social_links_valid: { Args: { v: Json }; Returns: boolean }
       visible_staff: {
         Args: never

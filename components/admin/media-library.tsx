@@ -4,7 +4,14 @@ import { PageHeader } from "@/components/admin/page-header";
 import { useEffect, useState, useTransition, useRef } from "react";
 import { toast } from "sonner";
 
-import { createMediaRecord, deleteMedia, getMediaUsage, getSignedUrl } from "@/app/[locale]/admin/actions/media";
+import {
+  createMediaRecord,
+  deleteMedia,
+  getMediaUsage,
+  getSignedUrl,
+  replaceMediaAndDelete,
+} from "@/app/[locale]/admin/actions/media";
+import { MediaPicker } from "@/components/admin/media-picker";
 import type { MediaReference } from "@/lib/media/references";
 
 type MediaItem = {
@@ -31,7 +38,20 @@ const CONSENT_TIERS = [
   { value: "anonymised", label: "Anonymised" },
 ];
 
-export function MediaLibrary({ media: initial }: { media: MediaItem[] }) {
+export function MediaLibrary({
+  media: initial,
+  isDeveloper = false,
+}: {
+  media: MediaItem[];
+  /**
+   * Whether the person signed in is a developer.
+   *
+   * Only a developer may delete a file that is still in use — and leave the
+   * broken pages behind. The action checks this too; the flag is so the
+   * interface can offer the button rather than hide it.
+   */
+  isDeveloper?: boolean;
+}) {
   const [media, setMedia] = useState<MediaItem[]>(initial);
   const [uploading, setUploading] = useState(false);
   const [altText, setAltText] = useState("");
@@ -60,6 +80,8 @@ export function MediaLibrary({ media: initial }: { media: MediaItem[] }) {
     item: MediaItem;
     references: MediaReference[];
   } | null>(null);
+  /** Whether the replacement picker is open in the blocked panel. */
+  const [replacing, setReplacing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pending, startTransition] = useTransition();
 
@@ -156,6 +178,59 @@ export function MediaLibrary({ media: initial }: { media: MediaItem[] }) {
     } finally {
       setUploading(false);
     }
+  }
+
+  /**
+   * Point every page that uses this file at another photograph, then delete
+   * it.
+   *
+   * The move happens in the database in one step, so the site is never half
+   * switched. The description under each photograph stays where it is: the
+   * editor has just chosen a new picture and the words may still describe
+   * the old one.
+   */
+  async function handleReplace(path: string) {
+    if (!blocked) return;
+    startTransition(async () => {
+      try {
+        const updated = await replaceMediaAndDelete(blocked.item.id, path);
+        setMedia((prev) => prev.filter((m) => m.id !== blocked.item.id));
+        setBlocked(null);
+        setReplacing(false);
+        toast.success(
+          `Replaced in ${updated} place${updated === 1 ? "" : "s"} and deleted the file. Check the descriptions still fit the new photograph.`,
+        );
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "The replacement failed.");
+      }
+    });
+  }
+
+  /**
+   * Delete a file that is still in use.
+   *
+   * For a developer, and for the moments when the file has to go and the
+   * pages are repaired afterwards. The audit trail records that it was forced
+   * and what it left behind.
+   */
+  async function handleForceDelete(item: MediaItem) {
+    if (
+      !confirm(
+        "Delete this file even though pages still point at it? Those pages will show a broken photograph until they are changed.",
+      )
+    ) {
+      return;
+    }
+    startTransition(async () => {
+      try {
+        await deleteMedia(item.id, { force: true });
+        setMedia((prev) => prev.filter((m) => m.id !== item.id));
+        setBlocked(null);
+        toast.success("File deleted. The pages that used it need fixing.");
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Delete failed");
+      }
+    });
   }
 
   async function handleDelete(item: MediaItem) {
@@ -372,13 +447,62 @@ export function MediaLibrary({ media: initial }: { media: MediaItem[] }) {
               </li>
             ))}
           </ul>
-          <button
-            type="button"
-            onClick={() => setBlocked(null)}
-            className="mt-4 rounded-full bg-brand-600 px-4 py-1.5 text-xs font-medium text-brand-50 hover:bg-brand-700"
-          >
-            Close
-          </button>
+
+          {/*
+            The way past it, in the order an editor wants them.
+
+            Replacing is the fix nine times in ten: the pages carry on
+            working, pointing at another photograph. Forcing the delete is
+            for a developer and for the moments when the file has to go — a
+            subject withdrawing consent — and the pages are repaired after.
+          */}
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setReplacing((current) => !current)}
+              className="rounded-full bg-brand-600 px-4 py-1.5 text-xs font-medium text-brand-50 hover:bg-brand-700"
+            >
+              {replacing ? "Cancel the replacement" : "Replace with another photograph"}
+            </button>
+            {isDeveloper ? (
+              <button
+                type="button"
+                onClick={() => handleForceDelete(blocked.item)}
+                disabled={pending}
+                className="rounded-full border border-red-300 px-4 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50 disabled:opacity-50"
+              >
+                Delete anyway
+              </button>
+            ) : null}
+            <button
+              type="button"
+              onClick={() => {
+                setBlocked(null);
+                setReplacing(false);
+              }}
+              className="rounded-full border border-border px-4 py-1.5 text-xs font-medium text-ink hover:border-brand-600 hover:text-brand-600"
+            >
+              Close
+            </button>
+          </div>
+
+          {replacing ? (
+            <div className="mt-4 rounded-xl border border-border bg-card p-4">
+              <p className="text-sm text-ink-muted">
+                Choose the photograph that takes its place. Every page listed
+                above will point at it, and the file will be deleted.
+              </p>
+              <div className="mt-3">
+                <MediaPicker
+                  id="media-replacement"
+                  label="Replacement photograph"
+                  hint="The description under each photograph stays — check it still fits."
+                  value=""
+                  onChange={handleReplace}
+                />
+              </div>
+            </div>
+          ) : null}
         </div>
       ) : null}
     </div>
