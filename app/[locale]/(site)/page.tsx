@@ -17,7 +17,7 @@ import {
 } from "@/lib/data/home";
 import { getPublicPartners } from "@/lib/data/partner";
 import { getSection, isVisible } from "@/lib/data/sections";
-import { HERO_PORTRAIT } from "@/lib/data/hero-portrait";
+import { heroPortraitFor } from "@/lib/data/hero-portrait";
 import { buildLanguageAlternates, jsonLdScript, webSiteJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -113,7 +113,7 @@ export default async function HomePage({
             label: hero.ctaSecondaryLabel ?? "See our impact",
             href: hero.ctaSecondaryHref ?? "#impact",
           }}
-          portrait={HERO_PORTRAIT}
+          portrait={heroPortraitFor(hero.imagePath, hero.imageAlt)}
           impactLine={hero.statLine ?? ""}
         />
       ) : null}

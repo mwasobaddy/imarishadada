@@ -301,9 +301,14 @@ export function Hero({
             />
           </svg>
 
-          <figcaption className="mt-5 max-w-xs text-xs leading-relaxed text-ink-muted">
-            {portrait.credit}
-          </figcaption>
+          {/* The credit names a photographer and a session. An image an editor
+              chose carries none, because the caption would be a claim about a
+              different picture. */}
+          {portrait.credit ? (
+            <figcaption className="mt-5 max-w-xs text-xs leading-relaxed text-ink-muted">
+              {portrait.credit}
+            </figcaption>
+          ) : null}
         </figure>
       </div>
     </section>

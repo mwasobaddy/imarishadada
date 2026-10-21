@@ -55,7 +55,7 @@ import { toPreviewSection, type SectionForm } from "@/lib/admin/section-form";
 import type { ContactDetails } from "@/lib/data/contact";
 import type { ConsentTierCounts } from "@/lib/data/impact";
 import type { PreviewData } from "@/lib/admin/preview-data";
-import { HERO_PORTRAIT } from "@/lib/data/hero-portrait";
+import { heroPortraitFor } from "@/lib/data/hero-portrait";
 import { REPORTING_PERIOD } from "@/lib/data/reporting-period";
 
 /**
@@ -115,7 +115,7 @@ export function ExactSectionPreview({
             label: form.cta_secondary_label || "See our impact",
             href: form.cta_secondary_href || "#impact",
           }}
-          portrait={HERO_PORTRAIT}
+          portrait={heroPortraitFor(form.image_path, form.image_alt)}
           impactLine={form.stat_line ?? ""}
         />
       );
@@ -434,6 +434,16 @@ export function ExactSectionPreview({
  * renderer treats any `-hero` key that way. `isExactSectionKey` is the single
  * answer to "is this section exact?", used by both the renderer and the label.
  */
+/**
+ * The sections whose public component renders a picture.
+ *
+ * The editor offers the image picker for these, so an editor can set the image
+ * that is not there yet. A section with no picture and no component to put one
+ * in is left alone — the field would be a control that changes nothing, which
+ * is the thing the editor was built to stop.
+ */
+export const SECTIONS_WITH_IMAGE = new Set(["home-hero"]);
+
 export const EXACT_SECTION_KEYS = new Set([
   "home-hero",
   "home-programmes",

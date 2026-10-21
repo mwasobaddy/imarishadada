@@ -17,6 +17,7 @@ import {
 import { toggleSection, updateSection } from "@/app/[locale]/admin/actions/pages";
 import { MediaPicker, type MediaOption } from "@/components/admin/media-picker";
 import { SectionPreview } from "@/components/admin/section-preview";
+import { SECTIONS_WITH_IMAGE } from "@/components/admin/section-preview-registry";
 import type { PreviewData } from "@/lib/admin/preview-data";
 import {
   discardChanges,
@@ -304,16 +305,19 @@ export function SectionEditor({
               </Group>
 
               {/*
-                Only shown when the section actually has a single image. No
-                public page reads `site_sections.image_path` today, so rendering
-                an empty picker on every section would offer editors a control
-                that changes nothing. If a section is ever seeded with one, the
-                field appears with it.
+                Shown when the section has a picture, or when its public
+                component has a place to put one — the homepage hero, whose
+                portrait an editor can now replace. For every other section an
+                empty picker would be a control that changes nothing.
               */}
-              {(form.image_path !== "") && (
+              {(form.image_path !== "" || SECTIONS_WITH_IMAGE.has(section.section_key)) && (
                 <Group
                   title="Picture"
-                  hint="Choose from the library. Every photograph needs a description."
+                  hint={
+                    SECTIONS_WITH_IMAGE.has(section.section_key)
+                      ? "This is the photograph on the page. Every photograph needs a description."
+                      : "Choose from the library. Every photograph needs a description."
+                  }
                 >
                   <div className="grid gap-4 sm:grid-cols-2">
                     <MediaPicker
