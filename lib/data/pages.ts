@@ -8,81 +8,19 @@
  * Anything that needs an admin override or a database row does NOT belong here.
  */
 
-/** An FAQ entry. `group` drives the filter chips on `/faq`. */
-export type FaqEntry = {
-  question: string;
-  answer: string;
-  group: "Giving" | "Programmes" | "About us" | "Safeguarding";
-};
+/*
+ * FAQS and its FaqEntry type used to live here.
+ *
+ * Removed when /faq moved to the `faqs` table (migration 0025). The table had a
+ * full schema and a working admin editor at /admin/content/faqs since 0007, and
+ * this constant was what the page actually rendered — so an editor adding a
+ * question saw nothing change.
+ *
+ * The move also fixed a false claim: the constant said the organisation has "a
+ * named safeguarding officer", which /legal/safeguarding and /transparency both
+ * contradict.
+ */
 
-export const FAQS: FaqEntry[] = [
-  {
-    group: "Giving",
-    question: "Do you offer monthly giving?",
-    answer:
-      "Yes, every amount on our giving ladder can be given monthly. Monthly gifts are what keep a mentor in a girl's life through the whole school year, rather than through one term.",
-  },
-  {
-    group: "Giving",
-    question: "Can I give from outside Kenya?",
-    answer:
-      "Yes, by card. You choose your currency at checkout and we record both the amount you gave and the Kenyan shilling equivalent, so your receipt is accurate either way.",
-  },
-  {
-    group: "Giving",
-    question: "Do you accept in-kind donations?",
-    answer:
-      "Please message us first. We cannot always accept physical goods, and an unasked-for donation is often unusable.",
-  },
-  {
-    group: "Giving",
-    question: "Is my donation tax deductible?",
-    answer:
-      "A receipt is issued for every donation. Whether it is deductible depends on your country and on our registration status, and we will tell you the truth about it rather than imply a benefit we cannot deliver.",
-  },
-  {
-    group: "Programmes",
-    question: "Who do you work with?",
-    answer:
-      "Young mothers aged 16 and over returning to school, and girls aged 9 to 16 in safe-space sessions. Both groups are in Kibera, Nairobi.",
-  },
-  {
-    group: "Programmes",
-    question: "How long does a participant stay with you?",
-    answer:
-      "It depends on what she needs. A re-entry package runs for a school year. Dada Space is open-ended: a girl can attend for as long as she finds it useful.",
-  },
-  {
-    group: "Programmes",
-    question: "Can I visit a session?",
-    answer:
-      "Ask us first. Sessions involving minors need consent and notice, and some conversations should not have visitors in the room.",
-  },
-  {
-    group: "About us",
-    question: "Are you a registered organisation?",
-    answer:
-      "Our BRS NGO registration number is being issued and will be published as soon as it is. Institutional and diaspora donors should expect to see it here.",
-  },
-  {
-    group: "About us",
-    question: "How is money spent?",
-    answer:
-      "Unrestricted gifts go where the need is greatest that term. Restricted gifts fund the outcome label you selected, for example a single re-entry package, and we report against that specific figure.",
-  },
-  {
-    group: "Safeguarding",
-    question: "How do you protect the girls you work with?",
-    answer:
-      "Two-adult sessions, safe recruitment with references and training, a code of conduct, and a named safeguarding officer. Our full policy is published on this site.",
-  },
-  {
-    group: "Safeguarding",
-    question: "Why are some names missing from your stories?",
-    answer:
-      "Because consent is theirs to give and theirs to withdraw. Every story carries a consent tier, and the tier decides what we publish, not our judgement on the day.",
-  },
-];
 
 /** Generic prose page: partner, volunteer, transparency, annual report, news. */
 export type ProseSection = {
