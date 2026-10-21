@@ -195,51 +195,19 @@ export const VOLUNTEER_PAGE: ProsePage = {
   ],
 };
 
-export const TRANSPARENCY_PAGE: ProsePage = {
-  slug: "transparency",
-  title: "Transparency",
-  eyebrow: "Transparency",
-  lede: "Where the money goes, how we count, and what we still cannot tell you. The gaps are on this page on purpose.",
-  draft: true,
-  sections: [
-    {
-      id: "money",
-      heading: "Where the money goes",
-      paragraphs: [
-        "We publish figures tied to a reporting period, and every figure states how it was counted. Unrestricted gifts go where the need is greatest that term; restricted gifts fund the outcome you selected and are reported against that specific figure.",
-        "A full breakdown of income and expenditure is published in the annual report once it is complete and signed off.",
-      ],
-    },
-    {
-      id: "gaps",
-      heading: "What we cannot yet tell you",
-      paragraphs: [
-        "Any organisation that presents only its strengths is telling you an incomplete story. These are the things we do not yet know or cannot yet measure.",
-      ],
-      bullets: [
-        "Cost per participant, because overhead allocation is not settled.",
-        "Retention beyond twelve months.",
-        "Income change for participants funded with start-up capital.",
-        "Whether re-enrolment holds when follow-through funding ends.",
-      ],
-    },
-    {
-      id: "complaints",
-      heading: "Complaints",
-      paragraphs: [
-        "If something is wrong, a concern about a decision, about a staff member, or about how a safeguarding report was handled, we want to know. Complaints are handled separately from safeguarding reports, by someone not involved in the original decision where that is possible.",
-        "Raise it through the contact page and ask for it to be treated as a complaint.",
-      ],
-    },
-    {
-      id: "governance",
-      heading: "Governance",
-      paragraphs: [
-        "Our board members and their roles are published on the About page once each person has given recorded consent to be named. We do not publish names we have not verified.",
-      ],
-    },
-  ],
-};
+/*
+ * TRANSPARENCY_PAGE used to live here.
+ *
+ * It was removed when /transparency left `ProseRoute` and became a real page
+ * (migration 0022). It needed two things this file cannot provide, by its own
+ * comment: a database row (`transparency_gaps`, `financial_breakdown`) and an
+ * admin override, because the roadmap requires an editor to be able to mark a
+ * gap as done.
+ *
+ * The remaining four prose pages still render from here. When one of them needs
+ * a database row, move it out the same way rather than adding the row to this
+ * file.
+ */
 
 export const ANNUAL_REPORT_PAGE: ProsePage = {
   slug: "annual-report",
@@ -309,7 +277,6 @@ export const NEWS_PAGE: ProsePage = {
 export const PROSE_PAGES: Record<string, ProsePage> = {
   partner: PARTNER_PAGE,
   volunteer: VOLUNTEER_PAGE,
-  transparency: TRANSPARENCY_PAGE,
   "annual-report": ANNUAL_REPORT_PAGE,
   news: NEWS_PAGE,
 };

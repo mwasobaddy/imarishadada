@@ -390,6 +390,7 @@ export type Database = {
           category: string
           created_at: string
           currency: string
+          direction: string
           fiscal_year: string
           id: string
           programme_id: string | null
@@ -402,6 +403,7 @@ export type Database = {
           category: string
           created_at?: string
           currency?: string
+          direction?: string
           fiscal_year: string
           id?: string
           programme_id?: string | null
@@ -414,6 +416,7 @@ export type Database = {
           category?: string
           created_at?: string
           currency?: string
+          direction?: string
           fiscal_year?: string
           id?: string
           programme_id?: string | null
@@ -1517,30 +1520,36 @@ export type Database = {
           created_at: string
           id: string
           item: string
+          kind: string
           notes: string | null
           sort_order: number
           status: string
           target_date: string | null
+          target_label: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
           id?: string
           item: string
+          kind?: string
           notes?: string | null
           sort_order?: number
           status?: string
           target_date?: string | null
+          target_label?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
           id?: string
           item?: string
+          kind?: string
           notes?: string | null
           sort_order?: number
           status?: string
           target_date?: string | null
+          target_label?: string | null
           updated_at?: string
         }
         Relationships: []
