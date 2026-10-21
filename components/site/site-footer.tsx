@@ -2,6 +2,7 @@ import Image from "next/image";
 import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 
 import { SocialLinks } from "@/components/site/social-links";
+import { getSocialLinks } from "@/lib/data/social";
 import { WHATSAPP_LINK, PHONE_DISPLAY } from "@/lib/contact/channels";
 // Evaluated once at module load, not per render. Calling `new Date()` inside
 // the component body is an unstable value under `cacheComponents` and fails
@@ -33,8 +34,11 @@ export async function SiteFooter() {
   const locale = await getLocale();
   setRequestLocale(locale);
 
-  const t = await getTranslations({ locale, namespace: "footer" });
-  const tc = await getTranslations({ locale, namespace: "common" });
+  const [t, tc, links] = await Promise.all([
+    getTranslations({ locale, namespace: "footer" }),
+    getTranslations({ locale, namespace: "common" }),
+    getSocialLinks(),
+  ]);
 
   const programmes = [
     { label: t("programmes.schoolReentry"), href: "/programmes/school-reentry" },
@@ -91,12 +95,11 @@ export async function SiteFooter() {
 
             {/* The channels are read from settings, so a link can be corrected
                 without a deploy. */}
-            <div className="mt-6">
-              <p className="text-[11px] font-semibold tracking-widest text-brand-600/70 uppercase">
-                {tc("followUs")}
-              </p>
-              <SocialLinks className="mt-1" />
-            </div>
+            <SocialLinks
+              className="mt-6"
+              links={links}
+              label={tc("followUs")}
+            />
           </div>
 
           <nav aria-labelledby="footer-programmes">

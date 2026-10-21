@@ -192,10 +192,13 @@ export function toPatch(form: SectionForm): SectionPatch {
  * hands the same sections to the preview, and a section that was read as a
  * `SiteSection` still has to become a form to be edited.
  */
-export function fromSiteSection(section: SiteSection): SectionForm {
+export function fromSiteSection(
+  section: SiteSection,
+  pageKey?: string | null,
+): SectionForm {
   return {
     section_key: section.key,
-    page_key: null,
+    page_key: pageKey ?? null,
     sort_order: 0,
     active: section.active,
     eyebrow: section.eyebrow ?? "",

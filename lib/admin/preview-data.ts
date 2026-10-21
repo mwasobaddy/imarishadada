@@ -7,11 +7,14 @@ import {
   railStatuses,
 } from "@/lib/data/donate";
 import { getGivingTiers, getProgrammes } from "@/lib/data/home";
+import { getProgramme } from "@/lib/data/programmes";
+import { getSocialLinks } from "@/lib/data/social";
 import { getVolunteerRoles } from "@/lib/data/volunteer";
 import { getFinancialBreakdown, getTransparencyGaps } from "@/lib/data/transparency";
 import type { BankDetails, PaymentRails, RailStatus } from "@/lib/data/donate";
 import type { FinancialLine, TransparencyGap } from "@/lib/data/gaps";
 import type { PaymentRail } from "@/lib/donate/money";
+import type { SocialLink } from "@/components/site/social-links";
 import type { VolunteerRole } from "@/lib/volunteer/roles";
 import {
   getAllImpactStats,
@@ -78,6 +81,16 @@ export type PreviewData = {
   bankReady?: boolean;
   /** The open volunteer roles, for the volunteer page. */
   volunteerRoles?: VolunteerRole[];
+  /** The channels, for the pages that list them. */
+  socialLinks?: SocialLink;
+  /**
+   * The programme pages, by slug.
+   *
+   * A programme page's lead section is the frame around the journey — the
+   * scrolling panels come from the programme's own body — so the preview needs
+   * the programme, not just its copy.
+   */
+  programmePages?: Record<string, { title: string; body: string }>;
   contact?: Awaited<ReturnType<typeof getContactDetails>>;
 };
 
@@ -115,9 +128,10 @@ export async function loadPreviewData(
       break;
 
     case "stories":
-      [data.stories, data.consentCounts] = await Promise.all([
+      [data.stories, data.consentCounts, data.socialLinks] = await Promise.all([
         getStories(),
         getConsentCounts(),
+        getSocialLinks(),
       ]);
       break;
 
@@ -139,15 +153,31 @@ export async function loadPreviewData(
       break;
 
     case "partner":
-      [data.partners, data.contact] = await Promise.all([
+      [data.partners, data.contact, data.socialLinks] = await Promise.all([
         getPublicPartners(),
         getContactDetails(),
+        getSocialLinks(),
       ]);
       break;
 
     case "volunteer":
       data.volunteerRoles = await getVolunteerRoles();
       break;
+
+    case "programme-school-reentry":
+    case "programme-economic-empowerment":
+    case "programme-dada-space":
+    case "programme-community-hub": {
+      const slug = pageKey.replace(/^programme-/, "");
+      const programme = await getProgramme(slug);
+      if (programme) {
+        data.programmePages = {
+          ...data.programmePages,
+          [slug]: { title: programme.title, body: programme.body },
+        };
+      }
+      break;
+    }
 
     case "ways-to-give": {
       const [tiers, rails, bank] = await Promise.all([

@@ -36,6 +36,10 @@ import {
 import { Programmes } from "@/components/sections/programmes";
 import { FaqContact, FaqEmpty } from "@/components/faq/sections";
 import { NewsEmpty } from "@/components/news/sections";
+import { ProgrammeContent } from "@/components/sections/programme-content";
+import { ProgrammeNarrative } from "@/components/sections/programme-narrative";
+import { LadiesRoom } from "@/components/stories/sections";
+import { PullQuote } from "@/components/site/pull-quote";
 import {
   PartnerApply,
   PartnerCannot,
@@ -285,6 +289,60 @@ export function ExactSectionPreview({
         <PartnerDirect section={section} contact={data.contact ?? FALLBACK_CONTACT} />
       );
 
+    /* ---- The programme pages ---- */
+
+    case "reentry-lead":
+    case "econ-lead":
+    case "dada-lead":
+    case "hub-lead": {
+      // The lead section is the frame around the journey: the scrolling panels
+      // come from the programme's own body, so the preview needs the programme.
+      const slug = form.page_key?.replace(/^programme-/, "") ?? "";
+      const programme = data.programmePages?.[slug];
+      const paragraphs = programme
+        ? programme.body
+            .split(/\n\s*\n/)
+            .map((paragraph) => paragraph.trim())
+            .filter(Boolean)
+        : [];
+
+      if (paragraphs.length === 0) {
+        return <ProgrammeContent section={section} />;
+      }
+
+      return (
+        <ProgrammeNarrative
+          paragraphs={paragraphs}
+          eyebrow={section.eyebrow}
+          heading={section.heading}
+          intro={section.body}
+        />
+      );
+    }
+
+    case "reentry-story":
+    case "econ-story":
+    case "dada-problems":
+    case "dada-why":
+    case "dada-how":
+    case "dada-quote":
+    case "hub-what":
+      return <ProgrammeContent section={section} />;
+
+    /* ---- The rest ---- */
+
+    case "about-quote":
+      return <PullQuote eyebrow={section.eyebrow} quote={section.heading} />;
+
+    case "stories-ladies-room":
+      return (
+        <LadiesRoom
+          section={section}
+          links={data.socialLinks ?? EMPTY_LINKS}
+          linksLabel="Where to find us"
+        />
+      );
+
     /* ---- Volunteer ---- */
 
     case "volunteer-roles":
@@ -404,6 +462,19 @@ export const EXACT_SECTION_KEYS = new Set([
   "volunteer-form",
   "volunteer-remote",
   "news-empty",
+  "stories-ladies-room",
+  "about-quote",
+  "reentry-lead",
+  "reentry-story",
+  "econ-lead",
+  "econ-story",
+  "dada-lead",
+  "dada-problems",
+  "dada-why",
+  "dada-how",
+  "dada-quote",
+  "hub-lead",
+  "hub-what",
   "faq-empty",
   "faq-contact",
   "partner-need",
@@ -483,4 +554,11 @@ const FALLBACK_STATUSES = {
   mpesa: "coming_soon",
   card: "coming_soon",
   bank: "coming_soon",
+} as never;
+
+/** The channels, when the preview has none. */
+const EMPTY_LINKS = {
+  linkedin: null,
+  facebook: null,
+  spotify: null,
 } as never;
