@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
-import Link from "next/link";
-import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
-
 import { PageHero } from "@/components/site/page-hero";
 import { Container } from "@/components/site/container";
+import {
+  ProgrammesMeasure,
+  ProgrammesPathway,
+  ProgrammesUnrestricted,
+} from "@/components/programmes/sections";
 import { ProgrammeCard } from "@/components/sections/programme-card";
-import { JourneySnake } from "@/components/sections/journey-snake";
 import { getProgrammes } from "@/lib/data/home";
 import { getProgrammeSections } from "@/lib/data/programmes";
 import { isVisible } from "@/lib/data/sections";
@@ -61,20 +62,6 @@ export const metadata: Metadata = {
  * marked with a visible caveat rather than asserted as fact. Confirm how the
  * programmes actually connect, then delete `unverified` and the note below.
  */
-/**
- * The pathway caveat is a gate, not copy.
- *
- * doc/roadmap/programmes.md is explicit that the sequence is a claim rather
- * than a description, and that a donor will ask: "If Dada Space participants
- * do not in practice feed into re-entry and economic programmes, do not imply
- * a pipeline."
- *
- * The editor can reword the caveat (it lives in `programmes-pathway.body`) but
- * cannot switch it off. Removing it requires a code change, and therefore a
- * conversation. Same reasoning as consent tiers.
- */
-const PATHWAY_UNVERIFIED = true;
-
 export default async function ProgrammesPage({
   params,
 }: PageProps<"/[locale]/programmes">) {
@@ -141,113 +128,14 @@ export default async function ProgrammesPage({
         </section>
 
         {/* ---- How they fit together ------------------------------------ */}
-        {isVisible(pathway) ? (
-          <section aria-labelledby="pathway-heading" className="bg-surface-lilac py-section">
-            <Container>
-              <div className="max-w-2xl">
-                {pathway.eyebrow && (
-                  <p className="text-sm font-medium tracking-wide text-brand-600 uppercase">
-                    {pathway.eyebrow}
-                  </p>
-                )}
-                <h2
-                  id="pathway-heading"
-                  className="mt-3 text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
-                >
-                  {pathway.heading}
-                </h2>
-              </div>
-
-              {PATHWAY_UNVERIFIED ? (
-                <p
-                  role="note"
-                  className="mt-8 max-w-2xl rounded-xl border-2 border-dashed border-brand-600/40 bg-surface p-5 text-sm leading-relaxed text-ink-muted"
-                >
-                  <span className="font-semibold text-brand-600">
-                    Draft — not yet verified.
-                  </span>{" "}
-                  {pathway.body}
-                </p>
-              ) : null}
-
-              <JourneySnake
-                items={(pathway.steps ?? []).map((step) => ({
-                  title: step.title,
-                  body: step.description,
-                }))}
-              />
-            </Container>
-          </section>
-        ) : null}
+        {isVisible(pathway) ? <ProgrammesPathway section={pathway} /> : null}
 
         {/* ---- How we measure ------------------------------------------- */}
-        {isVisible(measure) ? (
-          <section aria-labelledby="measure-heading" className="bg-brand py-section">
-            <Container>
-              <div className="max-w-2xl">
-                <h2
-                  id="measure-heading"
-                  className="text-3xl font-semibold tracking-tight text-ink-inverse sm:text-4xl"
-                >
-                  {measure.heading}
-                </h2>
-                <p className="measure mt-4 text-lg text-brand-100">
-                  {measure.body}
-                </p>
-                <Link
-                  href={measure.ctaHref ?? "/impact"}
-                  className="mt-6 inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2 text-sm font-medium text-brand-100 underline decoration-brand-100/40 underline-offset-4 hover:decoration-brand-100 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-50"
-                >
-                  {measure.ctaLabel}
-                  <svg
-                    aria-hidden="true"
-                    viewBox="0 0 24 24"
-                    className="size-4"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M5 12h14M13 6l6 6-6 6" />
-                  </svg>
-                </Link>
-              </div>
-            </Container>
-          </section>
-        ) : null}
+        {isVisible(measure) ? <ProgrammesMeasure section={measure} /> : null}
 
-        {/* ---- Support all three ---------------------------------------- */}
+        {/* ---- Support all of them -------------------------------------- */}
         {isVisible(unrestricted) ? (
-          <section aria-labelledby="unrestricted-heading" className="py-section bg-surface">
-            <Container>
-              <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16">
-                <div>
-                  <h2
-                    id="unrestricted-heading"
-                    className="text-3xl font-semibold tracking-tight text-brand-600 sm:text-4xl"
-                  >
-                    {unrestricted.heading}
-                  </h2>
-                  <p className="measure mt-4 text-lg text-ink-muted">
-                    {unrestricted.body}
-                  </p>
-                </div>
-
-                <div className="flex flex-col justify-center rounded-2xl border border-brand-600/30 bg-brand-50 p-8">
-                  <p className="measure text-ink-muted">
-                    {unrestricted.bodySecondary}
-                  </p>
-                  <InteractiveHoverButton
-                    href={unrestricted.ctaHref ?? "/donate"}
-                    className="mt-6 min-h-13 rounded-full bg-gold px-8 text-base font-semibold text-gold-ink w-fit"
-                  >
-                    {unrestricted.ctaLabel}
-                  </InteractiveHoverButton>
-                </div>
-              </div>
-            </Container>
-          </section>
+          <ProgrammesUnrestricted section={unrestricted} />
         ) : null}
       </main>
 

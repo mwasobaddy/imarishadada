@@ -41,6 +41,11 @@ import { ProgrammeNarrative } from "@/components/sections/programme-narrative";
 import { LadiesRoom } from "@/components/stories/sections";
 import { PullQuote } from "@/components/site/pull-quote";
 import {
+  ProgrammesMeasure,
+  ProgrammesPathway,
+  ProgrammesUnrestricted,
+} from "@/components/programmes/sections";
+import {
   PartnerApply,
   PartnerCannot,
   PartnerDirect,
@@ -267,6 +272,17 @@ export function ExactSectionPreview({
     case "faq-contact":
       return <FaqContact section={section} />;
 
+    /* ---- Programmes ---- */
+
+    case "programmes-pathway":
+      return <ProgrammesPathway section={section} />;
+
+    case "programmes-measure":
+      return <ProgrammesMeasure section={section} />;
+
+    case "programmes-unrestricted":
+      return <ProgrammesUnrestricted section={section} />;
+
     /* ---- Partner ---- */
 
     case "partner-need":
@@ -487,6 +503,9 @@ export const EXACT_SECTION_KEYS = new Set([
   "hub-what",
   "faq-empty",
   "faq-contact",
+  "programmes-pathway",
+  "programmes-measure",
+  "programmes-unrestricted",
   "partner-need",
   "partner-cannot",
   "partner-dd",
