@@ -2,6 +2,18 @@ import { getAuditLog } from "@/app/[locale]/admin/actions/audit-log";
 import { DataTable, StatusBadge } from "@/components/admin/data-table";
 import { EmptyState, PageHeader } from "@/components/admin/page-header";
 
+/**
+ * Who made the change.
+ *
+ * A person is their email address. A machine — a payment callback, a form on
+ * the public site — has no session, so it names itself in the metadata.
+ */
+function actorLabel(log: { actor_email: string | null; metadata: unknown }): string {
+  const meta = log.metadata as { actor?: unknown } | null;
+  if (meta && typeof meta.actor === "string" && meta.actor.trim()) return meta.actor;
+  return log.actor_email ?? "system";
+}
+
 export default async function AuditLogPage() {
   const logs = await getAuditLog(200);
 
@@ -44,15 +56,20 @@ export default async function AuditLogPage() {
               </td>
               <td className="px-4 py-3 text-ink-muted">{log.table_name}</td>
               <td className="px-4 py-3 text-ink-muted">
-                {log.actor_email ?? "unknown"}
+                {/*
+                  The actor. A person writes their email here; a machine — the
+                  M-Pesa callback, a form on the public site — names itself in
+                  the metadata, because it has no session and no email address.
+                */}
+                {actorLabel(log)}
               </td>
               <td className="max-w-xs truncate px-4 py-3 font-mono text-xs text-ink-muted">
-                {log.metadata
-                  ? JSON.stringify(log.metadata).slice(0, 80)
-                  : log.after
-                    ? JSON.stringify(log.after).slice(0, 80)
-                    : log.before
-                      ? JSON.stringify(log.before).slice(0, 80)
+                {log.after
+                  ? JSON.stringify(log.after).slice(0, 80)
+                  : log.before
+                    ? JSON.stringify(log.before).slice(0, 80)
+                    : log.metadata
+                      ? JSON.stringify(log.metadata).slice(0, 80)
                       : "—"}
               </td>
             </tr>

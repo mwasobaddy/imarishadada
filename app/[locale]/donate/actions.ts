@@ -18,6 +18,7 @@ import {
   MockModeRefusedError,
   PaymentNotConfiguredError,
 } from "@/lib/donate/adapter";
+import { recordAudit } from "@/lib/admin/audit";
 import { bankRailUsable, getBankDetails, getPaymentRails } from "@/lib/data/donate";
 import { getGivingTiers } from "@/lib/data/home";
 import {
@@ -336,6 +337,29 @@ async function persistPendingDonation(args: {
     return false;
   }
 
+  // The ledger is money, so every row in it is in the audit trail.
+  //
+  // The snapshot carries the reference, the rail and the amount — not the
+  // donor's name, email or phone. Those are in the row itself, under the
+  // ledger's own access rules, and copying them into a second table would
+  // give the same person two places to look and one more place to leak.
+  if (data) {
+    await recordAudit({
+      action: "create",
+      tableName: "donations",
+      rowId: data.id,
+      after: {
+        reference: args.reference,
+        rail: args.rail,
+        cadence: args.cadence,
+        total: args.donation.total,
+        currency: args.donation.currency,
+        status: "pending",
+      },
+      metadata: { actor: "donation form" },
+    });
+  }
+
   return Boolean(data);
 }
 
@@ -368,7 +392,19 @@ async function markCompleted(
       `[donate] CRITICAL: payment completed for ${reference} but the ledger update failed:`,
       error.message,
     );
+    return;
   }
+
+  await recordAudit({
+    action: "update",
+    tableName: "donations",
+    after: {
+      reference,
+      status: "completed",
+      provider: meta.simulated ? "mock" : "provider",
+    },
+    metadata: { actor: meta.simulated ? "donation form (simulated)" : "payment provider" },
+  });
 }
 
 async function markFailed(reference: string, message: string): Promise<void> {

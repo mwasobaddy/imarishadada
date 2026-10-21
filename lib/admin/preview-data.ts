@@ -1,9 +1,23 @@
 import { getCoreValues, getTeamMembers } from "@/lib/data/about";
 import { getContactDetails } from "@/lib/data/contact";
 import { getGivingTiers, getProgrammes } from "@/lib/data/home";
-import { getConsentCounts, getStories, type ConsentTierCounts, type StoryCard } from "@/lib/data/impact";
+import {
+  getAllImpactStats,
+  getConsentCounts,
+  getMeasurementGaps,
+  getStories,
+  type ConsentTierCounts,
+  type StoryCard,
+} from "@/lib/data/impact";
 import { getPublicPartners, type PublicPartner } from "@/lib/data/partner";
-import type { CoreValue, GivingTier, Programme, SiteSection, TeamMember } from "@/lib/data/types";
+import type {
+  CoreValue,
+  GivingTier,
+  ImpactStat,
+  Programme,
+  SiteSection,
+  TeamMember,
+} from "@/lib/data/types";
 
 /**
  * The data the admin's live preview needs.
@@ -34,6 +48,10 @@ export type PreviewData = {
   teamMembers?: TeamMember[];
   stories?: StoryCard[];
   consentCounts?: ConsentTierCounts;
+  /** The dated figures, for the impact page. */
+  stats?: ImpactStat[];
+  /** The things we do not yet measure, for the impact page. */
+  gaps?: string[];
   contact?: Awaited<ReturnType<typeof getContactDetails>>;
 };
 
@@ -74,6 +92,14 @@ export async function loadPreviewData(
       [data.stories, data.consentCounts] = await Promise.all([
         getStories(),
         getConsentCounts(),
+      ]);
+      break;
+
+    case "impact":
+      [data.stats, data.gaps, data.programmes] = await Promise.all([
+        getAllImpactStats(),
+        getMeasurementGaps(),
+        getProgrammes(),
       ]);
       break;
 

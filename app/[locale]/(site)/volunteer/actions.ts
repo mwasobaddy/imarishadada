@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 
 import { checkRateLimit } from "@/lib/data/contact";
 import { isHoneypotTripped, submittedTooQuickly } from "@/lib/contact/enquiry";
+import { recordAudit } from "@/lib/admin/audit";
 import { createServiceClient, isServiceRoleConfigured } from "@/lib/supabase/client";
 import {
   applicationFieldErrors,
@@ -115,22 +116,26 @@ export async function submitVolunteerApplication(input: {
 
   const data = parsed.data;
 
-  const { error } = await createServiceClient().from("volunteer_applications").insert({
-    reference,
-    name: data.name,
-    email: data.email,
-    phone: data.phone || null,
-    role_id: data.roleId ?? null,
-    motivation: data.motivation,
-    // `skills` holds the languages offered; `skills_detail` holds the free text.
-    // The mapping is recorded on the columns — see migration 0026.
-    skills: data.languages,
-    skills_detail: data.skillsDetail || null,
-    availability: data.availability,
-    // `request_hash` has no column on this table, so the client hash is not
-    // stored. The rate limiter already holds it, keyed by bucket.
-    status: "new",
-  });
+  const { data: row, error } = await createServiceClient()
+    .from("volunteer_applications")
+    .insert({
+      reference,
+      name: data.name,
+      email: data.email,
+      phone: data.phone || null,
+      role_id: data.roleId ?? null,
+      motivation: data.motivation,
+      // `skills` holds the languages offered; `skills_detail` holds the free text.
+      // The mapping is recorded on the columns — see migration 0026.
+      skills: data.languages,
+      skills_detail: data.skillsDetail || null,
+      availability: data.availability,
+      // `request_hash` has no column on this table, so the client hash is not
+      // stored. The rate limiter already holds it, keyed by bucket.
+      status: "new",
+    })
+    .select("id")
+    .single();
 
   if (error) {
     console.error("[volunteer] failed to record application:", error.message);
@@ -140,6 +145,18 @@ export async function submitVolunteerApplication(input: {
         "Something went wrong on our side and your application was not sent. Please try again, or message us on WhatsApp.",
     };
   }
+
+  // An application carries a volunteer's name, email, phone and motivation.
+  // The audit trail records that one arrived and which role it was for — not
+  // the person. Those details stay in the applications table, under its own
+  // access rules and its own retention.
+  await recordAudit({
+    action: "create",
+    tableName: "volunteer_applications",
+    rowId: row.id,
+    after: { reference, role_id: data.roleId ?? null },
+    metadata: { actor: "volunteer form" },
+  });
 
   return { status: "sent", reference };
 }

@@ -13,6 +13,7 @@ import {
   isHoneypotTripped,
   submittedTooQuickly,
 } from "@/lib/contact/enquiry";
+import { recordAudit } from "@/lib/admin/audit";
 import { createServiceClient, isServiceRoleConfigured } from "@/lib/supabase/client";
 
 /**
@@ -103,15 +104,19 @@ export async function submitEnquiry(input: {
   const identifier = clientHash(requestHeaders) ?? "unknown";
   const data = parsed.data;
 
-  const { error } = await createServiceClient().from("enquiries").insert({
-    reference,
-    name: data.name || null,
-    email: data.email,
-    phone: data.phone || null,
-    enquiry_type: data.enquiryType,
-    message: data.message,
-    request_hash: identifier,
-  });
+  const { data: row, error } = await createServiceClient()
+    .from("enquiries")
+    .insert({
+      reference,
+      name: data.name || null,
+      email: data.email,
+      phone: data.phone || null,
+      enquiry_type: data.enquiryType,
+      message: data.message,
+      request_hash: identifier,
+    })
+    .select("id")
+    .single();
 
   if (error) {
     console.error("[contact] failed to record enquiry:", error.message);
@@ -121,6 +126,18 @@ export async function submitEnquiry(input: {
         "Something went wrong on our side and your message was not sent. Please try again, or message us on WhatsApp.",
     };
   }
+
+  // An enquiry is a person's message. The audit trail records that one
+  // arrived, what kind it was and its reference — not the name, the email
+  // address, the phone number or the message itself. Those stay in the
+  // enquiries table, under its own access rules.
+  await recordAudit({
+    action: "create",
+    tableName: "enquiries",
+    rowId: row.id,
+    after: { reference, enquiry_type: data.enquiryType },
+    metadata: { actor: "contact form" },
+  });
 
   return { status: "sent", reference };
 }

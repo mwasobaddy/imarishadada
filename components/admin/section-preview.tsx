@@ -12,7 +12,7 @@ import {
 } from "@/lib/admin/section-form";
 import {
   ExactSectionPreview,
-  EXACT_SECTION_KEYS,
+  isExactSectionKey,
 } from "@/components/admin/section-preview-registry";
 import type { PreviewData } from "@/lib/admin/preview-data";
 
@@ -52,7 +52,7 @@ export function SectionPreview({
   active: boolean;
   data: PreviewData;
 }) {
-  const isExact = EXACT_SECTION_KEYS.has(form.section_key);
+  const isExact = isExactSectionKey(form.section_key);
 
   return (
     <div>

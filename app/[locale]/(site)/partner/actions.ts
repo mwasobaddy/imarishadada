@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 
 import { isHoneypotTripped, submittedTooQuickly } from "@/lib/contact/enquiry";
 import { checkRateLimit } from "@/lib/data/contact";
+import { recordAudit } from "@/lib/admin/audit";
 import { createServiceClient, isServiceRoleConfigured } from "@/lib/supabase/client";
 import {
   partnerEnquirySchema,
@@ -100,20 +101,24 @@ export async function submitPartnerEnquiry(input: {
 
   const data = parsed.data;
 
-  const { error } = await createServiceClient().from("partner_enquiries").insert({
-    reference,
-    organisation: data.organisation,
-    contact_name: data.contactName,
-    email: data.email,
-    phone: data.phone || null,
-    contact_role: data.contactRole || null,
-    organisation_type: data.organisationType,
-    partnership_type: data.partnershipType,
-    intended_amount: data.intendedAmount || null,
-    intended_programme: data.intendedProgramme || null,
-    message: data.message,
-    status: "new",
-  });
+  const { data: row, error } = await createServiceClient()
+    .from("partner_enquiries")
+    .insert({
+      reference,
+      organisation: data.organisation,
+      contact_name: data.contactName,
+      email: data.email,
+      phone: data.phone || null,
+      contact_role: data.contactRole || null,
+      organisation_type: data.organisationType,
+      partnership_type: data.partnershipType,
+      intended_amount: data.intendedAmount || null,
+      intended_programme: data.intendedProgramme || null,
+      message: data.message,
+      status: "new",
+    })
+    .select("id")
+    .single();
 
   if (error) {
     console.error("[partner] failed to record enquiry:", error.message);
@@ -123,6 +128,21 @@ export async function submitPartnerEnquiry(input: {
         "Something went wrong on our side and your enquiry was not sent. Please try again, or message us on WhatsApp.",
     };
   }
+
+  // The organisation's name and the contact's details are not copied into the
+  // audit trail. The reference, the type of partnership and the intended
+  // amount are enough to see what came in and to match it to the row.
+  await recordAudit({
+    action: "create",
+    tableName: "partner_enquiries",
+    rowId: row.id,
+    after: {
+      reference,
+      partnership_type: data.partnershipType,
+      intended_amount: data.intendedAmount ?? null,
+    },
+    metadata: { actor: "partner form" },
+  });
 
   return { status: "sent", reference };
 }

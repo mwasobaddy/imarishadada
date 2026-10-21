@@ -3,11 +3,16 @@
 import type { ReactNode } from "react";
 
 import { AboutApproach, AboutStory, AboutValues, AboutVisionMission, AboutWork } from "@/components/about/story";
+import { ImpactByProgramme } from "@/components/impact/by-programme";
+import { ImpactGaps } from "@/components/impact/gaps";
+import { ImpactMethodology } from "@/components/impact/methodology";
+import { ImpactReports } from "@/components/impact/reports";
 import { AboutTeam } from "@/components/about/team";
 import { ContactFaqs, ContactMethods } from "@/components/sections/contact-methods";
 import { GivingWays } from "@/components/sections/giving-ways";
 import { Hero } from "@/components/sections/hero";
 import { PartnerStrip } from "@/components/sections/partner-strip";
+import { StatCounter } from "@/components/sections/stat-counter";
 import { Programmes } from "@/components/sections/programmes";
 import { PageHero } from "@/components/site/page-hero";
 import { ConsentLedger, ConsentNote } from "@/components/stories/consent";
@@ -17,6 +22,7 @@ import type { ContactDetails } from "@/lib/data/contact";
 import type { ConsentTierCounts } from "@/lib/data/impact";
 import type { PreviewData } from "@/lib/admin/preview-data";
 import { HERO_PORTRAIT } from "@/lib/data/hero-portrait";
+import { REPORTING_PERIOD } from "@/lib/data/reporting-period";
 
 /**
  * The exact preview: the section as the public page renders it.
@@ -156,6 +162,37 @@ export function ExactSectionPreview({
         />
       );
 
+    /* ---- Impact ---- */
+
+    case "impact-headline":
+      return (
+        <StatCounter
+          stats={data.stats ?? []}
+          headingId="impact-headline-heading"
+          heading={form.heading}
+          intro={form.body || undefined}
+          period={`${REPORTING_PERIOD.from} – ${REPORTING_PERIOD.to}`}
+        />
+      );
+
+    case "impact-by-programme":
+      return (
+        <ImpactByProgramme
+          section={section}
+          programmes={data.programmes ?? []}
+          stats={data.stats ?? []}
+        />
+      );
+
+    case "impact-methodology":
+      return <ImpactMethodology section={section} />;
+
+    case "impact-gaps":
+      return <ImpactGaps section={section} gaps={data.gaps ?? []} />;
+
+    case "impact-reports":
+      return <ImpactReports section={section} />;
+
     /* ---- Ways to give ---- */
 
     case "ways-ladder":
@@ -187,6 +224,10 @@ export function ExactSectionPreview({
  *
  * Used by the admin to say which kind of preview is on screen, so nobody has
  * to guess whether they are looking at the page or an impression of it.
+ *
+ * Every masthead is in it: they all render through `PageHero`, and the
+ * renderer treats any `-hero` key that way. `isExactSectionKey` is the single
+ * answer to "is this section exact?", used by both the renderer and the label.
  */
 export const EXACT_SECTION_KEYS = new Set([
   "home-hero",
@@ -205,6 +246,11 @@ export const EXACT_SECTION_KEYS = new Set([
   "stories-grid",
   "stories-consent",
   "ways-ladder",
+  "impact-headline",
+  "impact-by-programme",
+  "impact-methodology",
+  "impact-gaps",
+  "impact-reports",
 ]);
 
 /**
@@ -229,3 +275,13 @@ const EMPTY_COUNTS: ConsentTierCounts = {
   named_no_face: 0,
   anonymised: 0,
 };
+
+/**
+ * Whether a section's preview is the real component.
+ *
+ * The renderer and the label must agree, or the editor is told one thing and
+ * shown another. Both ask this.
+ */
+export function isExactSectionKey(sectionKey: string): boolean {
+  return EXACT_SECTION_KEYS.has(sectionKey) || sectionKey.endsWith("-hero");
+}

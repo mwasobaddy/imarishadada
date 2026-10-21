@@ -1,6 +1,7 @@
 import { timingSafeEqual, createHmac } from "node:crypto";
 import { NextResponse } from "next/server";
 
+import { recordAudit } from "@/lib/admin/audit";
 import { createServiceClient, isServiceRoleConfigured } from "@/lib/supabase/client";
 import type { Json } from "@/lib/supabase/types";
 
@@ -155,6 +156,23 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "could not record event" }, { status: 500 });
   }
 
+  // The provider event is the first half of the money trail. The audit trail
+  // says a signed callback arrived, for which gift, and whether it succeeded.
+  // The payload itself stays in `payment_transactions.payload`, where the
+  // ledger's own rules keep it.
+  await recordAudit({
+    action: "create",
+    tableName: "payment_transactions",
+    rowId: donation.id,
+    after: {
+      provider: "mpesa",
+      provider_ref: reference,
+      event: succeeded ? "stk_success" : `stk_failure_${resultCode}`,
+      signature_verified: true,
+    },
+    metadata: { actor: "M-Pesa" },
+  });
+
   // Update the ledger. `eq("status", "pending")` means a callback arriving after
   // the row already completed is a no-op rather than a rewrite — the append-only
   // trigger would reject a monetary change anyway, but this avoids the error.
@@ -182,6 +200,20 @@ export async function POST(request: Request) {
     );
     return NextResponse.json({ error: "could not update donation" }, { status: 500 });
   }
+
+  // The ledger is money. Every state change in it is in the audit trail, with
+  // the amount and the reference and nothing that identifies the donor.
+  await recordAudit({
+    action: "update",
+    tableName: "donations",
+    rowId: donation.id,
+    after: {
+      reference,
+      status: succeeded ? "completed" : "failed",
+      provider: "mpesa",
+    },
+    metadata: { actor: "M-Pesa", result_code: resultCode },
+  });
 
   return NextResponse.json({ received: true });
 }

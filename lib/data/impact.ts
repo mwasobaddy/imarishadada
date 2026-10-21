@@ -311,11 +311,7 @@ export async function getAllImpactStats() {
  * `new Date()`, which would change on every render and make the page
  * non-deterministic.
  */
-export const REPORTING_PERIOD = {
-  from: "1 April 2025",
-  to: "31 March 2026",
-  label: "2025–26",
-} as const;
+export { REPORTING_PERIOD } from "@/lib/data/reporting-period";
 
 export const METHODOLOGY = [
   {
