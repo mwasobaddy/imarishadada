@@ -86,7 +86,7 @@ export async function updatePartnerEnquiryStatus(id: string, status: string, not
     after: data,
   });
 
-  revalidatePath("/admin/partner-enquiries");
+  revalidatePath("/admin/enquiries");
   return data;
 }
 
@@ -126,6 +126,6 @@ export async function updateVolunteerApplicationStatus(id: string, status: strin
     after: data,
   });
 
-  revalidatePath("/admin/volunteer-applications");
+  revalidatePath("/admin/enquiries");
   return data;
 }

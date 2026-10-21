@@ -56,12 +56,18 @@ export function EnquiriesInbox({
   enquiries,
   partnerEnquiries,
   volunteerApplications,
+  initialTab = "contact",
 }: {
   enquiries: Enquiry[];
   partnerEnquiries: PartnerEnquiry[];
   volunteerApplications: VolunteerApp[];
+  /**
+   * Which tab to open. Set from `?tab=` so the sidebar's permission-gated
+   * entries can deep-link here — see the note on `/admin/enquiries`.
+   */
+  initialTab?: "contact" | "partner" | "volunteer";
 }) {
-  const [tab, setTab] = useState<"contact" | "partner" | "volunteer">("contact");
+  const [tab, setTab] = useState<"contact" | "partner" | "volunteer">(initialTab);
   const [pending, startTransition] = useTransition();
 
   return (
