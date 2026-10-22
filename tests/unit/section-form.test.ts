@@ -97,7 +97,7 @@ describe("toSectionForm", () => {
     const result = toSectionForm({
       ...toRow(form()),
       steps: [{ title: "One" }, null, "nonsense"],
-      images: [{ path: "/images/a.avif", alt: "A", caption: "C" }],
+      images: [{ path: "/images/a.webp", alt: "A", caption: "C" }],
     });
 
     expect(result.steps).toEqual([
@@ -106,7 +106,7 @@ describe("toSectionForm", () => {
       { title: "", description: "" },
     ]);
     expect(result.images).toEqual([
-      { path: "/images/a.avif", alt: "A", caption: "C" },
+      { path: "/images/a.webp", alt: "A", caption: "C" },
     ]);
   });
 
@@ -135,11 +135,11 @@ describe("toPatch", () => {
     const patch = toPatch(
       form({
         steps: [{ title: "Enrol", description: "She signs up." }],
-        images: [{ path: "/images/a.avif", alt: "A", caption: "  " }],
+        images: [{ path: "/images/a.webp", alt: "A", caption: "  " }],
       }),
     );
     expect(patch.steps).toEqual([{ title: "Enrol", description: "She signs up." }]);
-    expect(patch.images).toEqual([{ path: "/images/a.avif", alt: "A" }]);
+    expect(patch.images).toEqual([{ path: "/images/a.webp", alt: "A" }]);
   });
 
   it("sends every field the public page can render, so nothing is silently dropped", () => {
@@ -175,7 +175,7 @@ describe("isDirty", () => {
     ["heading", { heading: "Changed" }],
     ["body_secondary", { body_secondary: "" }],
     ["steps", { steps: [{ title: "One", description: "" }] }],
-    ["images", { images: [{ path: "/images/a.avif", alt: "A", caption: "" }] }],
+    ["images", { images: [{ path: "/images/a.webp", alt: "A", caption: "" }] }],
     ["seo_title", { seo_title: "A title" }],
   ])("detects a change to %s", (_name, patch) => {
     expect(isDirty(form(patch), form())).toBe(true);
@@ -196,7 +196,7 @@ describe("discardChanges", () => {
   it("returns the saved values without sharing array references", () => {
     const saved = form({
       steps: [{ title: "One", description: "First" }],
-      images: [{ path: "/images/a.avif", alt: "A", caption: "" }],
+      images: [{ path: "/images/a.webp", alt: "A", caption: "" }],
     });
     const copy = discardChanges(saved);
 
@@ -218,7 +218,7 @@ describe("sectionWarnings", () => {
   });
 
   it("asks for alt text when a single image is set", () => {
-    const messages = sectionWarnings(form({ image_path: "/images/a.avif" }));
+    const messages = sectionWarnings(form({ image_path: "/images/a.webp" }));
     expect(messages.some((m) => m.includes("Describe the image"))).toBe(true);
   });
 
@@ -231,8 +231,8 @@ describe("sectionWarnings", () => {
       form({
         images: [
           { path: "", alt: "", caption: "" },
-          { path: "/images/b.avif", alt: "", caption: "" },
-          { path: "/images/c.avif", alt: "C", caption: "" },
+          { path: "/images/b.webp", alt: "", caption: "" },
+          { path: "/images/c.webp", alt: "C", caption: "" },
         ],
       }),
     );
@@ -291,7 +291,7 @@ describe("previewKind", () => {
       previewKind(
         form({
           section_key: "about-carousel",
-          images: [{ path: "/images/a.avif", alt: "A", caption: "" }],
+          images: [{ path: "/images/a.webp", alt: "A", caption: "" }],
           steps: [{ title: "One", description: "" }],
         }),
       ),

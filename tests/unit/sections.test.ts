@@ -98,11 +98,11 @@ describe("resolveProgrammeImage", () => {
     expect(
       resolveProgrammeImage(
         "school-reentry",
-        "/images/programmes/re-entry/re-entry-mother-writing.avif",
+        "/images/programmes/re-entry/re-entry-mother-writing.webp",
         "A young mother writing during a session",
       ),
     ).toEqual({
-      imagePath: "/images/programmes/re-entry/re-entry-mother-writing.avif",
+      imagePath: "/images/programmes/re-entry/re-entry-mother-writing.webp",
       imageAlt: "A young mother writing during a session",
     });
   });
@@ -130,7 +130,7 @@ describe("resolveProgrammeImage", () => {
     // (`programmes_alt_required_with_image`). If one slips through, the
     // consumer must decide — this must not silently supply a filename.
     expect(
-      resolveProgrammeImage("dada-space", "/images/x.avif", null).imageAlt,
+      resolveProgrammeImage("dada-space", "/images/x.webp", null).imageAlt,
     ).toBeNull();
   });
 });

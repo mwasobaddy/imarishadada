@@ -249,7 +249,7 @@ export function AboutField() {
         <figure className="flex flex-col gap-3">
           <div className="relative overflow-hidden rounded-card bg-surface-lilac">
             <Image
-              src="/images/about/about-outdoor-candid.avif"
+              src="/images/about/about-outdoor-candid.webp"
               alt="Participants in branded t-shirts talking together outdoors after a session in Kibera"
               width={1400}
               height={933}

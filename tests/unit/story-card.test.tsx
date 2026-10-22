@@ -35,7 +35,7 @@ const base: StoryCard = {
   quote: "Before Dada Space I was hiding my pregnancy from everyone.",
   attribution: "Amina, 19 · Kibera",
   consentTier: "named_full",
-  imagePath: "/images/consent/amina.avif",
+  imagePath: "/images/consent/amina.webp",
   imageAlt: "Amina writing at a desk during a session",
   programmeSlug: "school-reentry",
   programmeTitle: "School Re-entry",
@@ -59,12 +59,12 @@ describe("StoryCardItem — consent tiers", () => {
   });
 
   it("renders no image element for named_no_face, even when a path is set", () => {
-    renderCard({ consentTier: "named_no_face", imagePath: "/images/consent/amina.avif" });
+    renderCard({ consentTier: "named_no_face", imagePath: "/images/consent/amina.webp" });
     expect(screen.queryByTestId("story-photo")).not.toBeInTheDocument();
   });
 
   it("renders no image element for anonymised, even when a path is set", () => {
-    renderCard({ consentTier: "anonymised", imagePath: "/images/consent/amina.avif" });
+    renderCard({ consentTier: "anonymised", imagePath: "/images/consent/amina.webp" });
     expect(screen.queryByTestId("story-photo")).not.toBeInTheDocument();
   });
 

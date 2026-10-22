@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
  * A broken image reference does not fail a build. Next.js renders the `<img>`
  * with a src that 404s at runtime, and the page looks fine in every test that
  * checks structure rather than pixels. This exact class of bug shipped once:
- * the impact page referenced `/images/impact/impact-mothers-and-babies.avif`,
+ * the impact page referenced `/images/impact/impact-mothers-and-babies.webp`,
  * which had been filed under `programmes/re-entry/` by the selection sort, so
  * it was never converted into `public/`.
  *

@@ -209,12 +209,12 @@ const FALLBACKS: Record<string, Omit<SiteSection, "active">> = {
     ctaLabel: null,
     ctaHref: null,
     images: [
-      { path: "/images/about/about-two-women-classroom.avif", alt: "Two young women smiling together in a classroom in Kibera" },
-      { path: "/images/about/about-mentor-and-participant.avif", alt: "A participant and a younger girl seated together during a session" },
-      { path: "/images/about/about-core-values-presentation.avif", alt: "A participant presenting a chart to her group during a session" },
-      { path: "/images/about/about-outdoor-candid.avif", alt: "Participants in branded t-shirts talking outdoors after a session" },
-      { path: "/images/about/about-group-outdoors.avif", alt: "The full group photographed outside the community centre" },
-      { path: "/images/about/about-facilitation.avif", alt: "A participant drawing on a flipchart while the group watches" },
+      { path: "/images/about/about-two-women-classroom.webp", alt: "Two young women smiling together in a classroom in Kibera" },
+      { path: "/images/about/about-mentor-and-participant.webp", alt: "A participant and a younger girl seated together during a session" },
+      { path: "/images/about/about-core-values-presentation.webp", alt: "A participant presenting a chart to her group during a session" },
+      { path: "/images/about/about-outdoor-candid.webp", alt: "Participants in branded t-shirts talking outdoors after a session" },
+      { path: "/images/about/about-group-outdoors.webp", alt: "The full group photographed outside the community centre" },
+      { path: "/images/about/about-facilitation.webp", alt: "A participant drawing on a flipchart while the group watches" },
     ],
   },
   /**
@@ -279,10 +279,10 @@ const FALLBACKS: Record<string, Omit<SiteSection, "active">> = {
     ctaLabel: null,
     ctaHref: null,
     images: [
-      { path: "/images/impact/impact-group-with-banner.avif", alt: "The full group of participants photographed with the organisation's banner", caption: "The cohort behind the 2025–26 figures" },
-      { path: "/images/impact/impact-supplies-distributed.avif", alt: "Participants handing out supplies to families at the community centre", caption: "What a gift becomes on the ground" },
-      { path: "/images/impact/impact-community-meal.avif", alt: "A community meal served at the community centre in Kibera", caption: "Community outreach, Kibera" },
-      { path: "/images/impact/impact-group-outdoors.avif", alt: "Participants and staff standing together outside the community centre, smiling", caption: "The team and the girls, Kibera" },
+      { path: "/images/impact/impact-group-with-banner.webp", alt: "The full group of participants photographed with the organisation's banner", caption: "The cohort behind the 2025–26 figures" },
+      { path: "/images/impact/impact-supplies-distributed.webp", alt: "Participants handing out supplies to families at the community centre", caption: "What a gift becomes on the ground" },
+      { path: "/images/impact/impact-community-meal.webp", alt: "A community meal served at the community centre in Kibera", caption: "Community outreach, Kibera" },
+      { path: "/images/impact/impact-group-outdoors.webp", alt: "Participants and staff standing together outside the community centre, smiling", caption: "The team and the girls, Kibera" },
     ],
   },
 };
